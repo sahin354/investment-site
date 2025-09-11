@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Adani Corporation</title>
+  <link rel="stylesheet" href="auth-style.css">
+</head>
+<body>
+
+  <header class="auth-header">
+    Adani Corporation
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-box">
+      <div class="logo-container">
+        <img src="https://placehold.co/100x100/002855/FFFFFF?text=Logo" alt="Company Logo">
+      </div>
+      <h2>Create Account</h2>
+      <form id="registerForm">
+        <div class="input-group">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Create Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter a password" required>
+        </div>
+        <div class="input-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+        </div>
+        <button type="submit" class="auth-btn">Register</button>
+      </form>
+      <div class="form-link">
+        <a href="login.html">Already have an account? Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
