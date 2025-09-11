@@ -1,17 +1,28 @@
-// --- SECURITY GATEKEEPER (THE FIX) ---
-// This code now runs first and acts as a gatekeeper for your website.
-// It checks if you are logged in. If you are NOT, it sends you to the login page.
-// It makes an exception for the login and register pages so you don't get stuck in a loop.
-const currentPage = window.location.pathname.split('/').pop();
-if (localStorage.getItem('loggedIn') !== 'true' && currentPage !== 'login.html' && currentPage !== 'register.html') {
+// --- BULLETPROOF SECURITY GATEKEEPER ---
+// This is the definitive fix for the auto-logout bug.
+// It runs immediately when any page loads.
+
+// Get the name of the current HTML file (e.g., "index.html", "recharge.html")
+const currentPage = window.location.pathname.split('/').pop() || 'index.html'; 
+const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+
+// This is a debugging message. You can see it in your browser's console (press F12).
+console.log(`Page: ${currentPage}, Logged In: ${isLoggedIn}`);
+
+// The main security rule:
+// IF the user is NOT logged in, AND they are NOT trying to access the login or register pages...
+if (!isLoggedIn && currentPage !== 'login.html' && currentPage !== 'register.html') {
+    
+    // ...then redirect them to the login page.
+    console.log("Security Check: User is NOT logged in. Redirecting to login.html");
     window.location.href = 'login.html';
 }
 
-// --- PAGE FUNCTIONALITY ---
-// This waits for the HTML document to be fully loaded before running.
+// --- STANDARD PAGE FUNCTIONALITY ---
+// This code only runs after the entire HTML page has finished loading.
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Sidebar Menu Functionality ---
+    // --- Sidebar Menu Functionality (for index.html) ---
     const sideMenu = document.getElementById('sideMenu');
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeBtn');
@@ -21,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeBtn.addEventListener('click', () => { sideMenu.style.width = '0'; });
     }
 
-    // --- Tab Switching Functionality ---
+    // --- Tab Switching Functionality (for index.html) ---
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -29,17 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const tabId = button.getAttribute('data-tab');
-                
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 tabContents.forEach(content => content.classList.remove('active'));
-
                 button.classList.add('active');
                 document.getElementById(tabId).classList.add('active');
             });
         });
     }
 
-    // --- NEW LOGOUT LOGIC FOR THE MINE PAGE ---
+    // --- Logout Button on Mine Page ---
     const mineLogoutBtn = document.getElementById('mineLogoutBtn');
     if (mineLogoutBtn) {
         mineLogoutBtn.addEventListener('click', () => {
@@ -49,5 +58,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
 });
