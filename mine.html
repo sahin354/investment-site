@@ -5,57 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mine - Adani Corporation</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
-
-  <!-- Top bar -->
   <header class="top-bar">Adani Corporation - Mine</header>
-
   <main>
-    <!-- Profile Section -->
     <section class="profile">
-      <h2>Adani Corporation (1234567890)</h2>
-      <div class="badges">
-        <span class="badge">ID: 2</span>
-        <span class="badge">VIP 135</span>
-      </div>
+      <!-- These will be filled by JavaScript -->
+      <h2 id="userName">Loading...</h2>
+      <p id="userPhone">Loading...</p>
+      
       <div class="balances">
-        <div>₹ 4772.00<br><small>Balance</small></div>
-        <div>₹ 0.03<br><small>Agent Balance</small></div>
+        <div>₹ <span id="userBalance">0.00</span><br><small>Balance</small></div>
+        <div>₹ <span id="agentBalance">0.00</span><br><small>Agent Balance</small></div>
       </div>
       <div class="actions">
-        <!-- This link triggers the bug. The new script.js will fix it. -->
         <a href="recharge.html" class="btn-deposit">⬇ Deposit</a>
         <a href="#" class="btn-withdraw">⬆ Withdraw</a>
       </div>
     </section>
-
-    <!-- Menu Section -->
     <nav class="menu">
-      <a href="#" class="menu-item">📄 <span>Deposit Details</span></a>
-      <a href="#" class="menu-item">🏦 <span>My Bank Account</span></a>
-      <a href="#" class="menu-item">💰 <span>Withdraw Details</span></a>
-      <a href="#" class="menu-item">💬 <span>Chat With Support</span></a>
-      <a href="#" class="menu-item">📩 <span>Support Reply Message</span></a>
+      <!-- Menu items... -->
     </nav>
-
-    <!-- Logout Button Section -->
     <div class="logout-section">
       <button id="mineLogoutBtn" class="logout-button">Logout</button>
     </div>
   </main>
-
   <div class="bottom-nav-spacer"></div>
-
-  <!-- Bottom Navigation -->
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
     <a href="refer.html">Refer</a>
     <a href="mine.html">Mine</a>
   </footer>
-
-  <!-- Make sure the script is linked at the very end -->
   <script src="script.js"></script>
 </body>
 </html>
