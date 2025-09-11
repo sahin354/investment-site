@@ -1,11 +1,11 @@
+/* --- General/Shared Styles --- */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  padding-bottom: 60px; /* Add padding to prevent overlap with bottom nav */
+  background-color: #f5f5f5;
+  padding-bottom: 60px;
 }
 
-/* Top yellow bar */
 .top-bar {
   background-color: #FFD700;
   color: black;
@@ -16,16 +16,47 @@ body {
   position: relative;
 }
 
-/* Hamburger button */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #FFD700;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid #ccc;
+  z-index: 500;
+}
+
+.bottom-nav a {
+  text-decoration: none;
+  color: black;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+.bottom-nav-spacer {
+    height: 60px;
+}
+
+.card {
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* --- index.html specific styles --- */
 .menu-btn {
   position: absolute;
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   width: 25px;
   height: 18px;
 }
@@ -36,9 +67,9 @@ body {
   width: 100%;
   background-color: black;
   border-radius: 2px;
+  margin: 3px 0;
 }
 
-/* Sidebar menu */
 .side-menu {
   height: 100%;
   width: 0;
@@ -69,7 +100,7 @@ body {
 }
 
 .logout-link {
-  margin-top: auto; /* Pushes logout to the bottom */
+  margin-top: auto;
   background: #FFD700;
   color: black !important;
   font-weight: bold;
@@ -85,18 +116,14 @@ body {
   cursor: pointer;
 }
 
-/* Banner */
 .banner {
   width: 100%;
   height: auto;
-  display: block; /* Removes bottom space under the image */
+  display: block;
 }
 
-/* Tabs for Primary / VIP / Purchased */
 .tabs {
   display: flex;
-  justify-content: center;
-  margin: 10px 0;
 }
 
 .tabs button {
@@ -118,33 +145,11 @@ body {
   color: white;
 }
 
-/* Tab content */
-.tab-content {
-  display: none;
-}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
-.tab-content.active {
-  display: block;
-}
-
-/* Investment cards */
-.card {
-  background: white;
-  margin: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.card h3 {
-  margin: 0 0 10px;
-  color: #333;
-}
-
-.card p {
-  margin: 5px 0;
-  color: #555;
-}
+.card h3 { margin: 0 0 10px; color: #333; }
+.card p { margin: 5px 0; color: #555; }
 
 .invest-btn {
   display: block;
@@ -159,28 +164,189 @@ body {
   font-size: 16px;
 }
 
-/* Bottom nav */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #FFD700;
+/* --- mine.html specific styles --- */
+.profile {
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.profile h2 { margin: 0; font-size: 18px; }
+
+.badges { margin: 10px 0; }
+.badge {
+  display: inline-block;
+  background: #FFD700;
+  color: black;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin: 2px;
+}
+
+.balances {
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
-  border-top: 1px solid #ccc;
-  z-index: 500;
+  margin: 15px 0;
 }
 
-.bottom-nav a {
-  text-decoration: none;
-  color: black;
-  font-size: 14px;
+.balances div { font-weight: bold; }
+.balances small { font-weight: normal; }
+
+.actions {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px 0;
+}
+.actions a { text-decoration: none; }
+
+.btn-deposit {
+  background: #002B5B;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  width: 45%;
   text-align: center;
-  flex: 1;
 }
 
-.bottom-nav-spacer {
-    height: 60px; /* Same height as bottom nav bar */
+.btn-withdraw {
+  background: #FFD700;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  width: 45%;
+  text-align: center;
+}
+
+.menu {
+  background: white;
+  margin: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  text-decoration: none;
+  color: inherit;
+}
+
+.menu-item:last-child { border-bottom: none; }
+.menu-item span { margin-left: 10px; font-weight: bold; }
+
+/* --- recharge.html specific styles --- */
+.container {
+  margin: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+input[type="number"] {
+  box-sizing: border-box; 
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.recharge-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #002855;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.tips {
+  margin-top: 20px;
+  color: #444;
+  font-size: 14px;
+}
+
+.page-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #555;
+  margin-top: 30px;
+}
+
+/* --- refer.html specific styles --- */
+.referral-link {
+    width: 90%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 12px;
+    background-color: #002855;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.refer-tabs {
+    display: flex;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.refer-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.refer-tab.active {
+    background-color: #FFD700;
+    font-weight: bold;
+}
+
+.refer-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.refer-table th, .refer-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.status {
+    color: green;
+    font-weight: bold;
 }
