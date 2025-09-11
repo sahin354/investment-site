@@ -55,3 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+// --- LOGIN STATE TOGGLE FOR LOGOUT BUTTON ---
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+    // Show logout if logged in, otherwise hide
+    logoutBtn.style.display = loggedIn ? "block" : "none";
+
+    // Logout click handler
+    logoutBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      localStorage.removeItem("isLoggedIn");
+      window.location.reload();
+    });
+  }
+});
+
+
