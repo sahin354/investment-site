@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Adani Corporation</title>
-  <link rel="stylesheet" href="auth-style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Adani Corporation</title>
+    <link rel="stylesheet" href="auth-style.css">
 </head>
 <body>
-
-  <header class="auth-header">
-    Adani Corporation
-    <a href="register.html" class="register-btn-header">Register</a>
-  </header>
-
-  <div class="auth-container">
-    <div class="auth-box">
-      <div class="logo-container">
-        <img src="https://placehold.co/100x100/002855/FFFFFF?text=Logo" alt="Company Logo">
-      </div>
-      <h2>Login</h2>
-      <form id="loginForm">
-        <div class="input-group">
-          <label for="mobile">Account (Mobile number)</label>
-          <input type="tel" id="mobile" name="mobile" placeholder="Mobile phone number" required>
+    <div class="auth-container">
+        <img src="logo.png" alt="Company Logo" class="logo">
+        <h2>Login to Your Account</h2>
+        
+        <div class="form-group">
+            <label for="account">Email or Phone Number</label>
+            <input type="text" id="account" placeholder="Enter your email or phone number">
         </div>
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Password" required>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
         </div>
-        <button type="submit" class="auth-btn">Login</button>
-      </form>
-      <div class="form-link">
-        <a href="register.html">Don't have an account? Register</a>
-      </div>
+        
+        <button id="loginBtn">Login</button>
+        
+        <!-- Message area for errors -->
+        <p id="message" class="message"></p>
+        
+        <div class="auth-switch">
+            Don't have an account? <a href="register.html">Register here</a>
+        </div>
     </div>
-  </div>
 
-  <script src="auth.js"></script>
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
+
+
