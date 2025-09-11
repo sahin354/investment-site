@@ -1,3 +1,4 @@
+/* General Body Styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f2f5;
@@ -7,73 +8,89 @@ body {
     height: 100vh;
     margin: 0;
 }
+
+/* Main Form Container */
 .auth-container {
     background: white;
-    padding: 30px 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 20px 30px 30px 30px; /* More padding on the bottom */
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 380px;
     text-align: center;
     box-sizing: border-box;
 }
+
+/* Logo Styling */
 .logo {
-    width: 80px;
-    margin-bottom: 20px;
+    width: 100px; /* A slightly bigger logo */
+    height: 100px;
+    margin-bottom: 15px;
+    object-fit: contain;
 }
+
+/* Main Heading (e.g., "Create Account") */
 .auth-container h2 {
-    margin-bottom: 25px;
+    margin-bottom: 25px; /* More space below heading */
     color: #333;
+    font-size: 24px;
 }
+
+/* Styling for each input group (label + input) */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* THIS ADDS THE SPACE BETWEEN EACH FIELD */
     text-align: left;
 }
+
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px; /* Space between label and input box */
     font-weight: bold;
     color: #555;
+    font-size: 14px;
 }
+
 .form-group input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     box-sizing: border-box;
     font-size: 16px;
 }
+
+/* Main Button Styling */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background-color: #002855;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
-    transition: background-color 0.2s;
+    margin-top: 10px; /* Space above the button */
 }
-button:hover {
-    background-color: #001f3f;
-}
+
+/* Message area for errors/success */
 .message {
     margin-top: 15px;
     font-weight: bold;
+    height: 20px; /* Reserve space to prevent layout shift */
 }
-.message.error {
-    color: #d93025;
-}
-.message.success {
-    color: #1e8e3e;
-}
+.message.error { color: #d93025; }
+.message.success { color: #1e8e3e; }
+
+/* Link to switch between login/register */
 .auth-switch {
-    margin-top: 20px;
+    margin-top: 25px; /* More space above this link */
     color: #555;
+    font-size: 14px;
 }
+
 .auth-switch a {
     color: #002855;
     text-decoration: none;
     font-weight: bold;
-  }
+}
