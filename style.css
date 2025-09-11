@@ -1,0 +1,186 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  padding-bottom: 60px; /* Add padding to prevent overlap with bottom nav */
+}
+
+/* Top yellow bar */
+.top-bar {
+  background-color: #FFD700;
+  color: black;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+}
+
+/* Hamburger button */
+.menu-btn {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 18px;
+}
+
+.menu-btn span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: black;
+  border-radius: 2px;
+}
+
+/* Sidebar menu */
+.side-menu {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #002855;
+  overflow-x: hidden;
+  transition: 0.3s;
+  padding-top: 60px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-menu a {
+  padding: 12px 20px;
+  text-decoration: none;
+  font-size: 18px;
+  color: white;
+  display: block;
+  transition: 0.2s;
+}
+
+.side-menu a:hover {
+  background-color: #FFD700;
+  color: black;
+}
+
+.logout-link {
+  margin-top: auto; /* Pushes logout to the bottom */
+  background: #FFD700;
+  color: black !important;
+  font-weight: bold;
+  text-align: center;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Banner */
+.banner {
+  width: 100%;
+  height: auto;
+  display: block; /* Removes bottom space under the image */
+}
+
+/* Tabs for Primary / VIP / Purchased */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.tabs .active {
+  background-color: #FFD700;
+  color: black;
+}
+
+.tabs button:not(.active) {
+  background-color: #002855;
+  color: white;
+}
+
+/* Tab content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Investment cards */
+.card {
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  color: #333;
+}
+
+.card p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.invest-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #002855;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #FFD700;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid #ccc;
+  z-index: 500;
+}
+
+.bottom-nav a {
+  text-decoration: none;
+  color: black;
+  font-size: 14px;
+  text-align: center;
+  flex: 1;
+}
+
+.bottom-nav-spacer {
+    height: 60px; /* Same height as bottom nav bar */
+}
