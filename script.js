@@ -1,4 +1,16 @@
-// Wait for the document to be fully loaded before running the script
+// --- GATEKEEPER SCRIPT ---
+// This should be the very first thing in your script.js
+// It checks if the user is logged in. If not, it redirects them to login.html.
+if (localStorage.getItem('loggedIn') !== 'true') {
+  // Check if we are NOT already on the login or register page to avoid a redirect loop
+  if (window.location.pathname.indexOf('login.html') === -1 && window.location.pathname.indexOf('register.html') === -1) {
+    window.location.href = 'login.html';
+  }
+}
+// --- END GATEKEEPER SCRIPT ---
+
+
+// Wait for the document to be fully loaded before running the rest of the script
 document.addEventListener('DOMContentLoaded', function() {
 
   // --- Sidebar Menu Functionality (for index.html) ---
@@ -36,7 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
       event.preventDefault();
       
       if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem("loggedIn"); 
+        // REMOVE the loggedIn flag
+        localStorage.removeItem('loggedIn'); 
+        // Redirect to the login page
         window.location.href = "login.html";
       }
     });
