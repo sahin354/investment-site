@@ -99,6 +99,19 @@ body {
   color: black;
 }
 
+/* CORRECTED LOGOUT BUTTON STYLE */
+.logout-link {
+  margin-top: auto; /* Pushes this specific link to the bottom */
+  background-color: #c02828; /* A standout red color */
+  color: white !important; /* Ensures the text is white */
+  font-weight: bold;
+  text-align: center;
+}
+.logout-link:hover {
+  background-color: #a01010;
+}
+
+
 .close-btn {
   position: absolute;
   top: 15px;
@@ -342,15 +355,3 @@ input[type="number"] {
     color: green;
     font-weight: bold;
 }
-/* Style for the Logout Button */
-.logout-link {
-  margin-top: auto; /* Pushes the button to the bottom of the sidebar */
-  background-color: #c02828; /* A standout red color */
-  color: white !important; /* Ensures the text is white */
-  font-weight: bold;
-  text-align: center;
-}
-.logout-link:hover {
-  background-color: #c00; /* Darker red when you hover */
-}
-
