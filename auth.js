@@ -1,134 +1,113 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBqnJpGCtplUIwspovyntn9bbaTY2ygLNE",
-  authDomain: "adani-investment.firebaseapp.com",
-  projectId: "adani-investment",
-  storageBucket: "adani-investment.firebasestorage.app",
-  messagingSenderId: "549652082720",
-  appId: "1:549652082720:web:09bc0f371a498ee5184c45",
-  measurementId: "G-TGFHW9XKF2"
+    // your config keys
 };
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const path = window.location.pathname;
-const messageEl = document.getElementById('message');
 
-if (path.includes("register.html")) {
-    const registerBtn = document.getElementById('registerBtn');
-    const fullNameInput = document.getElementById('fullName');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-    const passwordInput = document.getElementById('password');
+// --- REGISTRATION LOGIC ---
+const registerForm = document.getElementById('registerForm');
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fullName = registerForm.fullName.value;
+        const email = registerForm.email.value;
+        const phone = registerForm.phone.value;
+        const password = registerForm.password.value;
+        const confirmPassword = registerForm.confirmPassword.value;
+        const messageDiv = document.getElementById('message');
 
-    registerBtn.addEventListener('click', async () => {
-        const fullName = fullNameInput.value.trim();
-        const email = emailInput.value.trim();
-        const phone = phoneInput.value.trim();
-        const password = passwordInput.value;
-
-        if (!fullName || !email || !phone || !password) {
-            messageEl.textContent = "Please fill in all fields.";
-            messageEl.className = 'message error';
+        if (password !== confirmPassword) {
+            messageDiv.textContent = "Error: Passwords do not match.";
             return;
         }
 
+        messageDiv.textContent = "Processing...";
+
         try {
-            messageEl.textContent = "Checking details...";
-            messageEl.className = 'message';
-
-            // Check if email is already in use
-            const emailCheck = await db.collection('users').where('email', '==', email).get();
-            if (!emailCheck.empty) {
-                messageEl.textContent = "This email is already registered. Please login.";
-                messageEl.className = 'message error';
+            // Step 1: Check if email or phone already exists in our database
+            const emailQuery = await db.collection('users').where('email', '==', email).get();
+            if (!emailQuery.empty) {
+                messageDiv.textContent = "Error: This email is already registered.";
+                return;
+            }
+            const phoneQuery = await db.collection('users').where('phone', '==', phone).get();
+            if (!phoneQuery.empty) {
+                messageDiv.textContent = "Error: This phone number is already registered.";
                 return;
             }
 
-            // Check if phone number is already in use
-            const phoneCheck = await db.collection('users').where('phone', '==', phone).get();
-            if (!phoneCheck.empty) {
-                messageEl.textContent = "This phone number is already registered. Please login.";
-                messageEl.className = 'message error';
-                return;
-            }
-
-            // Create user in Firebase Authentication
+            // Step 2: Create user with Firebase Authentication
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
-            // Send verification email
+            // Step 3: Send verification email
             await user.sendEmailVerification();
-
-            // Store user info in Firestore Database
+            
+            // Step 4: Create a user profile document in Firestore database
             await db.collection('users').doc(user.uid).set({
                 uid: user.uid,
                 fullName: fullName,
                 email: email,
                 phone: phone,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                balance: 0, // IMPORTANT: New users start with a balance of 0
+                agentBalance: 0,
+                registrationDate: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            messageEl.textContent = "Registration successful! Please check your email to verify your account.";
-            messageEl.className = 'message success';
-
+            messageDiv.textContent = "Registration successful! Please check your email to verify your account before logging in.";
+            
         } catch (error) {
-            messageEl.textContent = error.message;
-            messageEl.className = 'message error';
-        }
-    });
-
-} else if (path.includes("login.html")) {
-    const loginBtn = document.getElementById('loginBtn');
-    const accountInput = document.getElementById('account');
-    const passwordInput = document.getElementById('password');
-
-    loginBtn.addEventListener('click', async () => {
-        const account = accountInput.value.trim();
-        const password = passwordInput.value;
-
-        if (!account || !password) {
-            messageEl.textContent = "Please enter your details.";
-            messageEl.className = 'message error';
-            return;
-        }
-
-        try {
-            let userEmail = account;
-
-            // If user enters a phone number, find the associated email from Firestore
-            if (!account.includes('@')) {
-                const userQuery = await db.collection('users').where('phone', '==', account).get();
-                if (userQuery.empty) {
-                    throw new Error("Invalid phone number or password.");
-                }
-                userEmail = userQuery.docs[0].data().email;
-            }
-
-            // Sign in with the email
-            const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
-            const user = userCredential.user;
-
-            // IMPORTANT: Check if the user has verified their email
-            if (!user.emailVerified) {
-                auth.signOut(); // Log them out immediately
-                messageEl.textContent = "Your email is not verified. Please check your inbox.";
-                messageEl.className = 'message error';
-                return;
-            }
-
-            // If verified, proceed to the main page
-            localStorage.setItem('loggedIn', 'true');
-            window.location.href = 'index.html';
-
-        } catch (error) {
-            messageEl.textContent = "Invalid credentials. Please try again.";
-            messageEl.className = 'message error';
+            console.error("Registration Error:", error);
+            messageDiv.textContent = `Error: ${error.message}`;
         }
     });
 }
+
+
+// --- LOGIN LOGIC (No changes here, but keeping it for completeness) ---
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const loginId = loginForm.loginId.value;
+        const password = loginForm.password.value;
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = "Logging in...";
+
+        try {
+            let userEmail = loginId;
+            // Check if loginId is a phone number
+            if (!loginId.includes('@')) {
+                const phoneQuery = await db.collection('users').where('phone', '==', loginId).get();
+                if (phoneQuery.empty) {
+                    messageDiv.textContent = "Error: No account found with that phone number.";
+                    return;
+                }
+                userEmail = phoneQuery.docs[0].data().email;
+            }
+
+            const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
+            const user = userCredential.user;
+
+            if (!user.emailVerified) {
+                messageDiv.textContent = "Error: Please verify your email before logging in.";
+                auth.signOut();
+                return;
+            }
+            
+            localStorage.setItem('loggedIn', 'true');
+            // NEW: Save the user's UID to local storage to fetch their data later
+            localStorage.setItem('userUid', user.uid);
+            window.location.href = 'index.html';
+
+        } catch (error) {
+            console.error("Login Error:", error);
+            messageDiv.textContent = `Error: ${error.message}`;
+        }
+    });
+    }
