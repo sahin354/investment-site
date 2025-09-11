@@ -1,19 +1,16 @@
 // --- GATEKEEPER SCRIPT ---
-// This should be the very first thing in your script.js
-// It checks if the user is logged in. If not, it redirects them to login.html.
+// This checks if the user is logged in. If not, it redirects them to login.html.
 if (localStorage.getItem('loggedIn') !== 'true') {
-  // Check if we are NOT already on the login or register page to avoid a redirect loop
+  // Allow access only to login and register pages if not logged in
   if (window.location.pathname.indexOf('login.html') === -1 && window.location.pathname.indexOf('register.html') === -1) {
     window.location.href = 'login.html';
   }
 }
 // --- END GATEKEEPER SCRIPT ---
 
-
-// Wait for the document to be fully loaded before running the rest of the script
 document.addEventListener('DOMContentLoaded', function() {
 
-  // --- Sidebar Menu Functionality (for index.html) ---
+  // --- Sidebar Menu Functionality ---
   const sideMenu = document.getElementById('sideMenu');
   const menuBtn = document.getElementById('menuBtn');
   const closeBtn = document.getElementById('closeBtn');
@@ -23,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.addEventListener('click', () => { sideMenu.style.width = '0'; });
   }
 
-  // --- Tab Switching Functionality (for index.html) ---
+  // --- Tab Switching Functionality ---
   const tabButtons = document.querySelectorAll('.tab-button');
   const tabContents = document.querySelectorAll('.tab-content');
 
@@ -41,19 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // --- Logout Functionality (for sidebar in index.html) ---
+  // --- LOGOUT FUNCTIONALITY ---
+  // This code finds the logout button and makes it work.
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (event) => {
-      event.preventDefault();
+      event.preventDefault(); 
       
       if (confirm('Are you sure you want to logout?')) {
-        // REMOVE the loggedIn flag
+        // 1. Remove the login flag from browser storage
         localStorage.removeItem('loggedIn'); 
-        // Redirect to the login page
+        
+        // 2. Redirect the user to the login page
         window.location.href = "login.html";
       }
     });
   }
+  // --- END LOGOUT FUNCTIONALITY ---
 
 });
+
