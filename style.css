@@ -355,3 +355,25 @@ input[type="number"] {
     color: green;
     font-weight: bold;
 }
+/* --- Logout Button on Mine Page --- */
+.logout-section {
+  margin: 30px 15px; /* Adds space above the button */
+}
+
+.logout-button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background-color: #d9534f; /* A nice red color */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.logout-button:hover {
+  background-color: #c9302c; /* Darker red on hover */
+}
