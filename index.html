@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adani Corporation - Investment Site</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="sideMenu" class="side-menu">
+    <span id="closeBtn" class="close-btn">&times;</span>
+    <a href="index.html">Home</a>
+    <a href="recharge.html">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+    <a href="contact.html">Contact</a>
+    <a href="#" id="logoutBtn" class="logout-link">🚪 Logout</a>
+  </div>
+
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    Adani Corporation
+  </header>
+
+  <main>
+    <img src="banner.jpg" alt="Investment opportunities banner" class="banner">
+
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="primary">Primary</button>
+      <button class="tab-button" data-tab="vip">VIP</button>
+      <button class="tab-button" data-tab="purchased">Purchased</button>
+    </nav>
+
+    <section id="primary" class="tab-content active">
+      <article class="card">
+        <h3>Mahindra Scorpio</h3>
+        <p>Day Income: ₹190</p>
+        <p>Income Days: 7 days</p>
+        <p>Invest Price: ₹300</p>
+        <button class="invest-btn">Invest Now</button>
+      </article>
+
+      <article class="card">
+        <h3>Tata Curve</h3>
+        <p>Day Income: ₹90</p>
+        <p>Income Days: 30 days</p>
+        <p>Invest Price: ₹250</p>
+        <button class="invest-btn">Invest Now</button>
+      </article>
+    </section>
+
+    <section id="vip" class="tab-content">
+      <article class="card">
+        <h3>VIP Plan A</h3>
+        <p>Day Income: ₹500</p>
+        <p>Income Days: 15 days</p>
+        <p>Invest Price: ₹2000</p>
+        <button class="invest-btn">Invest Now</button>
+      </article>
+
+      <article class="card">
+        <h3>VIP Plan B</h3>
+        <p>Day Income: ₹1200</p>
+        <p>Income Days: 30 days</p>
+        <p>Invest Price: ₹5000</p>
+        <button class="invest-btn">Invest Now</button>
+      </article>
+    </section>
+
+    <section id="purchased" class="tab-content">
+      <article class="card">
+        <h3>Purchased Plan 1</h3>
+        <p>Status: Active</p>
+        <p>Remaining Days: 10</p>
+        <p>Daily Income: ₹190</p>
+        <button class="invest-btn">View Details</button>
+      </article>
+
+      <article class="card">
+        <h3>Purchased Plan 2</h3>
+        <p>Status: Completed</p>
+        <p>Total Earned: ₹2700</p>
+        <button class="invest-btn">View Summary</button>
+      </article>
+    </section>
+  </main>
+  
+  <div class="bottom-nav-spacer"></div>
+
+  <footer class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="recharge.html">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
