@@ -38,23 +38,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // --- LOGOUT FUNCTIONALITY ---
-  // This code finds the logout button and makes it work.
+   // --- LOGOUT FUNCTIONALITY ---
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (event) => {
       event.preventDefault(); 
       
       if (confirm('Are you sure you want to logout?')) {
-        // 1. Remove the login flag from browser storage
         localStorage.removeItem('loggedIn'); 
-        
-        // 2. Redirect the user to the login page
         window.location.href = "login.html";
       }
     });
   }
-  // --- END LOGOUT FUNCTIONALITY ---
+  // --- END OF LOGOUT FUNCTIONALITY ---
+
 
 });
 
