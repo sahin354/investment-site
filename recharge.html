@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Adani Corporation</title>
-    <link rel="stylesheet" href="auth-style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recharge - Adani Corporation</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="auth-container">
-        <img src="logo.png" alt="Company Logo" class="logo"> <!-- Make sure you have a logo.png or remove this line -->
-        <h2>Create an Account</h2>
-        
-        <!-- New Registration Form -->
-        <div class="form-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" placeholder="Enter your full name">
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" placeholder="Enter your phone number">
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Enter your email">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="Create a password">
-        </div>
-        
-        <button id="registerBtn">Register</button>
-        
-        <!-- Message area for errors or success -->
-        <p id="message" class="message"></p>
-        
-        <div class="auth-switch">
-            Already have an account? <a href="login.html">Login here</a>
-        </div>
+
+  <!-- Top Bar -->
+  <header class="top-bar">Recharge</header>
+
+  <main>
+    <!-- Recharge Form -->
+    <div class="container">
+      <label for="amount">Amount</label>
+      <input type="number" id="amount" placeholder="Please enter recharge amount">
+
+      <button class="recharge-btn">Recharge</button>
+
+      <div class="tips">
+        <p><b>Tips:</b></p>
+        <p>1. The single recharge amount is between ₹200 and ₹50,000</p>
+        <p>2. Invest more, earn more.</p>
+      </div>
     </div>
 
-    <!-- Firebase SDK Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="auth.js"></script>
+    <!-- Footer -->
+    <footer class="page-footer">
+      Copyright © Adani Corporation 2025. All Rights Reserved.
+    </footer>
+  </main>
+  
+  <div class="bottom-nav-spacer"></div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="recharge.html">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+  </nav>
+
+  <!-- Make sure the script is linked at the very end -->
+  <script src="script.js"></script>
 </body>
 </html>
-
 
