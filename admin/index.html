@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <a href="#" class="active" data-page="dashboard">Dashboard</a>
+        <a href="#" data-page="users">Manage Admin User</a>
+        <a href="#" data-page="plans">Plan Management</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1 id="page-title">Dashboard</h1>
+        </header>
+
+        <main>
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="stat-card">
+                    <h4>Registered Users</h4>
+                    <p id="total-users">0</p>
+                    <span>See in Detail &rarr;</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Withdrawal Request</h4>
+                    <p>0</p>
+                    <span>See in Detail &rarr;</span>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Recharge</h4>
+                    <p>₹0</p>
+                    <span>See in Detail &rarr;</span>
+                </div>
+            </div>
+
+            <!-- User Management Page -->
+            <div id="users" class="page">
+                <h2>Registered Users</h2>
+                <div id="user-list"></div>
+            </div>
+
+            <!-- Plan Management Page -->
+            <div id="plans" class="page">
+                <h2>Investment Plans</h2>
+                <div id="plan-list"></div>
+                <!-- Form to add a new plan can go here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
