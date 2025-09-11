@@ -1,11 +1,12 @@
-// IMPORTANT: You need to get this from your own Firebase project
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBqnJpGCtplUIwspovyntn9bbaTY2ygLNE",
+  authDomain: "adani-investment.firebaseapp.com",
+  projectId: "adani-investment",
+  storageBucket: "adani-investment.firebasestorage.app",
+  messagingSenderId: "549652082720",
+  appId: "1:549652082720:web:09bc0f371a498ee5184c45",
+  measurementId: "G-TGFHW9XKF2"
 };
 
 // Initialize Firebase
