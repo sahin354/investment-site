@@ -5,19 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mine - Adani Corporation</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Firebase Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
   <header class="top-bar">Adani Corporation - Mine</header>
   <main>
     <section class="profile">
-      <!-- These will be filled by JavaScript -->
       <h2 id="userName">Loading...</h2>
-      <p id="userPhone">Loading...</p>
-      
+      <p id="userPhone">(Loading...)</p>
       <div class="balances">
         <div>₹ <span id="userBalance">0.00</span><br><small>Balance</small></div>
         <div>₹ <span id="agentBalance">0.00</span><br><small>Agent Balance</small></div>
@@ -28,10 +25,11 @@
       </div>
     </section>
     <nav class="menu">
-      <!-- Menu items... -->
+      <a href="#" class="menu-item">📄 <span>Deposit Details</span></a>
+      <a href="#" class="menu-item">🏦 <span>My Bank Account</span></a>
     </nav>
     <div class="logout-section">
-      <button id="mineLogoutBtn" class="logout-button">Logout</button>
+      <button id="mineLogoutBtn" class="logout-btn">Logout</button>
     </div>
   </main>
   <div class="bottom-nav-spacer"></div>
