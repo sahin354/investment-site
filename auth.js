@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageDiv.textContent = "Processing...";
 
             try {
+                // Check if email or phone already exists
                 const emailQuery = await db.collection('users').where('email', '==', email).get();
                 if (!emailQuery.empty) {
                     messageDiv.textContent = "Error: This email is already registered. Please login.";
@@ -50,10 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                // Create user with email and password
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
+                
+                // Send email verification
                 await user.sendEmailVerification();
                 
+                // Create user profile in Firestore
                 await db.collection('users').doc(user.uid).set({
                     uid: user.uid,
                     fullName: fullName,
@@ -85,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 let userEmail = loginId;
+                // If login ID is not an email, assume it's a phone number
                 if (!loginId.includes('@')) {
                     const phoneQuery = await db.collection('users').where('phone', '==', loginId).get();
                     if (phoneQuery.empty) {
@@ -99,18 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (!user.emailVerified) {
                     messageDiv.textContent = "Error: Please verify your email before logging in.";
-                    auth.signOut();
+                    auth.signOut(); // Log out the unverified user
                     return;
                 }
                 
+                // Set flags in localStorage to persist login state
                 localStorage.setItem('loggedIn', 'true');
                 localStorage.setItem('userUid', user.uid);
+                
+                // Redirect to the main page
                 window.location.href = 'index.html';
 
             } catch (error) {
-                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.textContent = `Error: Invalid credentials or user not found.`;
+                console.error("Login error:", error);
             }
         });
     }
 });
-
+                
