@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
     const message = document.getElementById('auth-message');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
 
     // --- REGISTRATION LOGIC ---
     if (registerForm) {
@@ -60,24 +61,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 auth.createUserWithEmailAndPassword(email, password)
                     .then(userCredential => {
                         const user = userCredential.user;
-                        // Send verification email
                         user.sendEmailVerification();
-
-                        // Create a user document in Firestore with their details
                         db.collection('users').doc(user.uid).set({
                             fullName: fullName,
                             email: email,
                             phone: phone,
                             balance: 0,
-                            role: 'user', // Assign the default role
+                            role: 'user', 
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => {
                             message.textContent = 'Registration successful! A verification email has been sent. Please verify before logging in.';
                             message.className = 'success';
                             registerForm.reset();
                         });
-                    })
-                    .catch(error => {
+                    }).catch(error => {
                         console.error("Registration error:", error);
                         message.textContent = `Error: ${error.message}`;
                         message.className = 'error';
@@ -92,11 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const identifier = loginForm.identifier.value;
             const password = loginForm.password.value;
-            let email = identifier; // Assume it's an email by default
+            let email = identifier;
 
-            // Check if identifier is a phone number
             if (!identifier.includes('@')) {
-                // If it's a phone number, we need to find the corresponding email
                 db.collection('users').where('phone', '==', identifier).get()
                     .then(snapshot => {
                         if (snapshot.empty) {
@@ -119,17 +114,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!userCredential.user.emailVerified) {
                     message.textContent = 'Please verify your email before logging in.';
                     message.className = 'error';
-                    auth.signOut(); // Log them out if their email is not verified
+                    auth.signOut(); 
                 } else {
-                    // Set a flag in localStorage to be used by script.js
                     localStorage.setItem('loggedInUser', userCredential.user.uid);
                     window.location.href = 'index.html';
                 }
-            })
-            .catch(error => {
+            }).catch(error => {
                 console.error("Login error:", error);
                 message.textContent = 'Error: Invalid credentials or email not verified.';
                 message.className = 'error';
             });
+    }
+    
+    // --- NEW: FORGOT PASSWORD LOGIC ---
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = prompt("Please enter your registered email address:");
+            if (email) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        message.textContent = 'Password reset email sent! Please check your inbox.';
+                        message.className = 'success';
+                    })
+                    .catch(error => {
+                        console.error("Password reset error:", error);
+                        message.textContent = "Could not send reset email. Please ensure the email is correct.";
+                        message.className = 'error';
+                    });
+            }
+        });
     }
 });
