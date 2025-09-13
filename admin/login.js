@@ -13,21 +13,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-const loginBtn = document.getElementById('loginBtn');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const errorMessage = document.getElementById('error-message');
+const loginForm = document.getElementById('adminLoginForm');
+const errorMessage = document.getElementById('login-error');
 
-loginBtn.addEventListener('click', () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = loginForm.email.value;
+    const password = loginForm.password.value;
 
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            // Login successful, redirect to the admin dashboard
+            // Login successful, redirect to the dashboard
             window.location.href = 'index.html';
         })
         .catch((error) => {
-            errorMessage.textContent = error.message;
+            // Display an error message to the user
+            errorMessage.textContent = 'Error: Invalid email or password.';
+            console.error("Login failed:", error.message);
         });
 });
