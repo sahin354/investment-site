@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             email: email,
                             phone: phone,
                             balance: 0,
-                            role: 'user', // <-- THIS LINE IS THE NEW ADDITION
+                            role: 'user', // Assign the default role
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => {
                             message.textContent = 'Registration successful! A verification email has been sent. Please verify before logging in.';
@@ -119,8 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!userCredential.user.emailVerified) {
                     message.textContent = 'Please verify your email before logging in.';
                     message.className = 'error';
-                    auth.signOut();
+                    auth.signOut(); // Log them out if their email is not verified
                 } else {
+                    // Set a flag in localStorage to be used by script.js
                     localStorage.setItem('loggedInUser', userCredential.user.uid);
                     window.location.href = 'index.html';
                 }
