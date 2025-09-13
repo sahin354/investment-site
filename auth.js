@@ -18,11 +18,18 @@ const db = firebase.firestore();
 
 // --- MAIN SCRIPT EXECUTION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if we are on the login or register page
+    // --- Get all our form elements ---
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
+    const resetForm = document.getElementById('resetForm');
+    
     const message = document.getElementById('auth-message');
+
+    // --- Get the containers and links for showing/hiding forms ---
+    const loginFormContainer = document.getElementById('loginFormContainer');
+    const resetContainer = document.getElementById('resetContainer');
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const backToLoginLink = document.getElementById('backToLoginLink');
 
     // --- REGISTRATION LOGIC ---
     if (registerForm) {
@@ -40,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Check for duplicate email or phone in the database
             const usersRef = db.collection('users');
             const emailQuery = usersRef.where('email', '==', email).get();
             const phoneQuery = usersRef.where('phone', '==', phone).get();
@@ -57,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // If no duplicates, create the user
                 auth.createUserWithEmailAndPassword(email, password)
                     .then(userCredential => {
                         const user = userCredential.user;
@@ -126,23 +131,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
     
-    // --- NEW: FORGOT PASSWORD LOGIC ---
+    // --- FORGOT PASSWORD NAVIGATION ---
     if (forgotPasswordLink) {
         forgotPasswordLink.addEventListener('click', (e) => {
             e.preventDefault();
-            const email = prompt("Please enter your registered email address:");
-            if (email) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => {
-                        message.textContent = 'Password reset email sent! Please check your inbox.';
-                        message.className = 'success';
-                    })
-                    .catch(error => {
-                        console.error("Password reset error:", error);
-                        message.textContent = "Could not send reset email. Please ensure the email is correct.";
-                        message.className = 'error';
-                    });
-            }
+            loginFormContainer.style.display = 'none'; // Hide login form
+            resetContainer.style.display = 'block';   // Show reset form
+            message.textContent = ''; // Clear any old messages
+        });
+    }
+    
+    if (backToLoginLink) {
+        backToLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginFormContainer.style.display = 'block'; // Show login form
+            resetContainer.style.display = 'none';    // Hide reset form
+            message.textContent = ''; // Clear any old messages
+        });
+    }
+
+    // --- NEW: HANDLE PASSWORD RESET SUBMISSION ---
+    if (resetForm) {
+        resetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = resetForm.resetEmail.value;
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    message.textContent = 'Password reset email sent! Please check your inbox.';
+                    message.className = 'success';
+                })
+                .catch(error => {
+                    console.error("Password reset error:", error);
+                    message.textContent = "Could not send reset email. Please ensure the email is correct.";
+                    message.className = 'error';
+                });
         });
     }
 });
