@@ -86,3 +86,10 @@ h2 {
     text-decoration: none;
     font-weight: bold;
 }
+
+/* --- Forgot Password Link Style --- */
+.auth-switch a#backToLoginLink {
+    display: block; /* Make it take the full width */
+    margin-top: 15px;
+    text-align: center;
+}
