@@ -10,7 +10,6 @@ const firebaseConfig = {
 };
 
 // --- INITIALIZE FIREBASE & SERVICES ---
-// This check prevents Firebase from being initialized more than once.
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -18,100 +17,212 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // --- AUTHENTICATION GUARD ---
-// This function runs whenever the authentication state changes.
 auth.onAuthStateChanged(user => {
-    // Check if we are on a page that is NOT the login page.
-    const isNotLoginPage = !window.location.pathname.endsWith('login.html');
-    
-    if (!user && isNotLoginPage) {
-        // If no user is logged in AND we are not on the login page,
-        // redirect to the login page. This protects all admin pages.
+    if (user) {
+        // Check if user is an admin
+        db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists && doc.data().role === 'admin') {
+                console.log("Admin verified. Loading dashboard...");
+                runDashboardScripts(); // Run main scripts if admin
+            } else {
+                console.log("User is not an admin. Redirecting...");
+                auth.signOut();
+                window.location.href = 'login.html';
+            }
+        });
+    } else {
+        console.log("No user logged in. Redirecting...");
         window.location.href = 'login.html';
     }
 });
 
+// --- MAIN DASHBOARD FUNCTION ---
+function runDashboardScripts() {
+    // --- PAGE NAVIGATION LOGIC ---
+    const navLinks = document.querySelectorAll('.sidebar a');
+    const pages = document.querySelectorAll('.page');
+    const pageTitle = document.getElementById('page-title');
 
-// --- MAIN SCRIPT EXECUTION ---
-// This code runs after the HTML document has fully loaded.
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // This check ensures the dashboard code only runs on the main dashboard page, not on the login page.
-    if (document.body.classList.contains('dashboard-body')) {
-        
-        // --- NAVIGATION LOGIC ---
-        const navItems = document.querySelectorAll('.nav-item');
-        const pages = document.querySelectorAll('.page');
-        const pageTitle = document.getElementById('page-title');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page');
 
-        navItems.forEach(item => {
-            if (item.id !== 'logoutBtn') { // Exclude the logout button from this navigation logic
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    const pageId = item.getAttribute('data-page'); // e.g., "dashboard", "users"
+            if (pageId) {
+                // Update title and page visibility
+                pageTitle.textContent = link.textContent;
+                pages.forEach(page => page.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
 
-                    // Update active class on sidebar links
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    item.classList.add('active');
-
-                    // Show the correct page and hide the others
-                    pages.forEach(page => {
-                        page.id === pageId ? page.classList.add('active') : page.classList.remove('active');
-                    });
-                    
-                    // Update the header title to match the clicked link
-                    pageTitle.textContent = item.textContent;
-                });
+                // Update active link style
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
             }
         });
-
-        // --- LOGOUT LOGIC ---
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            auth.signOut().then(() => {
-                console.log('User signed out successfully.');
-                // The Authentication Guard will automatically redirect to the login page.
-            }).catch(error => {
-                console.error('Sign out error:', error);
-            });
+    });
+    
+    // --- LOGOUT BUTTON ---
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut();
         });
-        
-        // --- LOAD INITIAL DATA FOR THE DASHBOARD ---
-        loadDashboardStats();
     }
-});
 
+    // --- LOAD INITIAL DATA ---
+    loadDashboardStats();
+    loadUsers();
+    loadDepositRequests();
+    loadInvestmentPlans(); // <-- NEW: Load plans when dashboard loads
 
-// --- DATA FETCHING FUNCTIONS ---
-function loadDashboardStats() {
-    // Get references to the elements we want to update
-    const totalUsersEl = document.getElementById('total-users');
-    const pendingDepositsEl = document.getElementById('pending-deposits');
-    const totalRechargeEl = document.getElementById('total-recharge');
-
-    // Fetch and display the total number of registered users in real-time
-    if (totalUsersEl) {
+    // --- DASHBOARD STATS ---
+    function loadDashboardStats() {
+        const totalUsersEl = document.getElementById('total-users');
         db.collection('users').onSnapshot(snapshot => {
             totalUsersEl.textContent = snapshot.size;
-        }, err => console.error("Error fetching users count:", err));
+        });
+        // Add more stats loading here (recharge, etc.)
     }
 
-    // Fetch and display the number of pending deposits in real-time
-    if (pendingDepositsEl) {
-        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snapshot => {
-            pendingDepositsEl.textContent = snapshot.size;
-        }, err => console.error("Error fetching pending deposits:", err));
-    }
-    
-    // Fetch and display the total approved recharge amount in real-time
-    if (totalRechargeEl) {
-        db.collection('deposits').where('status', '==', 'approved').onSnapshot(snapshot => {
-            let total = 0;
+    // --- USER MANAGEMENT ---
+    function loadUsers() {
+        const userListEl = document.getElementById('user-list');
+        db.collection('users').onSnapshot(snapshot => {
+            let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Balance</th><th>Role</th></tr></thead><tbody>';
             snapshot.forEach(doc => {
-                total += doc.data().amount;
+                const user = doc.data();
+                html += `<tr>
+                    <td>${user.fullName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>₹${user.balance.toFixed(2)}</td>
+                    <td>${user.role}</td>
+                </tr>`;
             });
-            totalRechargeEl.textContent = total.toFixed(2);
-        }, err => console.error("Error fetching total recharge:", err));
+            html += '</tbody></table>';
+            userListEl.innerHTML = html;
+        });
     }
-}
+
+    // --- DEPOSIT REQUESTS ---
+    function loadDepositRequests() {
+        const tbody = document.getElementById('deposits-tbody');
+        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snapshot => {
+            tbody.innerHTML = '';
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="4">No pending requests.</td></tr>';
+            }
+            snapshot.forEach(doc => {
+                const request = doc.data();
+                const row = `
+                    <tr>
+                        <td>${request.userEmail}</td>
+                        <td>₹${request.amount.toFixed(2)}</td>
+                        <td>${new Date(request.requestedAt.toDate()).toLocaleString()}</td>
+                        <td>
+                            <button class="approve-btn" data-id="${doc.id}" data-amount="${request.amount}" data-userid="${request.userId}">Approve</button>
+                            <button class="reject-btn" data-id="${doc.id}">Reject</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        });
+    }
+
+    const depositsTable = document.getElementById('deposits-table');
+    depositsTable.addEventListener('click', (e) => {
+        const target = e.target;
+        const requestId = target.getAttribute('data-id');
+        if (target.classList.contains('approve-btn')) {
+            const amount = parseFloat(target.getAttribute('data-amount'));
+            const userId = target.getAttribute('data-userid');
+            approveDeposit(requestId, userId, amount);
+        }
+        if (target.classList.contains('reject-btn')) {
+            rejectDeposit(requestId);
+        }
+    });
+
+    function approveDeposit(requestId, userId, amount) {
+        const depositRef = db.collection('deposits').doc(requestId);
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(transaction => {
+            return transaction.get(userRef).then(userDoc => {
+                if (!userDoc.exists) throw "User does not exist!";
+                const newBalance = userDoc.data().balance + amount;
+                transaction.update(userRef, { balance: newBalance });
+                transaction.update(depositRef, { status: 'approved' });
+            });
+        }).catch(err => console.error("Approve transaction failed: ", err));
+    }
+
+    function rejectDeposit(requestId) {
+        db.collection('deposits').doc(requestId).update({ status: 'rejected' });
+    }
+
+    // --- NEW: INVESTMENT PLAN MANAGEMENT ---
+    function loadInvestmentPlans() {
+        const tbody = document.getElementById('plans-tbody');
+        if (!tbody) return;
+
+        db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
+            tbody.innerHTML = ''; // Clear table before adding new data
+            snapshot.forEach(doc => {
+                const plan = doc.data();
+                const row = `
+                    <tr>
+                        <td>${plan.planName}</td>
+                        <td>₹${plan.investPrice}</td>
+                        <td>₹${plan.dayIncome}</td>
+                        <td>${plan.incomeDays}</td>
+                        <td>
+                            <button class="delete-btn" data-id="${doc.id}">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        });
+    }
+
+    // Handle adding a new plan
+    const addPlanForm = document.getElementById('addPlanForm');
+    if (addPlanForm) {
+        addPlanForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const planName = addPlanForm.planName.value;
+            const investPrice = parseFloat(addPlanForm.investPrice.value);
+            const dayIncome = parseFloat(addPlanForm.dayIncome.value);
+            const incomeDays = parseInt(addPlanForm.incomeDays.value);
+
+            db.collection('plans').add({
+                planName,
+                investPrice,
+                dayIncome,
+                incomeDays
+            }).then(() => {
+                console.log("Plan added successfully");
+                addPlanForm.reset();
+            }).catch(error => {
+                console.error("Error adding plan: ", error);
+                alert("Could not add plan. See console for details.");
+            });
+        });
+    }
+
+    // Handle deleting a plan
+    const plansTable = document.getElementById('plans-table');
+    if (plansTable) {
+        plansTable.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const planId = e.target.getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this plan?')) {
+                    db.collection('plans').doc(planId).delete()
+                        .then(() => console.log("Plan deleted successfully"))
+                        .catch(error => console.error("Error deleting plan: ", error));
+                }
+            }
+        });
+    }
+              }
