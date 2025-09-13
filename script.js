@@ -16,28 +16,18 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- THE NEW, ROBUST AUTHENTICATION GUARD ---
-// This is the core of the fix. It listens for any change in the login state.
+// --- THE ROBUST AUTHENTICATION GUARD ---
 auth.onAuthStateChanged(user => {
-    // Check if we are on a page that is NOT the login/register page.
     const isProtectedPage = !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html');
 
     if (user) {
         // --- USER IS LOGGED IN ---
-        console.log('Authentication state changed: User is logged in.', user.uid);
-        
-        // If the user is logged in, we can now safely run all the code for our protected pages.
-        // We wrap all page-specific logic in a function to keep it clean.
+        console.log('User is logged in. Running page scripts.');
         runPageSpecificScripts(user);
-
     } else {
         // --- USER IS NOT LOGGED IN ---
-        console.log('Authentication state changed: User is logged out.');
-        
-        // If the user is not logged in AND they are trying to access a protected page,
-        // redirect them to the login page.
         if (isProtectedPage) {
-            console.log('Access denied. Redirecting to login page.');
+            console.log('User is not logged in. Redirecting to login.');
             window.location.href = 'login.html';
         }
     }
@@ -45,6 +35,7 @@ auth.onAuthStateChanged(user => {
 
 // This function holds all the logic that should ONLY run when a user is logged in.
 function runPageSpecificScripts(user) {
+
     // --- SIDEBAR MENU LOGIC (for index.html) ---
     const sideMenu = document.getElementById('sideMenu');
     const menuBtn = document.getElementById('menuBtn');
@@ -56,8 +47,8 @@ function runPageSpecificScripts(user) {
 
     // --- TAB SWITCHING LOGIC (for index.html) ---
     const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
     if (tabButtons.length > 0) {
+        const tabContents = document.querySelectorAll('.tab-content');
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const tabId = button.getAttribute('data-tab');
@@ -69,7 +60,7 @@ function runPageSpecificScripts(user) {
         });
     }
 
-    // --- LOGOUT LOGIC (for both sidebar and mine page) ---
+    // --- LOGOUT LOGIC (Handles both sidebar and mine page buttons) ---
     const logoutBtnSidebar = document.getElementById('logoutBtn');
     const logoutBtnMine = document.getElementById('logoutBtnMine');
 
@@ -87,8 +78,7 @@ function runPageSpecificScripts(user) {
         logoutBtnMine.addEventListener('click', handleLogout);
     }
     
-    // --- MINE PAGE: DISPLAY USER DATA ---
-    // Check if we are on the mine.html page by looking for a unique element
+    // --- MINE PAGE: DISPLAY USER DATA (This is now fixed) ---
     const userNameEl = document.getElementById('user-name-phone');
     if (userNameEl) {
         const userDocRef = db.collection('users').doc(user.uid);
@@ -111,7 +101,7 @@ function runPageSpecificScripts(user) {
         rechargeForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const amount = parseFloat(rechargeForm.amount.value);
-            if (amount < 200 || amount > 50000) {
+            if (isNaN(amount) || amount < 200 || amount > 50000) {
                 messageEl.textContent = 'Amount must be between ₹200 and ₹50,000.';
                 messageEl.className = 'error';
                 return;
@@ -133,4 +123,4 @@ function runPageSpecificScripts(user) {
             });
         });
     }
-    }
+}
