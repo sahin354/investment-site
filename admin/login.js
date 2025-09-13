@@ -9,47 +9,67 @@ const firebaseConfig = {
   measurementId: "G-TGFHW9XKF2"
 };
 
-// Initialize Firebase
+// --- INITIALIZE FIREBASE & SERVICES ---
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const loginForm = document.getElementById('adminLoginForm');
-const errorMessage = document.getElementById('login-error');
+// --- MAIN SCRIPT EXECUTION ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('adminLoginForm');
+    const messageEl = document.getElementById('login-message');
 
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = loginForm.email.value;
-    const password = loginForm.password.value;
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
 
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Step 1: Authentication successful. User provided correct email and password.
-            // NOW, WE MUST CHECK IF THEY ARE AUTHORIZED (i.e., if they are an admin).
-            const user = userCredential.user;
-            const userDocRef = db.collection('users').doc(user.uid);
+            messageEl.textContent = 'Logging in...';
+            messageEl.className = '';
 
-            // Go to the database to get this user's profile document.
-            return userDocRef.get();
-        })
-        .then((doc) => {
-            // Step 2: We have the user's document. Now, check their role.
-            if (doc.exists && doc.data().role === 'admin') {
-                // SUCCESS! The user exists in the database AND has the 'admin' role.
-                // Allow them to proceed to the dashboard.
-                window.location.href = 'index.html';
-            } else {
-                // FAILURE! This user is not an admin.
-                // We must log them out immediately and show an error message.
-                auth.signOut();
-                errorMessage.textContent = 'Error: You do not have permission to access this page.';
-            }
-        })
-        .catch((error) => {
-            // This error will be caught if the email/password was wrong in the first place.
-            errorMessage.textContent = 'Error: Invalid email or password.';
-            console.error("Login failed:", error.message);
+            // Step 1: Sign in with email and password
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+
+                    // Step 2: Check if the user has the 'admin' role in Firestore
+                    const userDocRef = db.collection('users').doc(user.uid);
+                    
+                    userDocRef.get().then(doc => {
+                        if (doc.exists && doc.data().role === 'admin') {
+                            // SUCCESS: User is an admin
+                            console.log("Admin user successfully logged in.");
+                            // Redirect to the admin dashboard
+                            window.location.href = 'index.html';
+                        } else {
+                            // FAILURE: User is not an admin
+                            console.log("Login failed: User is not an admin.");
+                            messageEl.textContent = 'Access Denied: You do not have admin privileges.';
+                            messageEl.className = 'error';
+                            // Log the user out for security
+                            auth.signOut();
+                        }
+                    }).catch(error => {
+                        console.error("Error getting user document:", error);
+                        messageEl.textContent = 'Error verifying user role.';
+                        messageEl.className = 'error';
+                        auth.signOut();
+                    });
+
+                })
+                .catch(error => {
+                    // This catches errors like wrong password, user not found, etc.
+                    console.error("Login error:", error);
+                    if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                        messageEl.textContent = 'Invalid email or password.';
+                    } else {
+                        messageEl.textContent = 'An error occurred during login.';
+                    }
+                    messageEl.className = 'error';
+                });
         });
+    }
 });
