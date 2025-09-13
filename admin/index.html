@@ -1,84 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="sidebar">
-        <h2>Admin</h2>
-        <a href="#" class="active" data-page="dashboard">Dashboard</a>
-        <a href="#" data-page="users">Manage Admin User</a>
-        <a href="#" data-page="plans">Plan Management</a>
-        <a href="#" id="logoutBtn">Logout</a>
-    </div>
+<!-- Plan Management Page -->
+<div id="plans" class="page">
+    <h2>Add New Investment Plan</h2>
+    <form id="addPlanForm" class="form-container">
+        <div class="form-group">
+            <label for="planName">Plan Name</label>
+            <input type="text" id="planName" placeholder="e.g., Mahindra Scorpio" required>
+        </div>
+        <div class="form-group">
+            <label for="investPrice">Invest Price (₹)</label>
+            <input type="number" id="investPrice" placeholder="e.g., 300" required>
+        </div>
+        <div class="form-group">
+            <label for="dayIncome">Day Income (₹)</label>
+            <input type="number" id="dayIncome" placeholder="e.g., 190" required>
+        </div>
+        <div class="form-group">
+            <label for="incomeDays">Income Days</label>
+            <input type="number" id="incomeDays" placeholder="e.g., 7" required>
+        </div>
+        <button type="submit" class="form-button">Add Plan</button>
+    </form>
 
-    <div class="main-content">
-        <header>
-            <h1 id="page-title">Dashboard</h1>
-        </header>
-
-        <main>
-            <!-- Dashboard Page -->
-            <div id="dashboard" class="page active">
-                <div class="stat-card">
-                    <h4>Registered Users</h4>
-                    <p id="total-users">0</p>
-                    <span>See in Detail &rarr;</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Withdrawal Request</h4>
-                    <p>0</p>
-                    <span>See in Detail &rarr;</span>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Recharge</h4>
-                    <p>₹0</p>
-                    <span>See in Detail &rarr;</span>
-                </div>
-            <!-- NEW: PENDING DEPOSITS SECTION -->
-          <div class="data-table-container">
-                <h2>Pending Deposit Requests</h2>
-                 <table id="depositsTable">
-          <thead>
-                  <tr>
-                    <th>User Email</th>
-                     <th>Amount</th>
-                       <th>Date</th>
-                       <th>Actions</th>
-                     </tr>
+    <div class="data-table-container">
+        <h3>Existing Plans</h3>
+        <table id="plans-table">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Price</th>
+                    <th>Daily Income</th>
+                    <th>Days</th>
+                    <th>Action</th>
+                </tr>
             </thead>
-        <tbody id="depositsTbody">
-           <!-- Deposit requests will be loaded here by JavaScript -->
-      <tr>
-        <td colspan="4">Loading requests...</td>
-      </tr>
+            <tbody id="plans-tbody">
+                <!-- Plan rows will be added here by JavaScript -->
             </tbody>
-            </table>
-      </div>
-       </div>
-
-            <!-- User Management Page -->
-            <div id="users" class="page">
-                <h2>Registered Users</h2>
-                <div id="user-list"></div>
-            </div>
-
-            <!-- Plan Management Page -->
-            <div id="plans" class="page">
-                <h2>Investment Plans</h2>
-                <div id="plan-list"></div>
-                <!-- Form to add a new plan can go here -->
-            </div>
-        </main>
+        </table>
     </div>
-
-    <!-- Firebase SDK Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+</div>
