@@ -123,3 +123,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// --- DYNAMICALLY LOAD INVESTMENT PLANS ON MAIN PAGE ---
+function loadPublicInvestmentPlans() {
+    const primaryContainer = document.getElementById('primary');
+    if (!primaryContainer) return;
+
+    db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
+        primaryContainer.innerHTML = ''; // Clear existing plans
+        snapshot.forEach(doc => {
+            const plan = doc.data();
+            const cardHTML = `
+                <article class="card">
+                    <h3>${plan.planName}</h3>
+                    <p>Day Income: ₹${plan.dayIncome}</p>
+                    <p>Income Days: ${plan.incomeDays} days</p>
+                    <p>Invest Price: ₹${plan.investPrice}</p>
+                    <button class="invest-btn">Invest Now</button>
+                </article>
+            `;
+            primaryContainer.innerHTML += cardHTML;
+        });
+    });
+}
+
+// Run the function if we are on the index page
+if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
+    loadPublicInvestmentPlans();
+}
+
