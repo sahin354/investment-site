@@ -72,8 +72,50 @@
             </div>
 
             <!-- Page 4: Plan Management -->
-            <div id="plans" class="page">
-                 <h2>Plan Management</h2>
+            <!-- Plan Management Page -->
+<div id="plans" class="page">
+    <h2>Add New Investment Plan</h2>
+    <!-- The form for adding new plans -->
+    <form id="addPlanForm" class="form-container">
+        <div class="form-group">
+            <label for="planName">Plan Name</label>
+            <input type="text" id="planName" placeholder="e.g., Mahindra Scorpio" required>
+        </div>
+        <div class="form-group">
+            <label for="investPrice">Invest Price (₹)</label>
+            <input type="number" id="investPrice" placeholder="e.g., 300" required>
+        </div>
+        <div class="form-group">
+            <label for="dayIncome">Day Income (₹)</label>
+            <input type="number" id="dayIncome" placeholder="e.g., 190" required>
+        </div>
+        <div class="form-group">
+            <label for="incomeDays">Income Days</label>
+            <input type="number" id="incomeDays" placeholder="e.g., 7" required>
+        </div>
+        <button type="submit" class="form-button">Add Plan</button>
+    </form>
+
+    <!-- The table to display existing plans -->
+    <div class="data-table-container">
+        <h3>Existing Plans</h3>
+        <table id="plans-table">
+            <thead>
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Price</th>
+                    <th>Daily Income</th>
+                    <th>Days</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="plans-tbody">
+                <!-- Plan rows will be added here by JavaScript -->
+            </tbody>
+        </table>
+        </div>
+       </div>
+     <h2>Plan Management</h2>
                  <p>Investment plan editor will go here.</p>
             </div>
         </main>
