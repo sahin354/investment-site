@@ -1,61 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Refer - Adani Corporation</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refer - Adani Corporation</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header class="top-bar">Adani Corporation - Refer & Earn</header>
-
-  <main class="container">
-    <h3>Share URL</h3>
-    <input type="text" class="referral-link" value="http://your-site.github.io/?ref=12345" readonly>
-    <button class="button">Copy & Share</button>
-
-    <h4>Total Refer: 3</h4>
-    <button class="button">Transfer Agent Balance To Wallet</button>
-
-    <div class="refer-tabs">
-      <div class="refer-tab active">Direct</div>
-      <div class="refer-tab">Secondary</div>
-      <div class="refer-tab">Third</div>
-    </div>
-
-    <table class="refer-table">
-      <thead>
-        <tr>
-          <th>Invitation</th>
-          <th>Register Time</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1234567890</td>
-          <td>2025-03-03 21:20:07</td>
-          <td class="status">Active</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h4>Invitation Bonus</h4>
-    <p>Direct Member (Level 1) – 34%<br>
-       Secondary Member (Level 2) – 3%<br>
-       Third Member (Level 3) – 2%</p>
-  </main>
-
-  <div class="bottom-nav-spacer"></div>
-
-  <nav class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
-    <a href="refer.html">Refer</a>
-    <a href="mine.html">Mine</a>
-  </nav>
-
-  <script src="script.js"></script>
+    <header class="top-bar">Adani Corporation - Refer & Earn</header>
+    <main>
+        <div class="card">
+            <h3>Your Referral Link</h3>
+            <input type="text" value="Fetching link..." id="referral-link" readonly style="width: 100%; padding: 10px; box-sizing: border-box;">
+            <button class="invest-btn" id="copy-btn" style="margin-top: 10px;">Copy Link</button>
+        </div>
+        <div class="card">
+            <h4>Invitation Bonus</h4>
+            <p>Direct Member (Level 1) – 34%<br>
+               Secondary Member (Level 2) – 3%<br>
+               Third Member (Level 3) – 2%</p>
+        </div>
+    </main>
+    <div class="bottom-nav-spacer"></div>
+    <footer class="bottom-nav">
+        <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
+    </footer>
+    <script src="script.js"></script> 
 </body>
 </html>
+
