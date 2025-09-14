@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Adani Corporation - Investment Site</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <aside id="sideMenu" class="side-menu">
-    <span id="closeBtn" class="close-btn">&times;</span>
-    <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
-    <a href="refer.html">Refer</a>
-    <a href="mine.html">Mine</a>
+    <div class="user-info">
+      <div class="user-icon">👤</div>
+      <div id="userEmail" class="user-email">Guest</div>
+    </div>
+    <nav class="side-nav">
+      <a href="#" id="mailBtn">📧 Mail</a>
+      <a href="#" id="withdrawalBtn">💰 Withdrawal</a>
+      <a href="#" id="rechargeBtn">🔋 Recharge</a>
+      <a href="#" id="referralBtn">🤝 Referral</a>
+      <a href="#" id="withdrawalHistoryBtn">📜 Withdrawal History</a>
+      <a href="#" id="transactionBtn">💳 Transaction</a>
+    </nav>
     <a href="#" id="logoutBtnSidebar" class="logout-link">🚪 Logout</a>
+    <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
 
   <header class="top-bar">
@@ -22,7 +30,7 @@
   </header>
 
   <main>
-    <img src="banner.jpg" alt="Adani Corporation banner" />
+    <img src="banner.jpg" alt="Adani Corporation banner" class="banner-img"/>
     <nav class="tabs">
       <button class="tab-button active" data-tab="primary">Primary</button>
       <button class="tab-button" data-tab="vip">VIP</button>
@@ -43,11 +51,11 @@
     <a href="mine.html">Mine</a>
   </footer>
 
-  <!-- Firebase JS SDKs -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  
+
   <script src="script.js"></script>
 </body>
 </html>
