@@ -27,10 +27,8 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// This function holds all the logic that runs when a user is logged in.
 function runPageSpecificScripts(user) {
-
-    // --- FULLY RESTORED: SIDEBAR MENU LOGIC ---
+    // --- SIDEBAR MENU LOGIC ---
     const sideMenu = document.getElementById('sideMenu');
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeBtn');
@@ -84,7 +82,7 @@ function runPageSpecificScripts(user) {
             });
         });
 
-        // Load user's purchased plans (Verified to show ALL purchases)
+        // Load user's purchased plans
         db.collection('investments').where('userId', '==', user.uid).orderBy('purchasedAt', 'desc').onSnapshot(snapshot => {
             const purchasedContainer = document.getElementById('purchased');
             purchasedContainer.innerHTML = snapshot.empty ? '<p class="info-text">You have no active investments.</p>' : '';
@@ -112,7 +110,6 @@ function runPageSpecificScripts(user) {
             e.preventDefault();
             const amount = parseFloat(withdrawalForm.withdrawAmount.value);
             const currentBalance = parseFloat(document.getElementById('user-balance').textContent.replace('₹', '').trim());
-
             if (isNaN(amount) || amount < 119) {
                 messageEl.textContent = 'Minimum withdrawal amount is ₹119.';
                 return;
@@ -121,10 +118,8 @@ function runPageSpecificScripts(user) {
                 messageEl.textContent = 'Insufficient balance.';
                 return;
             }
-            
             const tds = amount * 0.19;
             const finalAmount = amount - tds;
-
             if (confirm(`Withdrawal Summary:\nRequested: ₹${amount.toFixed(2)}\nTDS (19%): -₹${tds.toFixed(2)}\nAmount to Credit: ₹${finalAmount.toFixed(2)}\nProceed?`)) {
                 db.collection('withdrawals').add({
                     userId: user.uid, userEmail: user.email, requestedAmount: amount, tds, finalAmount,
@@ -138,7 +133,6 @@ function runPageSpecificScripts(user) {
     }
 }
 
-// INVESTMENT TRANSACTION FUNCTION
 async function investInPlan(user, planId, price) {
     const userRef = db.collection('users').doc(user.uid);
     const planRef = db.collection('plans').doc(planId);
@@ -147,10 +141,8 @@ async function investInPlan(user, planId, price) {
             const userDoc = await t.get(userRef);
             const planDoc = await t.get(planRef);
             if (!userDoc.exists || !planDoc.exists) throw new Error("User or Plan not found.");
-            
             const userData = userDoc.data();
             if ((userData.balance || 0) < price) throw new Error("Insufficient balance.");
-
             t.update(userRef, { balance: userData.balance - price });
             t.set(db.collection('investments').doc(), {
                 userId: user.uid, planId, ...planDoc.data(),
@@ -161,4 +153,4 @@ async function investInPlan(user, planId, price) {
     } catch (error) {
         alert(`Investment failed: ${error.message}`);
     }
-              }
+          }
