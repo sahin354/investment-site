@@ -153,4 +153,4 @@ async function investInPlan(user, planId, price) {
     } catch (error) {
         alert(`Investment failed: ${error.message}`);
     }
-          }
+        }
