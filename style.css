@@ -310,5 +310,39 @@ main {
     width: 220px;
     padding: 60px 15px 20px;
   }
-  }
+
+  .mine-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 90px 20px 60px 20px;
+  color: #222;
+}
+
+.card {
+  background: #e3f2fd;
+  border-radius: 12px;
+  padding: 25px 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.1);
+}
+
+.transaction-list {
+  list-style: none;
+  padding-left: 0;
+  font-size: 1.05em;
+}
+
+.transaction-list li {
+  background: white;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction-list li span {
+  font-weight: 700;
+}
   
