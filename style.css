@@ -1,47 +1,138 @@
-/* --- Global Styles --- */
-body { margin: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; padding-bottom: 60px; }
-.card { background: white; margin: 15px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.info-text { text-align: center; padding: 20px; color: #666; }
+/* Basic Layout & Styling */
 
-/* --- Two-Column Grid for Investment Plans --- */
-#primary, #vip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 10px 5px; }
-#primary .card, #vip .card { margin: 5px; }
-@media (max-width: 600px) { #primary, #vip { grid-template-columns: 1fr; } }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
-/* --- Header, Sidebar, Nav --- */
-.top-bar { background-color: #FFD700; color: black; padding: 15px; font-size: 18px; font-weight: bold; text-align: center; position: relative; }
-.menu-btn { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 25px; height: 18px; }
-.menu-btn span { display: block; height: 3px; width: 100%; background-color: black; border-radius: 2px; margin: 3px 0; }
-.side-menu { height: 100%; width: 0; position: fixed; top: 0; left: 0; background-color: #002855; overflow-x: hidden; transition: 0.3s; padding-top: 60px; z-index: 1000; display: flex; flex-direction: column; }
-.side-menu a { padding: 12px 20px; text-decoration: none; font-size: 18px; color: white; display: block; transition: 0.2s; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; color: white; cursor: pointer; }
-.logout-link { margin-top: auto; background: #c82333; color: white !important; font-weight: bold; text-align: center; }
-.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #FFD700; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ccc; z-index: 500; }
-.bottom-nav a { text-decoration: none; color: black; font-size: 14px; font-weight: bold; text-align: center; flex: 1; }
-.bottom-nav-spacer { height: 60px; }
+.top-bar {
+  background-color: #002366;
+  color: white;
+  padding: 15px 20px;
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+}
 
-/* --- Home Page Tabs & Cards --- */
-.banner { width: 100%; height: auto; display: block; }
-.tabs { display: flex; }
-.tabs button { flex: 1; padding: 12px; border: none; cursor: pointer; font-size: 16px; font-weight: bold; background-color: #002855; color: white; transition: background-color 0.2s; }
-.tabs button.active { background-color: #FFD700; color: black; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-.invest-btn { display: block; width: 100%; padding: 12px; background-color: #002855; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 16px; }
+.menu-btn {
+  cursor: pointer;
+  margin-right: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 20px;
+  width: 25px;
+}
 
-/* --- Mine & Form Pages --- */
-.profile { text-align: center; }
-.balances { display: flex; justify-content: space-around; margin: 15px 0; font-size: 1.2rem;}
-.menu { margin: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden; background: white; }
-.menu-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #ddd; text-decoration: none; color: inherit; }
-.menu-item:last-child { border-bottom: none; }
-.menu-item span { margin-left: 10px; font-weight: bold; }
-.logout-section { margin: 30px 15px; }
-.logout-btn-mine { display: block; width: 100%; padding: 12px; background-color: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-.logout-btn-mine:hover { background-color: #c82333; }
-.input-group { margin-bottom: 15px; }
-.input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-.input-group input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
-#withdrawal-message, #recharge-message { margin-top: 10px; font-weight: bold; text-align: center; }
-.error { color: #dc3545; }
-.success { color: #28a745; }
+.menu-btn span {
+  background-color: white;
+  height: 3px;
+  margin: 3px 0;
+  border-radius: 2px;
+}
+
+.side-menu {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #003399;
+  color: white;
+  padding-top: 40px;
+  transition: left 0.3s ease;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.side-menu a {
+  display: block;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+}
+
+.side-menu a:hover {
+  background-color: #001f7a;
+}
+
+.side-menu.open {
+  left: 0;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.tab-button {
+  cursor: pointer;
+  padding: 12px 30px;
+  border: none;
+  background-color: #eee;
+  margin: 0 5px;
+  font-size: 1em;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.tab-button.active,
+.tab-button:hover {
+  background-color: #0044cc;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+  padding: 20px;
+  max-width: 900px;
+  margin: 20px auto;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #002366;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.bottom-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1em;
+}
+
+.bottom-nav-spacer {
+  height: 50px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+.logout-link {
+  cursor: pointer;
+  color: #ff9999;
+}
