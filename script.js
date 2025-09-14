@@ -9,12 +9,10 @@ const firebaseConfig = {
   measurementId: "G-TGFHW9XKF2"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Sidebar toggle
 const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeBtn = document.getElementById('closeBtn');
@@ -22,11 +20,11 @@ const closeBtn = document.getElementById('closeBtn');
 menuBtn.addEventListener('click', () => {
   sideMenu.classList.add('open');
 });
+
 closeBtn.addEventListener('click', () => {
   sideMenu.classList.remove('open');
 });
 
-// Tabs switching
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
 
@@ -43,7 +41,6 @@ tabButtons.forEach(button => {
   });
 });
 
-// Load Firestore data for tabs
 function loadTabData(tabName) {
   const container = document.getElementById(tabName);
   container.innerHTML = '<p>Loading...</p>';
@@ -69,51 +66,37 @@ function loadTabData(tabName) {
     });
 }
 
-// Load initial tab data on page load
 loadTabData('primary');
 
-// Display logged-in user email in sidebar
 auth.onAuthStateChanged(user => {
-  const userEmailElem = document.getElementById('userEmail');
+  const accountId = document.getElementById('accountId');
+  const vipLevel = document.getElementById('vipLevel');
   if (user) {
-    userEmailElem.textContent = user.email;
-    console.log('User logged in:', user.email);
+    accountId.textContent = user.uid;
+
+    db.collection('users').doc(user.uid).get()
+      .then(doc => {
+        if (doc.exists) {
+          vipLevel.textContent = doc.data().vipLevel || 'Standard';
+        } else {
+          vipLevel.textContent = 'Standard';
+        }
+      })
+      .catch(() => {
+        vipLevel.textContent = 'Standard';
+      });
   } else {
-    userEmailElem.textContent = 'Guest';
-    console.log('No user logged in');
-    // Optional: redirect to login page if needed
+    accountId.textContent = 'Guest';
+    vipLevel.textContent = 'Guest';
   }
 });
 
-// Logout handler
-const logoutBtnSidebar = document.getElementById('logoutBtnSidebar');
-logoutBtnSidebar.addEventListener('click', () => {
-  auth.signOut()
-    .then(() => {
-      alert('Logged out successfully.');
-      location.reload();
-    })
-    .catch(error => {
-      alert('Logout error: ' + error.message);
-    });
+document.getElementById('logoutBtnSidebar').addEventListener('click', () => {
+  auth.signOut().then(() => {
+    alert('Logged out successfully.');
+    location.reload();
+  }).catch(err => {
+    alert('Logout error: ' + err.message);
+  });
 });
-
-// Sidebar buttons placeholders for additional features
-document.getElementById('mailBtn').addEventListener('click', () => {
-  alert('Mail feature coming soon!');
-});
-document.getElementById('withdrawalBtn').addEventListener('click', () => {
-  alert('Withdrawal feature coming soon!');
-});
-document.getElementById('rechargeBtn').addEventListener('click', () => {
-  alert('Recharge feature coming soon!');
-});
-document.getElementById('referralBtn').addEventListener('click', () => {
-  alert('Referral feature coming soon!');
-});
-document.getElementById('withdrawalHistoryBtn').addEventListener('click', () => {
-  alert('Withdrawal History feature coming soon!');
-});
-document.getElementById('transactionBtn').addEventListener('click', () => {
-  alert('Transaction feature coming soon!');
-});
+      
