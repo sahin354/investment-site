@@ -377,3 +377,23 @@ input[type="number"] {
 .logout-button:hover {
   background-color: #c9302c; /* Darker red on hover */
 }
+
+/* --- Logout Button on Mine Page --- */
+.logout-section {
+  margin: 30px 15px;
+}
+.logout-btn-mine {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #dc3545; /* Red Color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+.logout-btn-mine:hover {
+  background-color: #c82333; /* Darker Red */
+}
