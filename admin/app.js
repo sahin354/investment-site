@@ -205,3 +205,40 @@ function runDashboardScripts() {
         db.collection(collection).doc(reqId).update({ status: 'rejected' });
     }
                                     }
+     // --- NEW: USER BALANCE MANAGEMENT ---
+    const userListContainer = document.getElementById('user-list');
+    if (userListContainer) {
+        userListContainer.addEventListener('click', e => {
+            if (e.target.classList.contains('manage-btn')) {
+                const userId = e.target.dataset.userid;
+                const userName = e.target.dataset.username;
+                
+                const amountStr = prompt(`Enter amount to add or subtract for ${userName}:\n(Use a negative number to subtract, e.g., -50)`);
+                const amount = parseFloat(amountStr);
+
+                if (isNaN(amount)) {
+                    alert('Invalid number entered.');
+                    return;
+                }
+
+                const userRef = db.collection('users').doc(userId);
+                // Use a transaction for safety
+                db.runTransaction(transaction => {
+                    return transaction.get(userRef).then(userDoc => {
+                        if (!userDoc.exists) {
+                            throw "User does not exist!";
+                        }
+                        const currentBalance = userDoc.data().balance || 0;
+                        const newBalance = currentBalance + amount;
+                        transaction.update(userRef, { balance: newBalance });
+                        return newBalance;
+                    });
+                }).then(newBalance => {
+                    alert(`Success! ${userName}'s new balance is ₹${newBalance.toFixed(2)}.`);
+                }).catch(error => {
+                    console.error("Failed to update balance: ", error);
+                    alert("Failed to update balance. See console for details.");
+                });
+            }
+        });
+                  }
