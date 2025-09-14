@@ -397,3 +397,18 @@ input[type="number"] {
 .logout-btn-mine:hover {
   background-color: #c82333; /* Darker Red */
 }
+
+/* --- Two-Column Grid for Investment Plans --- */
+#primary, #vip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Creates two equal columns */
+    gap: 10px; /* Adds a small space between the cards */
+    padding: 10px;
+}
+
+/* On very small screens, go back to a single column */
+@media (max-width: 600px) {
+    #primary, #vip {
+        grid-template-columns: 1fr;
+    }
+  }
