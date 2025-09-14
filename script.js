@@ -8,24 +8,18 @@ const firebaseConfig = {
   appId: "1:549652082720:web:09bc0f371a498ee5184c45",
   measurementId: "G-TGFHW9XKF2"
 };
-
 // --- INITIALIZE FIREBASE & SERVICES ---
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 // --- THE ROBUST AUTHENTICATION GUARD ---
 auth.onAuthStateChanged(user => {
     const isProtectedPage = !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html');
-
     if (user) {
-        // --- USER IS LOGGED IN ---
         console.log('User is logged in. Running page scripts.');
         runPageSpecificScripts(user);
     } else {
-        // --- USER IS NOT LOGGED IN ---
         if (isProtectedPage) {
             console.log('User is not logged in. Redirecting to login.');
             window.location.href = 'login.html';
@@ -35,62 +29,62 @@ auth.onAuthStateChanged(user => {
 
 // This function holds all the logic that should ONLY run when a user is logged in.
 function runPageSpecificScripts(user) {
-
     // --- SIDEBAR MENU LOGIC (for index.html) ---
     const sideMenu = document.getElementById('sideMenu');
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeBtn');
-    if (menuBtn && sideMenu && closeBtn) {
+    if (menuBtn) {
         menuBtn.addEventListener('click', () => { sideMenu.style.width = '250px'; });
         closeBtn.addEventListener('click', () => { sideMenu.style.width = '0'; });
     }
 
-    // --- TAB SWITCHING LOGIC (for index.html) ---
-    const tabButtons = document.querySelectorAll('.tab-button');
-    if (tabButtons.length > 0) {
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabId = button.getAttribute('data-tab');
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                button.classList.add('active');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-    }
-
-    // --- LOGOUT LOGIC (Handles both sidebar and mine page buttons) ---
-    const logoutBtnSidebar = document.getElementById('logoutBtn');
-    const logoutBtnMine = document.getElementById('logoutBtnMine');
-
+    // --- LOGOUT LOGIC (Handles all logout buttons) ---
     const handleLogout = (event) => {
         event.preventDefault();
         if (confirm('Are you sure you want to logout?')) {
-            auth.signOut().catch(error => console.error('Logout error:', error));
-            // The onAuthStateChanged listener will automatically handle the redirect.
+            auth.signOut();
         }
     };
-    if (logoutBtnSidebar) {
-        logoutBtnSidebar.addEventListener('click', handleLogout);
-    }
-    if (logoutBtnMine) {
-        logoutBtnMine.addEventListener('click', handleLogout);
-    }
+    document.getElementById('logoutBtnSidebar')?.addEventListener('click', handleLogout);
+    document.getElementById('logoutBtnMine')?.addEventListener('click', handleLogout);
     
-    // --- MINE PAGE: DISPLAY USER DATA (This is now fixed) ---
-    const userNameEl = document.getElementById('user-name-phone');
-    if (userNameEl) {
-        const userDocRef = db.collection('users').doc(user.uid);
-        userDocRef.onSnapshot(doc => {
+    // --- MINE PAGE: DISPLAY USER DATA ---
+    if (document.getElementById('user-name-phone')) {
+        db.collection('users').doc(user.uid).onSnapshot(doc => {
             if (doc.exists) {
                 const userData = doc.data();
                 document.getElementById('user-name-phone').textContent = `${userData.fullName} (${userData.phone})`;
                 document.getElementById('user-email').textContent = userData.email;
                 document.getElementById('user-balance').textContent = `₹ ${userData.balance.toFixed(2)}`;
-            } else {
-                console.error("User document not found in Firestore!");
             }
+        });
+    }
+
+    // --- MINE PAGE: SUBMIT WITHDRAWAL REQUEST ---
+    const withdrawalForm = document.getElementById('withdrawalForm');
+    if (withdrawalForm) {
+        const messageEl = document.getElementById('withdrawal-message');
+        withdrawalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(withdrawalForm.withdrawAmount.value);
+            const currentBalance = parseFloat(document.getElementById('user-balance').textContent.replace('₹', '').trim());
+
+            if (isNaN(amount) || amount <= 0) {
+                messageEl.textContent = 'Please enter a valid amount.';
+                return;
+            }
+            if (amount > currentBalance) {
+                messageEl.textContent = 'Withdrawal amount cannot exceed your balance.';
+                return;
+            }
+
+            db.collection('withdrawals').add({
+                userId: user.uid, userEmail: user.email, amount: amount, status: 'pending',
+                requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                messageEl.textContent = 'Withdrawal request submitted!';
+                withdrawalForm.reset();
+            });
         });
     }
 
@@ -103,64 +97,35 @@ function runPageSpecificScripts(user) {
             const amount = parseFloat(rechargeForm.amount.value);
             if (isNaN(amount) || amount < 200 || amount > 50000) {
                 messageEl.textContent = 'Amount must be between ₹200 and ₹50,000.';
-                messageEl.className = 'error';
                 return;
             }
             db.collection('deposits').add({
-                userId: user.uid,
-                userEmail: user.email,
-                amount: amount,
-                status: 'pending',
+                userId: user.uid, userEmail: user.email, amount: amount, status: 'pending',
                 requestedAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                messageEl.textContent = 'Deposit request submitted successfully!';
-                messageEl.className = 'success';
+                messageEl.textContent = 'Deposit request submitted!';
                 rechargeForm.reset();
-            }).catch(error => {
-                messageEl.textContent = 'Error submitting request.';
-                messageEl.className = 'error';
-                console.error("Error adding deposit:", error);
+            });
+        });
+    }
+
+    // --- HOME PAGE: LOAD INVESTMENT PLANS ---
+    const primaryPlans = document.getElementById('primary');
+    if (primaryPlans) {
+        db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
+            primaryPlans.innerHTML = '';
+            snapshot.forEach(doc => {
+                const plan = doc.data();
+                const cardHTML = `
+                    <article class="card">
+                        <h3>${plan.planName}</h3>
+                        <p>Day Income: ₹${plan.dayIncome}</p>
+                        <p>Income Days: ${plan.incomeDays} days</p>
+                        <p>Invest Price: ₹${plan.investPrice}</p>
+                        <button class="invest-btn">Invest Now</button>
+                    </article>`;
+                primaryPlans.innerHTML += cardHTML;
             });
         });
     }
 }
-    // --- MINE PAGE: SUBMIT WITHDRAWAL REQUEST ---
-    const withdrawalForm = document.getElementById('withdrawalForm');
-    if (withdrawalForm) {
-        const messageEl = document.getElementById('withdrawal-message');
-        withdrawalForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const amount = parseFloat(withdrawalForm.withdrawAmount.value);
-            
-            // Get current balance to check if withdrawal is possible
-            const currentBalanceText = document.getElementById('user-balance').textContent;
-            const currentBalance = parseFloat(currentBalanceText.replace('₹', '').trim());
-
-            if (isNaN(amount) || amount <= 0) {
-                messageEl.textContent = 'Please enter a valid amount.';
-                messageEl.className = 'error';
-                return;
-            }
-            if (amount > currentBalance) {
-                messageEl.textContent = 'Withdrawal amount cannot exceed your balance.';
-                messageEl.className = 'error';
-                return;
-            }
-
-            db.collection('withdrawals').add({
-                userId: user.uid,
-                userEmail: user.email,
-                amount: amount,
-                status: 'pending',
-                requestedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                messageEl.textContent = 'Withdrawal request submitted successfully!';
-                messageEl.className = 'success';
-                withdrawalForm.reset();
-            }).catch(error => {
-                messageEl.textContent = 'Error submitting request.';
-                messageEl.className = 'error';
-                console.error("Error adding withdrawal:", error);
-            });
-        });
-    }
