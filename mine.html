@@ -9,30 +9,28 @@
 <body>
   <header class="top-bar">Adani Corporation - Mine</header>
   <main>
-    <section class="profile">
+    <section class="profile card">
       <h2 id="user-name-phone">Loading...</h2>
       <p id="user-email">Loading...</p>
       <div class="balances">
         <div><span id="user-balance">₹ 0.00</span><br><small>Balance</small></div>
       </div>
     </section>
+
     <section class="card">
         <h3>Withdraw Funds</h3>
         <form id="withdrawalForm">
-            <div class="input-group"><label for="withdrawAmount">Amount</label><input type="number" id="withdrawAmount" placeholder="Enter amount" required></div>
+            <div class="input-group"><label for="withdrawAmount">Amount to Withdraw</label><input type="number" id="withdrawAmount" placeholder="Min withdrawal: ₹119" required></div>
             <button type="submit" class="invest-btn">Request Withdrawal</button>
         </form>
         <p id="withdrawal-message"></p>
     </section>
 
-    <!-- Restored Menu Buttons -->
     <nav class="menu">
-        <a href="#" class="menu-item">📄 <span>Transaction Details</span></a>
+        <a href="#" class="menu-item">📄 <span>Deposit Details</span></a>
         <a href="#" class="menu-item">🏦 <span>My Bank Account</span></a>
-        <a href="#" class="menu-item">📥<span>Customer support</span></a>
     </nav>
     
-    <!-- Correctly placed Logout Button -->
     <div class="logout-section">
         <button id="logoutBtnMine" class="logout-btn-mine">Logout</button>
     </div>
