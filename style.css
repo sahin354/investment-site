@@ -1,120 +1,47 @@
 /* --- Global Styles --- */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  padding-bottom: 60px;
-}
-.card {
-  background: white;
-  margin: 15px;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-.info-text {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-}
+body { margin: 0; font-family: Arial, sans-serif; background-color: #f5f5f5; padding-bottom: 60px; }
+.card { background: white; margin: 15px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.info-text { text-align: center; padding: 20px; color: #666; }
 
-/* --- NEW: Two-Column Grid for Investment Plans --- */
-#primary, #vip {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Creates two equal columns */
-    gap: 5px; 
-    padding: 10px 5px;
-}
-/* Adjust card margin for grid */
-#primary .card, #vip .card {
-    margin: 5px;
-}
-/* On very small screens, go back to a single column */
-@media (max-width: 600px) {
-    #primary, #vip {
-        grid-template-columns: 1fr;
-    }
-}
+/* --- Two-Column Grid for Investment Plans --- */
+#primary, #vip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; padding: 10px 5px; }
+#primary .card, #vip .card { margin: 5px; }
+@media (max-width: 600px) { #primary, #vip { grid-template-columns: 1fr; } }
 
 /* --- Header, Sidebar, Nav --- */
-.top-bar {
-  background-color: #FFD700;
-  color: black;
-  padding: 15px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  position: relative;
-}
-.menu-btn {
-  position: absolute; left: 15px; top: 50%;
-  transform: translateY(-50%); cursor: pointer;
-  width: 25px; height: 18px;
-}
-.menu-btn span {
-  display: block; height: 3px; width: 100%;
-  background-color: black; border-radius: 2px; margin: 3px 0;
-}
-.side-menu {
-  height: 100%; width: 0; position: fixed; top: 0; left: 0;
-  background-color: #002855; overflow-x: hidden;
-  transition: 0.3s; padding-top: 60px; z-index: 1000;
-}
-.side-menu a {
-  padding: 12px 20px; text-decoration: none; font-size: 18px;
-  color: white; display: block; transition: 0.2s;
-}
-.close-btn {
-  position: absolute; top: 15px; right: 20px;
-  font-size: 30px; color: white; cursor: pointer;
-}
-.logout-link {
-  margin-top: auto; background: #c82333; color: white !important;
-  font-weight: bold; text-align: center;
-}
-.bottom-nav {
-  position: fixed; bottom: 0; left: 0; width: 100%;
-  background-color: #FFD700; display: flex;
-  justify-content: space-around; padding: 10px 0;
-  border-top: 1px solid #ccc; z-index: 500;
-}
-.bottom-nav a {
-  text-decoration: none; color: black; font-size: 14px;
-  font-weight: bold; text-align: center; flex: 1;
-}
+.top-bar { background-color: #FFD700; color: black; padding: 15px; font-size: 18px; font-weight: bold; text-align: center; position: relative; }
+.menu-btn { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 25px; height: 18px; }
+.menu-btn span { display: block; height: 3px; width: 100%; background-color: black; border-radius: 2px; margin: 3px 0; }
+.side-menu { height: 100%; width: 0; position: fixed; top: 0; left: 0; background-color: #002855; overflow-x: hidden; transition: 0.3s; padding-top: 60px; z-index: 1000; display: flex; flex-direction: column; }
+.side-menu a { padding: 12px 20px; text-decoration: none; font-size: 18px; color: white; display: block; transition: 0.2s; }
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; color: white; cursor: pointer; }
+.logout-link { margin-top: auto; background: #c82333; color: white !important; font-weight: bold; text-align: center; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #FFD700; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ccc; z-index: 500; }
+.bottom-nav a { text-decoration: none; color: black; font-size: 14px; font-weight: bold; text-align: center; flex: 1; }
 .bottom-nav-spacer { height: 60px; }
 
 /* --- Home Page Tabs & Cards --- */
 .banner { width: 100%; height: auto; display: block; }
 .tabs { display: flex; }
-.tabs button {
-  flex: 1; padding: 10px; border: none; cursor: pointer;
-  font-size: 16px; font-weight: bold; background-color: #002855; color: white;
-}
+.tabs button { flex: 1; padding: 12px; border: none; cursor: pointer; font-size: 16px; font-weight: bold; background-color: #002855; color: white; transition: background-color 0.2s; }
 .tabs button.active { background-color: #FFD700; color: black; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
-.invest-btn {
-  display: block; width: 100%; padding: 12px;
-  background-color: #002855; color: white; border: none;
-  border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 16px;
-}
+.invest-btn { display: block; width: 100%; padding: 12px; background-color: #002855; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 16px; }
 
-/* --- Mine Page --- */
-.profile { text-align: center; padding: 15px; }
-.balances { display: flex; justify-content: space-around; margin: 15px 0; }
+/* --- Mine & Form Pages --- */
+.profile { text-align: center; }
+.balances { display: flex; justify-content: space-around; margin: 15px 0; font-size: 1.2rem;}
 .menu { margin: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden; background: white; }
 .menu-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #ddd; text-decoration: none; color: inherit; }
 .menu-item:last-child { border-bottom: none; }
 .menu-item span { margin-left: 10px; font-weight: bold; }
 .logout-section { margin: 30px 15px; }
-.logout-btn-mine {
-  display: block; width: 100%; padding: 12px; background-color: #dc3545;
-  color: white; border: none; border-radius: 6px; cursor: pointer;
-  font-size: 16px; font-weight: bold;
-}
+.logout-btn-mine { display: block; width: 100%; padding: 12px; background-color: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
 .logout-btn-mine:hover { background-color: #c82333; }
 .input-group { margin-bottom: 15px; }
-.input-group label { display: block; margin-bottom: 5px; }
-#withdrawal-message.error { color: red; }
-#withdrawal-message.success { color: green; }
+.input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+.input-group input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+#withdrawal-message, #recharge-message { margin-top: 10px; font-weight: bold; text-align: center; }
+.error { color: #dc3545; }
+.success { color: #28a745; }
