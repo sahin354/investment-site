@@ -1,31 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refer - Adani Corporation</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adani Corporation - Refer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header class="top-bar">Adani Corporation - Refer & Earn</header>
-    <main>
-        <div class="card">
-            <h3>Your Referral Link</h3>
-            <input type="text" value="Fetching link..." id="referral-link" readonly style="width: 100%; padding: 10px; box-sizing: border-box;">
-            <button class="invest-btn" id="copy-btn" style="margin-top: 10px;">Copy Link</button>
-        </div>
-        <div class="card">
-            <h4>Invitation Bonus</h4>
-            <p>Direct Member (Level 1) – 34%<br>
-               Secondary Member (Level 2) – 3%<br>
-               Third Member (Level 3) – 2%</p>
-        </div>
-    </main>
-    <div class="bottom-nav-spacer"></div>
-    <footer class="bottom-nav">
-        <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
-    </footer>
-    <script src="script.js"></script> 
+
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-top">
+      <div class="account-info">
+        <div><strong>Account ID:</strong> <span id="accountId">Loading...</span></div>
+        <div><strong>VIP Level:</strong> <span id="vipLevel">Loading...</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-middle">
+      <a href="settings.html" class="sidebar-link">⚙️ Settings</a>
+      <a href="support.html" class="sidebar-link">🛠 Support</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <button id="logoutBtnSidebar" class="logout-btn">🚪 Logout</button>
+    </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    Adani Corporation - Refer
+  </header>
+
+  <main class="refer-main">
+    <section class="refer-section">
+      <h2>Your Referral Code</h2>
+      <div id="referralCode" class="referral-code">Loading...</div>
+      <button id="shareReferral" class="btn-primary">Share Referral Code</button>
+    </section>
+
+    <section class="refer-section">
+      <h2>Referral Stats</h2>
+      <ul id="referralStats" class="referral-stats">
+        <li>Loading...</li>
+      </ul>
+    </section>
+  </main>
+
+  <div class="bottom-nav-spacer"></div>
+
+  <footer class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="recharge.html">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <script src="script-refer.js"></script>
+
 </body>
 </html>
-
