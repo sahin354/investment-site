@@ -85,8 +85,17 @@ function runDashboardScripts() {
                     <td>₹${user.balance?.toFixed(2) || '0.00'}</td><td>${user.role}</td>
                 </tr>`;
             });
-            html += '</tbody></table>';
-            userListEl.innerHTML = html;
+                            // This is the new row with the Manage button
+                html += `<tr>
+                    <td>${user.fullName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td>
+                    <td>${user.role}</td>
+                    <td>
+                        <button class="manage-btn" data-userid="${doc.id}" data-username="${user.fullName}">Manage</button>
+                    </td>
+                </tr>`;
         });
     }
 
