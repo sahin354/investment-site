@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adani Corporation - Investment Site</title>
+  <title>Adani Corporation - Home</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <aside id="sideMenu" class="side-menu">
-    <div class="user-info">
-      <div class="user-icon">👤</div>
-      <div id="userEmail" class="user-email">Guest</div>
+    <div class="sidebar-top">
+      <div class="account-info">
+        <div><strong>Account ID:</strong> <span id="accountId">Loading...</span></div>
+        <div><strong>VIP Level:</strong> <span id="vipLevel">Loading...</span></div>
+      </div>
     </div>
-    <nav class="side-nav">
-      <a href="#" id="mailBtn">📧 Mail</a>
-      <a href="#" id="withdrawalBtn">💰 Withdrawal</a>
-      <a href="#" id="rechargeBtn">🔋 Recharge</a>
-      <a href="#" id="referralBtn">🤝 Referral</a>
-      <a href="#" id="withdrawalHistoryBtn">📜 Withdrawal History</a>
-      <a href="#" id="transactionBtn">💳 Transaction</a>
+    <nav class="sidebar-middle">
+      <a href="settings.html" class="sidebar-link">⚙️ Settings</a>
+      <a href="support.html" class="sidebar-link">🛠 Support</a>
     </nav>
-    <a href="#" id="logoutBtnSidebar" class="logout-link">🚪 Logout</a>
+    <div class="sidebar-bottom">
+      <button id="logoutBtnSidebar" class="logout-btn">🚪 Logout</button>
+    </div>
     <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
 
@@ -31,6 +32,7 @@
 
   <main>
     <img src="banner.jpg" alt="Adani Corporation banner" class="banner-img"/>
+
     <nav class="tabs">
       <button class="tab-button active" data-tab="primary">Primary</button>
       <button class="tab-button" data-tab="vip">VIP</button>
@@ -51,11 +53,11 @@
     <a href="mine.html">Mine</a>
   </footer>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
   <script src="script.js"></script>
+
 </body>
 </html>
