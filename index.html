@@ -5,75 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adani Corporation - Investment Site</title>
   <link rel="stylesheet" href="style.css">
-  <!-- ADDED: Firebase SDK Scripts -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
-
-  <!-- Sidebar -->
   <aside id="sideMenu" class="side-menu">
     <span id="closeBtn" class="close-btn">&times;</span>
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
     <a href="refer.html">Refer</a>
     <a href="mine.html">Mine</a>
-    <a href="#">Contact</a>
-    <!-- Your Original Logout Button -->
-    <a href="#" id="sidebarLogoutBtn" class="logout-link">🚪 Logout</a>
+    <a href="#" id="logoutBtnSidebar" class="logout-link">🚪 Logout</a>
   </aside>
 
-  <!-- Top bar -->
   <header class="top-bar">
-    <div id="menuBtn" class="menu-btn">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Adani Corporation
   </header>
 
-  <!-- Main Content -->
   <main>
-    <!-- Banner -->
-    <img src="banner.jpg" alt="Investment opportunities banner" class="banner">
+    <img src="https://placehold.co/600x200/002855/FFD700?text=Adani+Banner" alt="Banner" class="banner" onerror="this.onerror=null;this.src='https://placehold.co/600x200?text=Banner';">
 
-    <!-- Your Tabs -->
     <nav class="tabs">
       <button class="tab-button active" data-tab="primary">Primary</button>
       <button class="tab-button" data-tab="vip">VIP</button>
       <button class="tab-button" data-tab="purchased">Purchased</button>
     </nav>
 
-    <!-- Your Primary Tab Content -->
-    <div class="card">
-  
-    <section id="primary" class="tab-content active">
-     
-      
-    </section>
-
-    <!-- Your VIP Tab Content -->
-    <section id="vip" class="tab-content">
-    
-    </section>
-
-    <!-- Your Purchased Tab Content -->
-    <section id="purchased" class="tab-content">
-      <article class="card">
-        <h3>Purchased Plan 1</h3>
-        <p>Status: Active</p>
-        <p>Remaining Days: 10</p>
-        <p>Daily Income: ₹190</p>
-        <button class="invest-btn">View Details</button>
-      </article>
-    </section>
+    <section id="primary" class="tab-content active"></section>
+    <section id="vip" class="tab-content"></section>
+    <section id="purchased" class="tab-content"></section>
   </main>
   
   <div class="bottom-nav-spacer"></div>
 
-  <!-- Bottom Navigation -->
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
@@ -81,12 +44,12 @@
     <a href="mine.html">Mine</a>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
 
 
-  
-
-
-
+    
