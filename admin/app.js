@@ -36,7 +36,6 @@ function runDashboardScripts() {
     const navLinks = document.querySelectorAll('.sidebar .nav-item');
     const pages = document.querySelectorAll('.main-content .page');
     const pageTitle = document.getElementById('page-title');
-
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -55,86 +54,29 @@ function runDashboardScripts() {
     document.getElementById('logoutBtn')?.addEventListener('click', () => auth.signOut());
 
     // --- LOAD ALL DATA ---
-    loadDashboardStats();
     loadUsers();
-    loadDepositRequests();
-    loadWithdrawalRequests();
     loadInvestmentPlans();
+    // (Other data loading functions like deposits/withdrawals go here)
 
-    // --- DATA LOADING FUNCTIONS ---
-    function loadDashboardStats() {
-        db.collection('users').onSnapshot(snap => {
-            document.getElementById('total-users').textContent = snap.size;
-        });
-        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snap => {
-            document.getElementById('pending-deposits').textContent = snap.size;
-        });
-        db.collection('withdrawals').where('status', '==', 'pending').onSnapshot(snap => {
-            document.getElementById('pending-withdrawals').textContent = snap.size;
-        });
-    }
-
+    // --- USER MANAGEMENT ---
     function loadUsers() {
         const userListEl = document.getElementById('user-list');
         db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-            let html = '<table><thead><tr><th>Full Name</th><th>Email</th><th>Phone</th><th>Balance</th><th>Role</th></tr></thead><tbody>';
+            let html = '<table><thead><tr><th>Full Name</th><th>Email</th><th>Balance</th><th>Role</th><th>Actions</th></tr></thead><tbody>';
             snapshot.forEach(doc => {
                 const user = doc.data();
                 html += `<tr>
-                    <td>${user.fullName}</td><td>${user.email}</td><td>${user.phone}</td>
+                    <td>${user.fullName}</td><td>${user.email}</td>
                     <td>₹${user.balance?.toFixed(2) || '0.00'}</td><td>${user.role}</td>
+                    <td><button class="manage-btn" data-userid="${doc.id}" data-username="${user.fullName}">Manage</button></td>
                 </tr>`;
             });
-                            // This is the new row with the Manage button
-                html += `<tr>
-                    <td>${user.fullName}</td>
-                    <td>${user.email}</td>
-                    <td>${user.phone}</td>
-                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td>
-                    <td>${user.role}</td>
-                    <td>
-                        <button class="manage-btn" data-userid="${doc.id}" data-username="${user.fullName}">Manage</button>
-                    </td>
-                </tr>`;
+            html += '</tbody></table>';
+            userListEl.innerHTML = html;
         });
     }
 
-    function loadDepositRequests() {
-        const tbody = document.getElementById('deposits-tbody');
-        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snapshot => {
-            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="4">No pending requests.</td></tr>' : '';
-            snapshot.forEach(doc => {
-                const req = doc.data();
-                tbody.innerHTML += `<tr>
-                    <td>${req.userEmail}</td><td>₹${req.amount.toFixed(2)}</td>
-                    <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
-                    <td>
-                        <button class="approve-btn" data-type="deposit" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
-                        <button class="reject-btn" data-type="deposit" data-id="${doc.id}">Reject</button>
-                    </td>
-                </tr>`;
-            });
-        });
-    }
-
-    function loadWithdrawalRequests() {
-        const tbody = document.getElementById('withdrawals-tbody');
-        db.collection('withdrawals').where('status', '==', 'pending').onSnapshot(snapshot => {
-            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="4">No pending requests.</td></tr>' : '';
-            snapshot.forEach(doc => {
-                const req = doc.data();
-                tbody.innerHTML += `<tr>
-                    <td>${req.userEmail}</td><td>₹${req.amount.toFixed(2)}</td>
-                    <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
-                    <td>
-                        <button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
-                        <button class="reject-btn" data-type="withdrawal" data-id="${doc.id}">Reject</button>
-                    </td>
-                </tr>`;
-            });
-        });
-    }
-
+    // --- PLAN MANAGEMENT ---
     function loadInvestmentPlans() {
         const tbody = document.getElementById('plans-tbody');
         db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
@@ -142,7 +84,8 @@ function runDashboardScripts() {
             snapshot.forEach(doc => {
                 const plan = doc.data();
                 tbody.innerHTML += `<tr>
-                    <td>${plan.planName}</td><td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td>
+                    <td>${plan.planName} ${plan.isVip ? '(VIP)' : ''}</td>
+                    <td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td>
                     <td><button class="delete-btn" data-id="${doc.id}">Delete</button></td>
                 </tr>`;
             });
@@ -151,15 +94,13 @@ function runDashboardScripts() {
 
     // --- EVENT LISTENERS FOR ACTIONS ---
     document.querySelector('.content-area').addEventListener('click', e => {
-        const { type, id, amount, userid } = e.target.dataset;
-        if (!type || !id) return;
-        const amountNum = parseFloat(amount);
-        if (e.target.classList.contains('approve-btn')) {
-            if (type === 'deposit') approveDeposit(id, userid, amountNum);
-            if (type === 'withdrawal') approveWithdrawal(id, userid, amountNum);
-        }
-        if (e.target.classList.contains('reject-btn')) {
-            rejectTransaction((type === 'deposit' ? 'deposits' : 'withdrawals'), id);
+        const { userid, username, id } = e.target.dataset;
+        if (e.target.classList.contains('manage-btn')) {
+            const amountStr = prompt(`Enter amount to add/subtract for ${username}:\n(e.g., 50 to add, -50 to subtract)`);
+            const amount = parseFloat(amountStr);
+            if (!isNaN(amount)) {
+                updateUserBalance(userid, amount);
+            }
         }
         if (e.target.classList.contains('delete-btn')) {
             if (confirm('Are you sure?')) db.collection('plans').doc(id).delete();
@@ -172,73 +113,21 @@ function runDashboardScripts() {
             planName: e.target.planName.value,
             investPrice: parseFloat(e.target.investPrice.value),
             dayIncome: parseFloat(e.target.dayIncome.value),
-            incomeDays: parseInt(e.target.incomeDays.value)
+            incomeDays: parseInt(e.target.incomeDays.value),
+            isVip: e.target.isVipPlan.checked
         }).then(() => e.target.reset());
     });
 
     // --- TRANSACTION LOGIC ---
-    function approveDeposit(reqId, userId, amount) {
+    function updateUserBalance(userId, amount) {
         const userRef = db.collection('users').doc(userId);
         db.runTransaction(async t => {
             const userDoc = await t.get(userRef);
             if (!userDoc.exists) throw "User not found!";
             const newBalance = (userDoc.data().balance || 0) + amount;
             t.update(userRef, { balance: newBalance });
-            t.update(db.collection('deposits').doc(reqId), { status: 'approved' });
-        }).catch(err => console.error("Approve deposit failed:", err));
+            return newBalance;
+        }).then(newBalance => alert(`Success! New balance is ₹${newBalance.toFixed(2)}.`))
+          .catch(err => alert(`Failed to update balance: ${err}`));
     }
-    
-    function approveWithdrawal(reqId, userId, amount) {
-        const userRef = db.collection('users').doc(userId);
-        db.runTransaction(async t => {
-            const userDoc = await t.get(userRef);
-            if (!userDoc.exists) throw "User not found!";
-            const currentBalance = userDoc.data().balance || 0;
-            if (currentBalance < amount) throw "Insufficient funds!";
-            const newBalance = currentBalance - amount;
-            t.update(userRef, { balance: newBalance });
-            t.update(db.collection('withdrawals').doc(reqId), { status: 'approved' });
-        }).catch(err => alert("Withdrawal failed: " + err));
-    }
-
-    function rejectTransaction(collection, reqId) {
-        db.collection(collection).doc(reqId).update({ status: 'rejected' });
-    }
-                                    }
-     // --- NEW: USER BALANCE MANAGEMENT ---
-    const userListContainer = document.getElementById('user-list');
-    if (userListContainer) {
-        userListContainer.addEventListener('click', e => {
-            if (e.target.classList.contains('manage-btn')) {
-                const userId = e.target.dataset.userid;
-                const userName = e.target.dataset.username;
-                
-                const amountStr = prompt(`Enter amount to add or subtract for ${userName}:\n(Use a negative number to subtract, e.g., -50)`);
-                const amount = parseFloat(amountStr);
-
-                if (isNaN(amount)) {
-                    alert('Invalid number entered.');
-                    return;
-                }
-
-                const userRef = db.collection('users').doc(userId);
-                // Use a transaction for safety
-                db.runTransaction(transaction => {
-                    return transaction.get(userRef).then(userDoc => {
-                        if (!userDoc.exists) {
-                            throw "User does not exist!";
-                        }
-                        const currentBalance = userDoc.data().balance || 0;
-                        const newBalance = currentBalance + amount;
-                        transaction.update(userRef, { balance: newBalance });
-                        return newBalance;
-                    });
-                }).then(newBalance => {
-                    alert(`Success! ${userName}'s new balance is ₹${newBalance.toFixed(2)}.`);
-                }).catch(error => {
-                    console.error("Failed to update balance: ", error);
-                    alert("Failed to update balance. See console for details.");
-                });
-            }
-        });
-                  }
+}
