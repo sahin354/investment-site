@@ -93,17 +93,26 @@ function runDashboardScripts() {
     function loadWithdrawalRequests() {
         const tbody = document.getElementById('withdrawals-tbody');
         db.collection('withdrawals').where('status', '==', 'pending').onSnapshot(snapshot => {
-            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No pending withdrawal requests.</td></tr>' : '';
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No pending requests.</td></tr>' : '';
             snapshot.forEach(doc => {
                 const req = doc.data();
-                tbody.innerHTML += `<tr><td>${req.userEmail}</td><td>₹${req.requestedAmount.toFixed(2)}</td><td>₹${req.tds.toFixed(2)}</td><td><b>₹${req.finalAmount.toFixed(2)}</b></td><td><button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${req.requestedAmount}" data-userid="${req.userId}">Approve</button><button class="reject-btn" data-type="withdrawal" data-id="${doc.id}">Reject</button></td></tr>`;
+                tbody.innerHTML += `<tr><td>${req.userEmail}</td><td>₹${req.requestedAmount.toFixed(2)}</td><td>₹${req.tds.toFixed(2)}</td><td><b>₹${req.finalAmount.toFixed(2)}</b></td><td><button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${req.requestedAmount}" data-userid="${req.userId}">Approve</button><button class="reject-btn" data-type="withdrawal" data-id="${doc.id}" data-userid="${req.userId}" data-amount="${req.requestedAmount}">Reject</button></td></tr>`;
             });
         });
     }
     
-    function loadInvestmentPlans() { /* ... See full code block ... */ }
+    function loadInvestmentPlans() {
+        const tbody = document.getElementById('plans-tbody');
+        db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No plans yet.</td></tr>' : '';
+            snapshot.forEach(doc => {
+                const plan = doc.data();
+                tbody.innerHTML += `<tr><td>${plan.planName} ${plan.isVip ? '<b>(VIP)</b>' : ''}</td><td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td><td><button class="delete-btn" data-id="${doc.id}">Delete</button></td></tr>`;
+            });
+        });
+    }
 
-    // --- EVENT LISTENERS FOR ACTIONS ---
+    // --- EVENT LISTENERS ---
     document.querySelector('.content-area').addEventListener('click', e => {
         const { type, id, amount, userid, username } = e.target.dataset;
         const amountNum = parseFloat(amount);
@@ -125,11 +134,55 @@ function runDashboardScripts() {
         }
     });
 
-    document.getElementById('addPlanForm').addEventListener('submit', e => { /* ... See full code block ... */ });
+    document.getElementById('addPlanForm').addEventListener('submit', e => {
+        e.preventDefault();
+        db.collection('plans').add({
+            planName: e.target.planName.value,
+            investPrice: parseFloat(e.target.investPrice.value),
+            dayIncome: parseFloat(e.target.dayIncome.value),
+            incomeDays: parseInt(e.target.incomeDays.value),
+            isVip: e.target.isVipPlan.checked
+        }).then(() => e.target.reset());
+    });
 
     // --- TRANSACTION LOGIC ---
-    function approveDeposit(reqId, userId, amount) { /* ... See full code block ... */ }
-    function approveWithdrawal(reqId, userId, amount) { /* ... See full code block ... */ }
-    function rejectTransaction(collection, reqId) { /* ... See full code an async function ... */ }
-    function updateUserBalance(userId, amount) { /* ... See full code block ... */ }
-}
+    function approveDeposit(reqId, userId, amount) {
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(async t => {
+            const userDoc = await t.get(userRef);
+            if (!userDoc.exists) throw "User not found!";
+            const newBalance = (userDoc.data().balance || 0) + amount;
+            t.update(userRef, { balance: newBalance });
+            t.update(db.collection('deposits').doc(reqId), { status: 'approved' });
+        }).catch(err => console.error("Approve deposit failed:", err));
+    }
+    
+    function approveWithdrawal(reqId, userId, amount) {
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(async t => {
+            const userDoc = await t.get(userRef);
+            if (!userDoc.exists) throw "User not found!";
+            const currentBalance = userDoc.data().balance || 0;
+            if (currentBalance < amount) throw "Insufficient funds!";
+            const newBalance = currentBalance - amount;
+            t.update(userRef, { balance: newBalance });
+            t.update(db.collection('withdrawals').doc(reqId), { status: 'approved' });
+        }).catch(err => alert("Withdrawal failed: " + err));
+    }
+
+    function rejectTransaction(collection, reqId) {
+        db.collection(collection).doc(reqId).update({ status: 'rejected' });
+    }
+
+    function updateUserBalance(userId, amount) {
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(async t => {
+            const doc = await t.get(userRef);
+            if (!doc.exists) throw "User not found!";
+            const newBalance = (doc.data().balance || 0) + amount;
+            t.update(userRef, { balance: newBalance });
+            return newBalance;
+        }).then(newBalance => alert(`Success! New balance is ₹${newBalance.toFixed(2)}.`))
+          .catch(err => alert(`Failed: ${err}`));
+    }
+              }
