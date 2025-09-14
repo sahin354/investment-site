@@ -112,10 +112,12 @@ function runPageSpecificScripts(user) {
             const currentBalance = parseFloat(document.getElementById('user-balance').textContent.replace('₹', '').trim());
             if (isNaN(amount) || amount < 119) {
                 messageEl.textContent = 'Minimum withdrawal amount is ₹119.';
+                messageEl.className = 'error';
                 return;
             }
             if (amount > currentBalance) {
                 messageEl.textContent = 'Insufficient balance.';
+                messageEl.className = 'error';
                 return;
             }
             const tds = amount * 0.19;
@@ -126,6 +128,7 @@ function runPageSpecificScripts(user) {
                     status: 'pending', requestedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
                     messageEl.textContent = 'Withdrawal request submitted!';
+                    messageEl.className = 'success';
                     withdrawalForm.reset();
                 });
             }
@@ -153,4 +156,4 @@ async function investInPlan(user, planId, price) {
     } catch (error) {
         alert(`Investment failed: ${error.message}`);
     }
-      }
+          }
