@@ -8,6 +8,15 @@ const firebaseConfig = {
   appId: "1:549652082720:web:09bc0f371a498ee5184c45",
   measurementId: "G-TGFHW9XKF2"
 };
+// --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 
 // --- INITIALIZE FIREBASE & SERVICES ---
 if (!firebase.apps.length) {
@@ -21,7 +30,7 @@ auth.onAuthStateChanged(user => {
     if (user) {
         db.collection('users').doc(user.uid).get().then(doc => {
             if (doc.exists && doc.data().role === 'admin') {
-                runDashboardScripts(user); 
+                runDashboardScripts();
             } else {
                 auth.signOut();
                 window.location.href = 'login.html';
@@ -33,7 +42,7 @@ auth.onAuthStateChanged(user => {
 });
 
 // --- MAIN DASHBOARD FUNCTION ---
-function runDashboardScripts(adminUser) {
+function runDashboardScripts() {
     // --- PAGE NAVIGATION LOGIC ---
     const navLinks = document.querySelectorAll('.sidebar .nav-item');
     const pages = document.querySelectorAll('.main-content .page');
@@ -46,8 +55,7 @@ function runDashboardScripts(adminUser) {
             if (pageId) {
                 pageTitle.textContent = link.textContent.trim();
                 pages.forEach(page => page.classList.remove('active'));
-                const activePage = document.getElementById(pageId);
-                if (activePage) activePage.classList.add('active');
+                document.getElementById(pageId)?.classList.add('active');
                 navLinks.forEach(nav => nav.classList.remove('active'));
                 link.classList.add('active');
             }
@@ -55,133 +63,161 @@ function runDashboardScripts(adminUser) {
     });
     
     // --- LOGOUT BUTTON ---
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            auth.signOut();
-        });
-    }
+    document.getElementById('logoutBtn')?.addEventListener('click', () => auth.signOut());
 
-    // --- LOAD ALL DATA WHEN DASHBOARD STARTS ---
+    // --- LOAD ALL DATA ---
     loadDashboardStats();
     loadUsers();
     loadDepositRequests();
+    loadWithdrawalRequests();
     loadInvestmentPlans();
-    loadWithdrawalRequests(); // <-- NEW FUNCTION
 
     // --- DATA LOADING FUNCTIONS ---
+    function loadDashboardStats() {
+        db.collection('users').onSnapshot(snap => {
+            document.getElementById('total-users').textContent = snap.size;
+        });
+        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snap => {
+            document.getElementById('pending-deposits').textContent = snap.size;
+        });
+        db.collection('withdrawals').where('status', '==', 'pending').onSnapshot(snap => {
+            document.getElementById('pending-withdrawals').textContent = snap.size;
+        });
+    }
 
-    function loadDashboardStats() { /* ... existing code ... */ }
-    function loadUsers() { /* ... existing code ... */ }
-    function loadDepositRequests() { /* ... existing code ... */ }
-    function loadInvestmentPlans() { /* ... existing code ... */ }
+    function loadUsers() {
+        const userListEl = document.getElementById('user-list');
+        db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            let html = '<table><thead><tr><th>Full Name</th><th>Email</th><th>Phone</th><th>Balance</th><th>Role</th></tr></thead><tbody>';
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                html += `<tr>
+                    <td>${user.fullName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td>
+                    <td>${user.role}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            userListEl.innerHTML = html;
+        });
+    }
 
-    // --- NEW: WITHDRAWAL MANAGEMENT ---
+    function loadDepositRequests() {
+        const tbody = document.getElementById('deposits-tbody');
+        db.collection('deposits').where('status', '==', 'pending').onSnapshot(snapshot => {
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="4">No pending requests.</td></tr>' : '';
+            snapshot.forEach(doc => {
+                const req = doc.data();
+                tbody.innerHTML += `<tr>
+                    <td>${req.userEmail}</td>
+                    <td>₹${req.amount.toFixed(2)}</td>
+                    <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
+                    <td>
+                        <button class="approve-btn" data-type="deposit" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
+                        <button class="reject-btn" data-type="deposit" data-id="${doc.id}">Reject</button>
+                    </td>
+                </tr>`;
+            });
+        });
+    }
+
     function loadWithdrawalRequests() {
         const tbody = document.getElementById('withdrawals-tbody');
-        if (!tbody) return;
-
         db.collection('withdrawals').where('status', '==', 'pending').onSnapshot(snapshot => {
-            tbody.innerHTML = '';
-            if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="4">No pending withdrawal requests.</td></tr>';
-                return;
-            }
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="4">No pending requests.</td></tr>' : '';
             snapshot.forEach(doc => {
-                const request = doc.data();
-                const date = request.requestedAt ? new Date(request.requestedAt.toDate()).toLocaleString() : 'N/A';
-                const row = `
-                    <tr>
-                        <td>${request.userEmail}</td>
-                        <td>₹${request.amount.toFixed(2)}</td>
-                        <td>${date}</td>
-                        <td>
-                            <button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${request.amount}" data-userid="${request.userId}">Approve</button>
-                            <button class="reject-btn" data-type="withdrawal" data-id="${doc.id}">Reject</button>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                const req = doc.data();
+                tbody.innerHTML += `<tr>
+                    <td>${req.userEmail}</td>
+                    <td>₹${req.amount.toFixed(2)}</td>
+                    <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
+                    <td>
+                        <button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
+                        <button class="reject-btn" data-type="withdrawal" data-id="${doc.id}">Reject</button>
+                    </td>
+                </tr>`;
             });
         });
     }
 
-    // --- EVENT LISTENERS FOR BUTTONS ---
+    function loadInvestmentPlans() {
+        const tbody = document.getElementById('plans-tbody');
+        db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No plans created yet.</td></tr>' : '';
+            snapshot.forEach(doc => {
+                const plan = doc.data();
+                tbody.innerHTML += `<tr>
+                    <td>${plan.planName}</td><td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td>
+                    <td><button class="delete-btn" data-id="${doc.id}">Delete</button></td>
+                </tr>`;
+            });
+        });
+    }
 
-    // Deposit Approve/Reject (Your existing, working code)
-    const depositsTable = document.getElementById('deposits-table');
-    depositsTable.addEventListener('click', e => { /* ... existing code ... */ });
-    function approveDeposit(requestId, userId, amount) { /* ... existing code ... */ }
-    function rejectDeposit(requestId) { /* ... existing code ... */ }
+    // --- EVENT LISTENERS FOR ACTIONS ---
+    document.querySelector('.content-area').addEventListener('click', e => {
+        const { type, id, amount, userid } = e.target.dataset;
+        if (!type || !id) return;
 
-    // Plan Management (Your existing, working code)
-    const addPlanForm = document.getElementById('addPlanForm');
-    addPlanForm.addEventListener('submit', e => { /* ... existing code ... */ });
-    const plansTable = document.getElementById('plans-table');
-    plansTable.addEventListener('click', e => { /* ... existing code ... */ });
-    
-    // --- NEW: WITHDRAWAL EVENT LISTENER ---
-    const withdrawalsTable = document.getElementById('withdrawals-table');
-    if (withdrawalsTable) {
-        withdrawalsTable.addEventListener('click', e => {
-            const target = e.target;
-            const requestId = target.dataset.id;
-            const type = target.dataset.type;
-
-            if (type === 'withdrawal') {
-                if (target.classList.contains('approve-btn')) {
-                    const amount = parseFloat(target.dataset.amount);
-                    const userId = target.dataset.userid;
-                    approveWithdrawal(requestId, userId, amount);
-                }
-                if (target.classList.contains('reject-btn')) {
-                    rejectWithdrawal(requestId);
-                }
+        const amountNum = parseFloat(amount);
+        
+        if (e.target.classList.contains('approve-btn')) {
+            if (type === 'deposit') approveDeposit(id, userid, amountNum);
+            if (type === 'withdrawal') approveWithdrawal(id, userid, amountNum);
+        }
+        if (e.target.classList.contains('reject-btn')) {
+            if (type === 'deposit') rejectTransaction('deposits', id);
+            if (type === 'withdrawal') rejectTransaction('withdrawals', id);
+        }
+        if (e.target.classList.contains('delete-btn')) {
+            if (confirm('Are you sure you want to delete this plan?')) {
+                db.collection('plans').doc(id).delete();
             }
-        });
-    }
-
-    function approveWithdrawal(requestId, userId, amount) {
-        const userRef = db.collection('users').doc(userId);
-        db.runTransaction(transaction => {
-            return transaction.get(userRef).then(userDoc => {
-                if (!userDoc.exists) throw "User does not exist!";
-                const currentBalance = userDoc.data().balance || 0;
-                if (currentBalance < amount) throw "Insufficient funds for withdrawal!";
-                
-                const newBalance = currentBalance - amount;
-                transaction.update(userRef, { balance: newBalance });
-                transaction.update(db.collection('withdrawals').doc(requestId), { status: 'approved' });
-            });
-        }).catch(err => {
-            console.error("Approve withdrawal transaction failed: ", err);
-            alert("Could not approve withdrawal: " + err);
-        });
-    }
-
-    function rejectWithdrawal(requestId) {
-        db.collection('withdrawals').doc(requestId).update({ status: 'rejected' });
-    }
-}
-
-// NOTE: I am re-pasting the full functions for clarity, but much of this is your existing, working code.
-// The only new parts are for loading and handling withdrawals.
-
-function loadDashboardStats() {
-    db.collection('users').onSnapshot(snapshot => {
-        document.getElementById('total-users').textContent = snapshot.size;
+        }
     });
-}
-function loadUsers() {
-    const userListEl = document.getElementById('user-list');
-    db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snapshot => { /* ... */ });
-}
-function loadDepositRequests() {
-    const tbody = document.getElementById('deposits-tbody');
-    db.collection('deposits').where('status', '==', 'pending').onSnapshot(snapshot => { /* ... */ });
-}
-function loadInvestmentPlans() {
-    const tbody = document.getElementById('plans-tbody');
-    db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => { /* ... */ });
-                              }
+
+    document.getElementById('addPlanForm').addEventListener('submit', e => {
+        e.preventDefault();
+        db.collection('plans').add({
+            planName: e.target.planName.value,
+            investPrice: parseFloat(e.target.investPrice.value),
+            dayIncome: parseFloat(e.target.dayIncome.value),
+            incomeDays: parseInt(e.target.incomeDays.value)
+        }).then(() => e.target.reset());
+    });
+
+    // --- TRANSACTION LOGIC ---
+    function approveDeposit(reqId, userId, amount) {
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(async t => {
+            const userDoc = await t.get(userRef);
+            if (!userDoc.exists) throw "User not found!";
+            const newBalance = (userDoc.data().balance || 0) + amount;
+            t.update(userRef, { balance: newBalance });
+            t.update(db.collection('deposits').doc(reqId), { status: 'approved' });
+        }).catch(err => console.error("Approve deposit failed:", err));
+    }
+    
+    function approveWithdrawal(reqId, userId, amount) {
+        const userRef = db.collection('users').doc(userId);
+        db.runTransaction(async t => {
+            const userDoc = await t.get(userRef);
+            if (!userDoc.exists) throw "User not found!";
+            const currentBalance = userDoc.data().balance || 0;
+            if (currentBalance < amount) throw "Insufficient funds!";
+            const newBalance = currentBalance - amount;
+            t.update(userRef, { balance: newBalance });
+            t.update(db.collection('withdrawals').doc(reqId), { status: 'approved' });
+        }).catch(err => {
+            console.error("Approve withdrawal failed:", err);
+            alert("Withdrawal failed: " + err);
+        });
+    }
+
+    function rejectTransaction(collection, reqId) {
+        db.collection(collection).doc(reqId).update({ status: 'rejected' });
+    }
+          }
+
