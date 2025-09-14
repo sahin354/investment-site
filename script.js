@@ -14,26 +14,26 @@ if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- THE ROBUST AUTHENTICATION GUARD ---
+// --- THE ROBUST AUTHENTICATION GUARD (UNCHANGED) ---
 auth.onAuthStateChanged(user => {
     const isProtectedPage = !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html');
     if (user && user.emailVerified) {
         runPageSpecificScripts(user);
     } else {
         if (isProtectedPage) {
-            auth.signOut(); // Ensure user is fully logged out if not verified
+            auth.signOut();
             window.location.href = 'login.html';
         }
     }
 });
 
 function runPageSpecificScripts(user) {
-    // --- LOGOUT LOGIC ---
+    // --- LOGOUT LOGIC (UNCHANGED) ---
     const handleLogout = () => { if (confirm('Are you sure?')) auth.signOut(); };
     document.getElementById('logoutBtnSidebar')?.addEventListener('click', handleLogout);
     document.getElementById('logoutBtnMine')?.addEventListener('click', handleLogout);
     
-    // --- MINE PAGE: DISPLAY USER DATA ---
+    // --- MINE PAGE: DISPLAY USER DATA (UNCHANGED) ---
     if (document.getElementById('user-name-phone')) {
         db.collection('users').doc(user.uid).onSnapshot(doc => {
             if (doc.exists) {
@@ -45,16 +45,26 @@ function runPageSpecificScripts(user) {
         });
     }
 
-    // --- MINE PAGE: SUBMIT WITHDRAWAL REQUEST ---
-    const withdrawalForm = document.getElementById('withdrawalForm');
-    if (withdrawalForm) { /* ... Your existing withdrawal code ... */ }
-
-    // --- HOME PAGE: LOAD PLANS AND HANDLE INVESTMENTS ---
+    // --- HOME PAGE LOGIC (VIP/PURCHASED TABS ARE NOW FIXED) ---
     const primaryContainer = document.getElementById('primary');
     if (primaryContainer) {
         const vipContainer = document.getElementById('vip');
         const purchasedContainer = document.getElementById('purchased');
 
+        // --- ADDED: TAB SWITCHING LOGIC ---
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(targetTab)?.classList.add('active');
+            });
+        });
+
+        // Load available plans (Unchanged)
         db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
             primaryContainer.innerHTML = '';
             vipContainer.innerHTML = '';
@@ -65,6 +75,7 @@ function runPageSpecificScripts(user) {
             });
         });
 
+        // Load user's purchased plans (Unchanged)
         db.collection('investments').where('userId', '==', user.uid).orderBy('purchasedAt', 'desc').onSnapshot(snapshot => {
             purchasedContainer.innerHTML = snapshot.empty ? '<p class="info-text">You have no active investments.</p>' : '';
             snapshot.forEach(doc => {
@@ -73,6 +84,7 @@ function runPageSpecificScripts(user) {
             });
         });
 
+        // Handle "Invest Now" button clicks (Unchanged)
         document.querySelector('main').addEventListener('click', e => {
             if (e.target.classList.contains('invest-btn')) {
                 const planId = e.target.dataset.planid;
@@ -81,9 +93,54 @@ function runPageSpecificScripts(user) {
             }
         });
     }
+
+    // --- NEW: WITHDRAWAL LOGIC WITH YOUR RULES ---
+    const withdrawalForm = document.getElementById('withdrawalForm');
+    if (withdrawalForm) {
+        const messageEl = document.getElementById('withdrawal-message');
+        withdrawalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(withdrawalForm.withdrawAmount.value);
+            const currentBalance = parseFloat(document.getElementById('user-balance').textContent.replace('₹', '').trim());
+
+            // Rule 1: Minimum withdrawal
+            if (isNaN(amount) || amount < 119) {
+                messageEl.textContent = 'Minimum withdrawal amount is ₹119.';
+                messageEl.className = 'error';
+                return;
+            }
+            // Rule 2: Sufficient balance
+            if (amount > currentBalance) {
+                messageEl.textContent = 'Withdrawal amount cannot exceed your balance.';
+                messageEl.className = 'error';
+                return;
+            }
+            
+            // Rule 3: Calculate TDS
+            const tds = amount * 0.19;
+            const finalAmount = amount - tds;
+
+            if (confirm(`Withdrawal Request Summary:\n\nRequested Amount: ₹${amount.toFixed(2)}\nTDS (19%): - ₹${tds.toFixed(2)}\n------------------------------\nAmount to be Credited: ₹${finalAmount.toFixed(2)}\n\nDo you want to proceed?`)) {
+                db.collection('withdrawals').add({
+                    userId: user.uid,
+                    userEmail: user.email,
+                    requestedAmount: amount,
+                    tds,
+                    finalAmount,
+                    status: 'pending',
+                    requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    messageEl.textContent = 'Withdrawal request submitted successfully!';
+                    messageEl.className = 'success';
+                    withdrawalForm.reset();
+                });
+            }
+        });
+    }
 }
 
 async function investInPlan(user, planId, price) {
+    // This entire function is unchanged and works as before
     const userRef = db.collection('users').doc(user.uid);
     const planRef = db.collection('plans').doc(planId);
     try {
@@ -91,10 +148,8 @@ async function investInPlan(user, planId, price) {
             const userDoc = await t.get(userRef);
             const planDoc = await t.get(planRef);
             if (!userDoc.exists || !planDoc.exists) throw new Error("User or Plan not found.");
-            
             const userData = userDoc.data();
             if ((userData.balance || 0) < price) throw new Error("Insufficient balance.");
-
             t.update(userRef, { balance: userData.balance - price });
             t.set(db.collection('investments').doc(), {
                 userId: user.uid, planId, ...planDoc.data(),
@@ -105,4 +160,4 @@ async function investInPlan(user, planId, price) {
     } catch (error) {
         alert(`Investment failed: ${error.message}`);
     }
-                                                                  }
+      }
