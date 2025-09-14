@@ -124,3 +124,43 @@ function runPageSpecificScripts(user) {
         });
     }
 }
+    // --- MINE PAGE: SUBMIT WITHDRAWAL REQUEST ---
+    const withdrawalForm = document.getElementById('withdrawalForm');
+    if (withdrawalForm) {
+        const messageEl = document.getElementById('withdrawal-message');
+        withdrawalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(withdrawalForm.withdrawAmount.value);
+            
+            // Get current balance to check if withdrawal is possible
+            const currentBalanceText = document.getElementById('user-balance').textContent;
+            const currentBalance = parseFloat(currentBalanceText.replace('₹', '').trim());
+
+            if (isNaN(amount) || amount <= 0) {
+                messageEl.textContent = 'Please enter a valid amount.';
+                messageEl.className = 'error';
+                return;
+            }
+            if (amount > currentBalance) {
+                messageEl.textContent = 'Withdrawal amount cannot exceed your balance.';
+                messageEl.className = 'error';
+                return;
+            }
+
+            db.collection('withdrawals').add({
+                userId: user.uid,
+                userEmail: user.email,
+                amount: amount,
+                status: 'pending',
+                requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                messageEl.textContent = 'Withdrawal request submitted successfully!';
+                messageEl.className = 'success';
+                withdrawalForm.reset();
+            }).catch(error => {
+                messageEl.textContent = 'Error submitting request.';
+                messageEl.className = 'error';
+                console.error("Error adding withdrawal:", error);
+            });
+        });
+    }
