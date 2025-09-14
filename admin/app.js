@@ -21,8 +21,7 @@ auth.onAuthStateChanged(user => {
             if (doc.exists && doc.data().role === 'admin') {
                 runDashboardScripts(); 
             } else {
-                auth.signOut();
-                window.location.href = 'login.html';
+                auth.signOut(); window.location.href = 'login.html';
             }
         });
     } else {
@@ -32,31 +31,31 @@ auth.onAuthStateChanged(user => {
 
 // --- MAIN DASHBOARD FUNCTION ---
 function runDashboardScripts() {
-    // --- PAGE NAVIGATION LOGIC ---
+    // --- PAGE NAVIGATION ---
     const navLinks = document.querySelectorAll('.sidebar .nav-item');
     const pages = document.querySelectorAll('.main-content .page');
     const pageTitle = document.getElementById('page-title');
     navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             const pageId = link.getAttribute('data-page');
             if (pageId) {
                 pageTitle.textContent = link.textContent.trim();
-                pages.forEach(page => page.classList.remove('active'));
+                pages.forEach(p => p.classList.remove('active'));
                 document.getElementById(pageId)?.classList.add('active');
-                navLinks.forEach(nav => nav.classList.remove('active'));
+                navLinks.forEach(n => n.classList.remove('active'));
                 link.classList.add('active');
             }
         });
     });
     
-    // --- LOGOUT BUTTON ---
+    // --- LOGOUT ---
     document.getElementById('logoutBtn')?.addEventListener('click', () => auth.signOut());
 
     // --- LOAD ALL DATA ---
     loadUsers();
     loadInvestmentPlans();
-    // (Other data loading functions like deposits/withdrawals go here)
+    // (Add other data loaders like deposits/withdrawals here)
 
     // --- USER MANAGEMENT ---
     function loadUsers() {
@@ -65,11 +64,7 @@ function runDashboardScripts() {
             let html = '<table><thead><tr><th>Full Name</th><th>Email</th><th>Balance</th><th>Role</th><th>Actions</th></tr></thead><tbody>';
             snapshot.forEach(doc => {
                 const user = doc.data();
-                html += `<tr>
-                    <td>${user.fullName}</td><td>${user.email}</td>
-                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td><td>${user.role}</td>
-                    <td><button class="manage-btn" data-userid="${doc.id}" data-username="${user.fullName}">Manage</button></td>
-                </tr>`;
+                html += `<tr><td>${user.fullName}</td><td>${user.email}</td><td>₹${user.balance?.toFixed(2) || '0.00'}</td><td>${user.role}</td><td><button class="manage-btn" data-userid="${doc.id}" data-username="${user.fullName}">Manage</button></td></tr>`;
             });
             html += '</tbody></table>';
             userListEl.innerHTML = html;
@@ -80,27 +75,21 @@ function runDashboardScripts() {
     function loadInvestmentPlans() {
         const tbody = document.getElementById('plans-tbody');
         db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
-            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No plans created yet.</td></tr>' : '';
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">No plans yet.</td></tr>' : '';
             snapshot.forEach(doc => {
                 const plan = doc.data();
-                tbody.innerHTML += `<tr>
-                    <td>${plan.planName} ${plan.isVip ? '(VIP)' : ''}</td>
-                    <td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td>
-                    <td><button class="delete-btn" data-id="${doc.id}">Delete</button></td>
-                </tr>`;
+                tbody.innerHTML += `<tr><td>${plan.planName} ${plan.isVip ? '<b>(VIP)</b>' : ''}</td><td>₹${plan.investPrice}</td><td>₹${plan.dayIncome}</td><td>${plan.incomeDays}</td><td><button class="delete-btn" data-id="${doc.id}">Delete</button></td></tr>`;
             });
         });
     }
 
-    // --- EVENT LISTENERS FOR ACTIONS ---
+    // --- EVENT LISTENERS ---
     document.querySelector('.content-area').addEventListener('click', e => {
         const { userid, username, id } = e.target.dataset;
         if (e.target.classList.contains('manage-btn')) {
-            const amountStr = prompt(`Enter amount to add/subtract for ${username}:\n(e.g., 50 to add, -50 to subtract)`);
+            const amountStr = prompt(`Enter amount to add/subtract for ${username}:`);
             const amount = parseFloat(amountStr);
-            if (!isNaN(amount)) {
-                updateUserBalance(userid, amount);
-            }
+            if (!isNaN(amount)) updateUserBalance(userid, amount);
         }
         if (e.target.classList.contains('delete-btn')) {
             if (confirm('Are you sure?')) db.collection('plans').doc(id).delete();
@@ -118,16 +107,16 @@ function runDashboardScripts() {
         }).then(() => e.target.reset());
     });
 
-    // --- TRANSACTION LOGIC ---
+    // --- DB TRANSACTIONS ---
     function updateUserBalance(userId, amount) {
         const userRef = db.collection('users').doc(userId);
         db.runTransaction(async t => {
-            const userDoc = await t.get(userRef);
-            if (!userDoc.exists) throw "User not found!";
-            const newBalance = (userDoc.data().balance || 0) + amount;
+            const doc = await t.get(userRef);
+            if (!doc.exists) throw "User not found!";
+            const newBalance = (doc.data().balance || 0) + amount;
             t.update(userRef, { balance: newBalance });
             return newBalance;
         }).then(newBalance => alert(`Success! New balance is ₹${newBalance.toFixed(2)}.`))
-          .catch(err => alert(`Failed to update balance: ${err}`));
+          .catch(err => alert(`Failed: ${err}`));
     }
-}
+                             }
