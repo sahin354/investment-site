@@ -7,52 +7,44 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Top bar -->
   <header class="top-bar">Adani Corporation - Mine</header>
 
   <main>
-    <!-- Profile Section -->
     <section class="profile">
-      <!-- THIS IS THE CORRECTED SECTION FOR USER DETAILS -->
       <h2 id="user-name-phone">Loading...</h2>
       <p id="user-email">Loading...</p>
-      
       <div class="balances">
         <div>
-          <span id="user-balance">₹ 0.00</span>
-          <br><small>Balance</small>
+          <span id="user-balance">₹ 0.00</span><br><small>Balance</small>
         </div>
-        <div>
-          ₹ 0.00
-          <br><small>Agent Balance</small>
-        </div>
-      </div>
-      <div class="actions">
-        <a href="recharge.html" class="btn-deposit">⬇ Deposit</a>
-        <a href="#" class="btn-withdraw">⬆ Withdraw</a>
       </div>
     </section>
 
-    <!-- Menu Section -->
+    <!-- NEW: WITHDRAW FUNDS SECTION -->
+    <section class="card">
+        <h3>Withdraw Funds</h3>
+        <form id="withdrawalForm">
+            <div class="input-group">
+                <label for="withdrawAmount">Amount to Withdraw</label>
+                <input type="number" id="withdrawAmount" placeholder="Enter amount" required>
+            </div>
+            <button type="submit" class="invest-btn">Request Withdrawal</button>
+        </form>
+        <p id="withdrawal-message"></p>
+    </section>
+
     <nav class="menu">
       <a href="#" class="menu-item">📄 <span>Deposit Details</span></a>
       <a href="#" class="menu-item">🏦 <span>My Bank Account</span></a>
-      <a href="#" class="menu-item">💰 <span>Withdraw Details</span></a>
-      <a href="#" class="menu-item">💬 <span>Chat With Support</span></a>
-      <a href="#" class="menu-item">📩 <span>Support Reply Message</span></a>
     </nav>
     
-    <!-- Logout Button Section -->
     <div class="logout-section">
-        <!-- THIS IS THE CORRECTED LOGOUT BUTTON -->
         <button id="logoutBtnMine" class="logout-btn">Logout</button>
     </div>
   </main>
 
   <div class="bottom-nav-spacer"></div>
 
-  <!-- Bottom Navigation -->
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
@@ -60,7 +52,6 @@
     <a href="mine.html">Mine</a>
   </footer>
 
-  <!-- Firebase SDK Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -69,3 +60,4 @@
 </html>
 
 
+  
