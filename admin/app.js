@@ -8,20 +8,9 @@ const firebaseConfig = {
   appId: "1:549652082720:web:09bc0f371a498ee5184c45",
   measurementId: "G-TGFHW9XKF2"
 };
-// --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
 
 // --- INITIALIZE FIREBASE & SERVICES ---
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -30,7 +19,7 @@ auth.onAuthStateChanged(user => {
     if (user) {
         db.collection('users').doc(user.uid).get().then(doc => {
             if (doc.exists && doc.data().role === 'admin') {
-                runDashboardScripts();
+                runDashboardScripts(); 
             } else {
                 auth.signOut();
                 window.location.href = 'login.html';
@@ -92,11 +81,8 @@ function runDashboardScripts() {
             snapshot.forEach(doc => {
                 const user = doc.data();
                 html += `<tr>
-                    <td>${user.fullName}</td>
-                    <td>${user.email}</td>
-                    <td>${user.phone}</td>
-                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td>
-                    <td>${user.role}</td>
+                    <td>${user.fullName}</td><td>${user.email}</td><td>${user.phone}</td>
+                    <td>₹${user.balance?.toFixed(2) || '0.00'}</td><td>${user.role}</td>
                 </tr>`;
             });
             html += '</tbody></table>';
@@ -111,8 +97,7 @@ function runDashboardScripts() {
             snapshot.forEach(doc => {
                 const req = doc.data();
                 tbody.innerHTML += `<tr>
-                    <td>${req.userEmail}</td>
-                    <td>₹${req.amount.toFixed(2)}</td>
+                    <td>${req.userEmail}</td><td>₹${req.amount.toFixed(2)}</td>
                     <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
                     <td>
                         <button class="approve-btn" data-type="deposit" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
@@ -130,8 +115,7 @@ function runDashboardScripts() {
             snapshot.forEach(doc => {
                 const req = doc.data();
                 tbody.innerHTML += `<tr>
-                    <td>${req.userEmail}</td>
-                    <td>₹${req.amount.toFixed(2)}</td>
+                    <td>${req.userEmail}</td><td>₹${req.amount.toFixed(2)}</td>
                     <td>${new Date(req.requestedAt.toDate()).toLocaleString()}</td>
                     <td>
                         <button class="approve-btn" data-type="withdrawal" data-id="${doc.id}" data-amount="${req.amount}" data-userid="${req.userId}">Approve</button>
@@ -160,21 +144,16 @@ function runDashboardScripts() {
     document.querySelector('.content-area').addEventListener('click', e => {
         const { type, id, amount, userid } = e.target.dataset;
         if (!type || !id) return;
-
         const amountNum = parseFloat(amount);
-        
         if (e.target.classList.contains('approve-btn')) {
             if (type === 'deposit') approveDeposit(id, userid, amountNum);
             if (type === 'withdrawal') approveWithdrawal(id, userid, amountNum);
         }
         if (e.target.classList.contains('reject-btn')) {
-            if (type === 'deposit') rejectTransaction('deposits', id);
-            if (type === 'withdrawal') rejectTransaction('withdrawals', id);
+            rejectTransaction((type === 'deposit' ? 'deposits' : 'withdrawals'), id);
         }
         if (e.target.classList.contains('delete-btn')) {
-            if (confirm('Are you sure you want to delete this plan?')) {
-                db.collection('plans').doc(id).delete();
-            }
+            if (confirm('Are you sure?')) db.collection('plans').doc(id).delete();
         }
     });
 
@@ -210,14 +189,10 @@ function runDashboardScripts() {
             const newBalance = currentBalance - amount;
             t.update(userRef, { balance: newBalance });
             t.update(db.collection('withdrawals').doc(reqId), { status: 'approved' });
-        }).catch(err => {
-            console.error("Approve withdrawal failed:", err);
-            alert("Withdrawal failed: " + err);
-        });
+        }).catch(err => alert("Withdrawal failed: " + err));
     }
 
     function rejectTransaction(collection, reqId) {
         db.collection(collection).doc(reqId).update({ status: 'rejected' });
     }
-          }
-
+                                    }
