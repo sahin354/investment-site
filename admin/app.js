@@ -185,4 +185,4 @@ function runDashboardScripts() {
         }).then(newBalance => alert(`Success! New balance is ₹${newBalance.toFixed(2)}.`))
           .catch(err => alert(`Failed: ${err}`));
     }
-              }
+}
