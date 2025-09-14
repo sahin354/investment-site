@@ -14,7 +14,7 @@ if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- THE ROBUST AUTHENTICATION GUARD (UNCHANGED) ---
+// --- THE ROBUST AUTHENTICATION GUARD ---
 auth.onAuthStateChanged(user => {
     const isProtectedPage = !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html');
     if (user && user.emailVerified) {
@@ -30,7 +30,7 @@ auth.onAuthStateChanged(user => {
 // This function holds all the logic that runs when a user is logged in.
 function runPageSpecificScripts(user) {
 
-    // --- RESTORED: SIDEBAR MENU LOGIC ---
+    // --- FULLY RESTORED: SIDEBAR MENU LOGIC ---
     const sideMenu = document.getElementById('sideMenu');
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeBtn');
@@ -39,12 +39,12 @@ function runPageSpecificScripts(user) {
         closeBtn.addEventListener('click', () => { sideMenu.style.width = '0'; });
     }
 
-    // --- LOGOUT LOGIC (UNCHANGED) ---
+    // --- UNIFIED LOGOUT LOGIC ---
     const handleLogout = () => { if (confirm('Are you sure you want to logout?')) auth.signOut(); };
     document.getElementById('logoutBtnSidebar')?.addEventListener('click', handleLogout);
     document.getElementById('logoutBtnMine')?.addEventListener('click', handleLogout);
     
-    // --- MINE PAGE: DISPLAY USER DATA (UNCHANGED) ---
+    // --- MINE PAGE: DISPLAY USER DATA ---
     if (document.getElementById('user-name-phone')) {
         db.collection('users').doc(user.uid).onSnapshot(doc => {
             if (doc.exists) {
@@ -59,10 +59,7 @@ function runPageSpecificScripts(user) {
     // --- HOME PAGE LOGIC (VIP/PURCHASED TABS ARE NOW FIXED) ---
     const primaryContainer = document.getElementById('primary');
     if (primaryContainer) {
-        const vipContainer = document.getElementById('vip');
-        const purchasedContainer = document.getElementById('purchased');
-
-        // Tab Switching Logic
+        // --- FIXED: TAB SWITCHING LOGIC ---
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
         tabButtons.forEach(button => {
@@ -78,16 +75,18 @@ function runPageSpecificScripts(user) {
         // Load available investment plans
         db.collection('plans').orderBy('investPrice').onSnapshot(snapshot => {
             primaryContainer.innerHTML = '';
-            vipContainer.innerHTML = '';
+            document.getElementById('vip').innerHTML = '';
             snapshot.forEach(doc => {
                 const plan = doc.data();
                 const cardHTML = `<article class="card"><h3>${plan.planName}</h3><p>Day Income: ₹${plan.dayIncome}</p><p>Income Days: ${plan.incomeDays} days</p><p>Invest Price: ₹${plan.investPrice}</p><button class="invest-btn" data-planid="${doc.id}" data-price="${plan.investPrice}">Invest Now</button></article>`;
-                if (plan.isVip) { vipContainer.innerHTML += cardHTML; } else { primaryContainer.innerHTML += cardHTML; }
+                if (plan.isVip) { document.getElementById('vip').innerHTML += cardHTML; } 
+                else { primaryContainer.innerHTML += cardHTML; }
             });
         });
 
         // Load user's purchased plans (Verified to show ALL purchases)
         db.collection('investments').where('userId', '==', user.uid).orderBy('purchasedAt', 'desc').onSnapshot(snapshot => {
+            const purchasedContainer = document.getElementById('purchased');
             purchasedContainer.innerHTML = snapshot.empty ? '<p class="info-text">You have no active investments.</p>' : '';
             snapshot.forEach(doc => {
                 const investment = doc.data();
@@ -105,12 +104,41 @@ function runPageSpecificScripts(user) {
         });
     }
 
-    // Your working withdrawal logic is here, unchanged
+    // --- WITHDRAWAL LOGIC WITH YOUR RULES ---
     const withdrawalForm = document.getElementById('withdrawalForm');
-    if (withdrawalForm) { /* ... your existing withdrawal code ... */ }
+    if (withdrawalForm) {
+        const messageEl = document.getElementById('withdrawal-message');
+        withdrawalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(withdrawalForm.withdrawAmount.value);
+            const currentBalance = parseFloat(document.getElementById('user-balance').textContent.replace('₹', '').trim());
+
+            if (isNaN(amount) || amount < 119) {
+                messageEl.textContent = 'Minimum withdrawal amount is ₹119.';
+                return;
+            }
+            if (amount > currentBalance) {
+                messageEl.textContent = 'Insufficient balance.';
+                return;
+            }
+            
+            const tds = amount * 0.19;
+            const finalAmount = amount - tds;
+
+            if (confirm(`Withdrawal Summary:\nRequested: ₹${amount.toFixed(2)}\nTDS (19%): -₹${tds.toFixed(2)}\nAmount to Credit: ₹${finalAmount.toFixed(2)}\nProceed?`)) {
+                db.collection('withdrawals').add({
+                    userId: user.uid, userEmail: user.email, requestedAmount: amount, tds, finalAmount,
+                    status: 'pending', requestedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    messageEl.textContent = 'Withdrawal request submitted!';
+                    withdrawalForm.reset();
+                });
+            }
+        });
+    }
 }
 
-// INVESTMENT TRANSACTION FUNCTION (UNCHANGED)
+// INVESTMENT TRANSACTION FUNCTION
 async function investInPlan(user, planId, price) {
     const userRef = db.collection('users').doc(user.uid);
     const planRef = db.collection('plans').doc(planId);
@@ -133,4 +161,4 @@ async function investInPlan(user, planId, price) {
     } catch (error) {
         alert(`Investment failed: ${error.message}`);
     }
-      }
+              }
