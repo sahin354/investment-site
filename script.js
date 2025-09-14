@@ -22,7 +22,6 @@ const closeBtn = document.getElementById('closeBtn');
 menuBtn.addEventListener('click', () => {
   sideMenu.classList.add('open');
 });
-
 closeBtn.addEventListener('click', () => {
   sideMenu.classList.remove('open');
 });
@@ -33,16 +32,13 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 tabButtons.forEach(button => {
   button.addEventListener('click', () => {
-    // Remove active class from all buttons and contents
     tabButtons.forEach(btn => btn.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
 
-    // Activate current tab and content
     button.classList.add('active');
     const tabId = button.getAttribute('data-tab');
     document.getElementById(tabId).classList.add('active');
 
-    // Load data for active tab
     loadTabData(tabId);
   });
 });
@@ -73,17 +69,28 @@ function loadTabData(tabName) {
     });
 }
 
-// Load initial tab data
+// Load initial tab data on page load
 loadTabData('primary');
 
-// Authentication UI
-const logoutBtnSidebar = document.getElementById('logoutBtnSidebar');
+// Display logged-in user email in sidebar
+auth.onAuthStateChanged(user => {
+  const userEmailElem = document.getElementById('userEmail');
+  if (user) {
+    userEmailElem.textContent = user.email;
+    console.log('User logged in:', user.email);
+  } else {
+    userEmailElem.textContent = 'Guest';
+    console.log('No user logged in');
+    // Optional: redirect to login page if needed
+  }
+});
 
+// Logout handler
+const logoutBtnSidebar = document.getElementById('logoutBtnSidebar');
 logoutBtnSidebar.addEventListener('click', () => {
   auth.signOut()
     .then(() => {
       alert('Logged out successfully.');
-      // Optionally redirect to login or reload
       location.reload();
     })
     .catch(error => {
@@ -91,12 +98,22 @@ logoutBtnSidebar.addEventListener('click', () => {
     });
 });
 
-// Monitor auth state
-auth.onAuthStateChanged(user => {
-  if (user) {
-    console.log('User logged in:', user.email);
-  } else {
-    console.log('No user logged in');
-    // Optionally redirect to login page
-  }
+// Sidebar buttons placeholders for additional features
+document.getElementById('mailBtn').addEventListener('click', () => {
+  alert('Mail feature coming soon!');
+});
+document.getElementById('withdrawalBtn').addEventListener('click', () => {
+  alert('Withdrawal feature coming soon!');
+});
+document.getElementById('rechargeBtn').addEventListener('click', () => {
+  alert('Recharge feature coming soon!');
+});
+document.getElementById('referralBtn').addEventListener('click', () => {
+  alert('Referral feature coming soon!');
+});
+document.getElementById('withdrawalHistoryBtn').addEventListener('click', () => {
+  alert('Withdrawal History feature coming soon!');
+});
+document.getElementById('transactionBtn').addEventListener('click', () => {
+  alert('Transaction feature coming soon!');
 });
