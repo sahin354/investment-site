@@ -31,21 +31,58 @@
   </header>
 
   <main class="mine-main">
-
-    <section class="user-info-section card">
-      <h2>Your Profile</h2>
-      <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
-      <p><strong>Name:</strong> <span id="userName">Loading...</span></p>
-      <p><strong>Phone:</strong> <span id="userPhone">Loading...</span></p>
+    <!-- Top bar with avatar, name, VIP and Recharge -->
+    <section class="mine-profilebar card-green">
+      <div class="mine-avatar">
+        <img src="avatar.png" alt="Avatar" />
+      </div>
+      <div class="mine-profile-details">
+        <div class="mine-username" id="userName">User Name</div>
+        <div class="mine-userid" id="accountId">ID: Loading...</div>
+        <div class="mine-vip" id="vipLevel">VIP: -</div>
+      </div>
+      <button class="btn-green" id="rechargeBtnMain">Recharge</button>
     </section>
 
-    <section class="transaction-history-section card">
-      <h2>Transaction History</h2>
-      <ul id="transactionList" class="transaction-list">
-        <li>Loading transactions...</li>
-      </ul>
+    <!-- Balance and quick links -->
+    <section class="mine-balances">
+      <div class="mine-balance-amount">
+        <span>Current balance</span>
+        <strong id="currentBalance">0.00</strong>
+      </div>
+      <div class="mine-quicklinks">
+        <button class="quicklink-btn" id="withdrawBtn">Withdrawal</button>
+        <button class="quicklink-btn" id="teamBtn">Team</button>
+        <button class="quicklink-btn" id="bankCardBtn">Bank Card</button>
+      </div>
     </section>
 
+    <!-- List of records/links -->
+    <section class="mine-links card">
+      <a class="mine-link-item" id="withdrawalRecordsBtn">Withdrawal Records</a>
+      <a class="mine-link-item" id="balanceDetailsBtn">Balance Details</a>
+      <a class="mine-link-item" id="depositRecordsBtn">Deposit Records</a>
+    </section>
+
+    <!-- Multi Service Section -->
+    <section class="mine-service card">
+      <div class="mine-link-service" id="customerServiceBtn">
+        <span>🧑‍💼</span>
+        <span>Online Customer Service</span>
+      </div>
+      <div class="mine-link-service" id="telegramBtn">
+        <span>💬</span>
+        <span>Telegram Channel</span>
+      </div>
+    </section>
+
+    <!-- Account settings and Logout -->
+    <section class="mine-bottomlinks card">
+      <a class="mine-link-item" id="accountBtn">Account</a>
+      <a class="mine-link-item" id="settingsBtn">Setting</a>
+    </section>
+
+    <button id="logoutBtnMain" class="logout-btn-wide">Logout</button>
   </main>
 
   <div class="bottom-nav-spacer"></div>
@@ -60,7 +97,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
   <script src="script-mine.js"></script>
 </body>
 </html>
