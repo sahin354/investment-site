@@ -14,49 +14,58 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const menuBtn = document.getElementById('menuBtn');
-const sideMenu = document.getElementById('sideMenu');
-const closeBtn = document.getElementById('closeBtn');
-
-menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
-closeBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
-
-auth.onAuthStateChanged(user => {
-  const accountIdElem = document.getElementById('accountId');
-  const vipLevelElem = document.getElementById('vipLevel');
-  const userNameElem = document.getElementById('userName');
-  if (user) {
-    accountIdElem.textContent = "ID: " + user.uid;
-    db.collection('users').doc(user.uid).get()
+document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
+document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
+document.getElementById('sidebarSupport').onclick = () => window.open("https://yourcustomersupporturl", "_blank");
+document.getElementById('sidebarTelegram').onclick = () => window.open("https://t.me/yourtelegramchannel", "_blank");
+firebase.auth().onAuthStateChanged(user => {
+  if(!user) window.location = 'login.html';
+  else {
+    document.getElementById('sidebarUserId').textContent = user.uid;
+    firebase.firestore().collection('users').doc(user.uid).get()
       .then(doc => {
-        const d = doc.exists ? doc.data() : {};
-        vipLevelElem.textContent = "VIP: " + (d.vipLevel || '-');
-        userNameElem.textContent = d.name || user.email || 'User';
+        const d=doc.data()||{};
+        document.getElementById('sidebarVIP').textContent = d.vipLevel || "Standard";
+        document.getElementById('userName').textContent = d.name || user.email || 'User';
+        document.getElementById('userPhone').textContent = d.phone || '-';
+        document.getElementById('rechargeBal').textContent = d.rechargeBalance||'0.00';
+        document.getElementById('withdrawBal').textContent = d.withdrawalBalance||'0.00';
       });
-  } else {
-    accountIdElem.textContent = 'ID: Guest';
-    vipLevelElem.textContent = 'VIP: -';
-    userNameElem.textContent = 'Guest';
+    // Withdrawal records
+    firebase.firestore().collection('withdrawals').where('uid','==',user.uid).get()
+      .then(snap => {
+        let records = snap.empty ? "No withdrawals." : "";
+        snap.forEach(doc => {
+          let d=doc.data();
+          records += `₹${d.amount} | Status: ${d.status||'Pending'} | ${d.timestamp?.toDate().toLocaleString()}<br>`;
+        });
+        document.getElementById('withdrawalRecords').innerHTML = records;
+      });
+    // Transactions
+    firebase.firestore().collection('transactions').where('uid','==',user.uid).get()
+      .then(snap => {
+        let records = snap.empty ? "No transactions." : "";
+        snap.forEach(doc => {
+          let d=doc.data();
+          records += `${d.type||'Txn'}: ₹${d.amount||'-'} | ${d.timestamp?.toDate().toLocaleString()}<br>`;
+        });
+        document.getElementById('transactionList').innerHTML = records;
+      });
   }
 });
-
-// Button stubs
-document.getElementById('rechargeBtnMain').onclick = () => window.location = 'recharge.html';
-document.getElementById('withdrawBtn').onclick = () => alert('Withdrawal functionality coming soon!');
-document.getElementById('teamBtn').onclick = () => alert('Team functionality coming soon!');
-document.getElementById('bankCardBtn').onclick = () => alert('Bank Card functionality coming soon!');
-document.getElementById('withdrawalRecordsBtn').onclick = () => alert('Withdrawal Records coming soon!');
-document.getElementById('balanceDetailsBtn').onclick = () => alert('Balance Details coming soon!');
-document.getElementById('depositRecordsBtn').onclick = () => alert('Deposit Records coming soon!');
-document.getElementById('customerServiceBtn').onclick = () => window.open('https://t.me/yourcustomerservice', '_blank');
-document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/yourtelegramchannel', '_blank');
-document.getElementById('accountBtn').onclick = () => alert('Account management coming soon!');
-document.getElementById('settingsBtn').onclick = () => window.location = 'settings.html';
-
-document.getElementById('logoutBtnSidebar').onclick =
-document.getElementById('logoutBtnMain').onclick = function() {
-  auth.signOut().then(() => {
-    alert('Logged out successfully.');
-    location.reload();
-  }).catch(err => alert('Logout error: ' + err.message));
-}
+document.getElementById('withdrawForm').onsubmit = e => {
+  e.preventDefault();
+  const amt = +document.getElementById('withdrawAmt').value;
+  if(amt<119||amt>50000) return alert('Invalid amount!');
+  const tds = Math.round(amt*.19);
+  const net = amt-tds;
+  alert(`₹${tds} TDS deducted. Net: ₹${net}`);
+  const uid=firebase.auth().currentUser?.uid;
+  if(uid){
+    firebase.firestore().collection('withdrawals').add({
+      uid,amount:amt,tds,netAmount:net,status:'Pending',timestamp:firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>alert('Withdrawal requested!'));
+  }
+};
+document.getElementById('addBankBtn').onclick = () => alert('Bank Account Add Form Coming Soon!');
+document.getElementById('logoutBtnMain').onclick = () => firebase.auth().signOut().then(()=>window.location='login.html');
