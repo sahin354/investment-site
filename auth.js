@@ -9,146 +9,97 @@ const firebaseConfig = {
   measurementId: "G-TGFHW9XKF2"
 };
 
-// --- INITIALIZE FIREBASE & SERVICES ---
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+// auth.js
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- MAIN SCRIPT EXECUTION ---
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Get all our form elements ---
-    const registerForm = document.getElementById('registerForm');
-    const loginForm = document.getElementById('loginForm');
-    const resetForm = document.getElementById('resetForm');
-    const message = document.getElementById('auth-message');
-    const loginFormContainer = document.getElementById('loginFormContainer');
-    const resetContainer = document.getElementById('resetContainer');
-    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-    const backToLoginLink = document.getElementById('backToLoginLink');
+// --- REGISTRATION LOGIC ---
+const registerBtn = document.getElementById('registerBtn');
+if (registerBtn) {
+    registerBtn.addEventListener('click', () => {
+        const fullName = document.getElementById('fullName').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-    // --- REGISTRATION LOGIC ---
-    if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const fullName = registerForm.fullName.value;
-            const email = registerForm.email.value;
-            const phone = registerForm.phone.value;
-            const password = registerForm.password.value;
-            const confirmPassword = registerForm.confirmPassword.value;
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
 
-            if (password !== confirmPassword) {
-                message.textContent = 'Passwords do not match.';
-                message.className = 'error';
-                return;
-            }
+        // Get referral code from URL if it exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
 
-            const usersRef = db.collection('users');
-            const emailQuery = usersRef.where('email', '==', email).get();
-            const phoneQuery = usersRef.where('phone', '==', phone).get();
-
-            Promise.all([emailQuery, phoneQuery]).then(results => {
-                if (!results[0].empty) {
-                    message.textContent = 'This email is already registered. Please login.';
-                    return;
-                }
-                if (!results[1].empty) {
-                    message.textContent = 'This phone number is already registered. Please login.';
-                    return;
-                }
-
-                auth.createUserWithEmailAndPassword(email, password)
-                    .then(userCredential => {
-                        const user = userCredential.user;
-                        user.sendEmailVerification();
-                        db.collection('users').doc(user.uid).set({
-                            fullName: fullName,
-                            email: email,
-                            phone: phone,
-                            balance: 0,
-                            role: 'user', // Default role
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => {
-                            message.textContent = 'Registration successful! A verification email has been sent.';
-                            message.className = 'success';
-                            registerForm.reset();
-                        });
-                    }).catch(error => {
-                        message.textContent = `Error: ${error.message}`;
-                    });
-            });
-        });
-    }
-
-    // --- LOGIN LOGIC ---
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const identifier = loginForm.identifier.value;
-            const password = loginForm.password.value;
-            let email = identifier;
-
-            if (!identifier.includes('@')) { // It's a phone number
-                db.collection('users').where('phone', '==', identifier).get()
-                    .then(snapshot => {
-                        if (snapshot.empty) {
-                            message.textContent = 'No account found with that phone number.';
-                            return;
-                        }
-                        email = snapshot.docs[0].data().email;
-                        signInUser(email, password);
-                    });
-            } else { // It's an email
-                signInUser(email, password);
-            }
-        });
-    }
-
-    function signInUser(email, password) {
-        auth.signInWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                if (!userCredential.user.emailVerified) {
-                    message.textContent = 'Please verify your email before logging in.';
-                    auth.signOut(); 
-                } else {
-                    localStorage.setItem('loggedInUser', userCredential.user.uid);
-                    window.location.href = 'index.html';
-                }
-            }).catch(error => {
-                message.textContent = 'Error: Invalid credentials.';
-            });
-    }
-    
-    // --- FORGOT PASSWORD LOGIC ---
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginFormContainer.style.display = 'none';
-            resetContainer.style.display = 'block';
-            message.textContent = '';
-        });
-    }
-    
-    if (backToLoginLink) {
-        backToLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginFormContainer.style.display = 'block';
-            resetContainer.style.display = 'none';
-            message.textContent = '';
-        });
-    }
-
-    if (resetForm) {
-        resetForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = resetForm.resetEmail.value;
-            auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    message.textContent = 'Password reset email sent! Please check your inbox.';
-                    message.className = 'success';
-                })
-                .catch(error => {
-                    message.textContent = "Could not send reset email. Please ensure the email is correct.";
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                // Send email verification
+                user.sendEmailVerification().then(() => {
+                    alert("Registration successful! Please check your email to verify your account.");
                 });
-        });
-    }
-});
+
+                // Store user data in Firestore
+                db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    fullName: fullName,
+                    phone: phone,
+                    email: email,
+                    referredBy: refCode || null, // Store who referred them
+                    rechargeBalance: 0,
+                    withdrawalBalance: 0,
+                    vipLevel: 1,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    window.location.href = 'login.html';
+                });
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    });
+}
+
+// --- LOGIN LOGIC ---
+const loginBtn = document.getElementById('loginBtn');
+if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                if(userCredential.user.emailVerified) {
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Please verify your email before logging in.');
+                    auth.signOut();
+                }
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    });
+}
+
+
+// --- FORGOT PASSWORD LOGIC ---
+const forgotPasswordLink = document.getElementById('forgotPassword');
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', () => {
+        const email = document.getElementById('email').value;
+        if (!email) {
+            alert("Please enter your email address first.");
+            return;
+        }
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
+                alert("Password reset email sent!");
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    });
+}
