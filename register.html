@@ -1,27 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Register</title>
-  <link rel="stylesheet" href="style.css"/>
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="auth-main card">
-    <h2>Register</h2>
-    <form id="registerForm">
-      <input type="text" id="regName" placeholder="Full Name" required>
-      <input type="tel" id="regPhone" placeholder="Phone" required>
-      <input type="email" id="regEmail" placeholder="Email" required>
-      <input type="password" id="regPass" placeholder="Password" required>
-      <input type="password" id="regConfirmPass" placeholder="Confirm Password" required>
-      <button class="btn-primary">Register</button>
-    </form>
-  </main>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebaseConfig.js"></script>
-  <script src="script-auth.js"></script>
+    <div class="container">
+        <h1>Create Account</h1>
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <button id="registerBtn">Register</button>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+    
+    <script src="firebaseConfig.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
