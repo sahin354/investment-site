@@ -68,5 +68,22 @@ document.getElementById('logoutBtnSidebar').addEventListener('click', () => {
     location.reload();
   }).catch(err => {
     alert('Logout error: ' + err.message);
-  });
+  }
+});
+document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
+document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
+document.getElementById('sidebarSupport').onclick = () => window.open("https://yourcustomersupporturl", "_blank");
+document.getElementById('sidebarTelegram').onclick = () => window.open("https://t.me/yourtelegramchannel", "_blank");
+firebase.auth().onAuthStateChanged(user => {
+  if(!user) window.location = 'login.html';
+  else {
+    document.getElementById('sidebarUserId').textContent = user.uid;
+    firebase.firestore().collection('users').doc(user.uid).get()
+      .then(doc => document.getElementById('sidebarVIP').textContent = doc.data()?.vipLevel || "Standard");
+    const link = location.origin + "/register.html?ref=" + user.uid;
+    document.getElementById('referLink').value = link;
+    document.getElementById('copyReferLink').onclick = () => navigator.clipboard.writeText(link);
+    firebase.firestore().collection('referrals').where('referrerUid','==',user.uid).get()
+      .then(snap => document.getElementById('referUserCount').textContent = "Users Referred: " + snap.size);
+  }
 });
