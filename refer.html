@@ -1,64 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adani Corporation - Refer</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Refer</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
+  <!-- Include Sidebar -->
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-top">
-      <div class="account-info">
-        <div><strong>Account ID:</strong> <span id="accountId">Loading...</span></div>
-        <div><strong>VIP Level:</strong> <span id="vipLevel">Loading...</span></div>
-      </div>
+      <div><strong>User ID:</strong> <span id="sidebarUserId"></span></div>
+      <div><strong>VIP Level:</strong> <span id="sidebarVIP"></span></div>
     </div>
     <nav class="sidebar-middle">
+      <a href="#" id="sidebarSupport" class="sidebar-link">🧑‍💼 Customer Support</a>
+      <a href="#" id="sidebarTelegram" class="sidebar-link">💬 Telegram Channel</a>
       <a href="settings.html" class="sidebar-link">⚙️ Settings</a>
-      <a href="support.html" class="sidebar-link">🛠 Support</a>
     </nav>
-    <div class="sidebar-bottom">
-      <button id="logoutBtnSidebar" class="logout-btn">🚪 Logout</button>
-    </div>
     <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
-
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
-    Adani Corporation - Refer
+    Refer
   </header>
-
-  <main class="refer-main">
-    <section class="refer-section">
-      <h2>Your Referral Code</h2>
-      <div id="referralCode" class="referral-code">Loading...</div>
-      <button id="shareReferral" class="btn-primary">Share Referral Code</button>
+  <main>
+    <section class="card">
+      <h2>Your Referral Link</h2>
+      <input type="text" id="referLink" readonly>
+      <button id="copyReferLink" class="btn-primary">Copy</button>
     </section>
-
-    <section class="refer-section">
-      <h2>Referral Stats</h2>
-      <ul id="referralStats" class="referral-stats">
-        <li>Loading...</li>
+    <section class="card">
+      <h2>Referred Users</h2>
+      <div id="referUserCount"></div>
+    </section>
+    <section class="card">
+      <h3>Commission Instructions</h3>
+      <ul>
+        <li>Level 1: <b>21%</b></li>
+        <li>Level 2: <b>3%</b></li>
+        <li>Level 3: <b>1%</b></li>
       </ul>
     </section>
   </main>
-
   <div class="bottom-nav-spacer"></div>
-
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
     <a href="refer.html">Refer</a>
     <a href="mine.html">Mine</a>
   </footer>
-
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
+  <script src="firebaseConfig.js"></script>
   <script src="script-refer.js"></script>
-
 </body>
-</html>
+  </html>
+  
