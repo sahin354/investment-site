@@ -393,7 +393,7 @@ main {
   transition: background 0.2s;
 }
 
-.btn-green:hover {
+.btn-light blue:hover {
   background: #008744;
 }
 
@@ -500,4 +500,5 @@ main {
   background: #c62828;
   }
   
+
 
