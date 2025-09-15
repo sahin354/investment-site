@@ -1,35 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recharge - Adani Corporation</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <header class="top-bar">Recharge</header>
-    <main>
-        <div class="card">
-            <h2>Recharge Your Account</h2>
-            <form id="rechargeForm">
-                <div class="input-group">
-                    <label for="amount">Amount</label>
-                    <input type="number" id="amount" placeholder="Min: ₹200, Max: ₹50,000" required>
-                </div>
-                <button type="submit" class="invest-btn">Submit Deposit Request</button>
-            </form>
-            <p id="recharge-message"></p>
-        </div>
-    </main>
-    <div class="bottom-nav-spacer"></div>
-    <footer class="bottom-nav">
-        <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
-    </footer>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="script.js"></script>
+  <main class="auth-main card">
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="regName" placeholder="Full Name" required>
+      <input type="tel" id="regPhone" placeholder="Phone" required>
+      <input type="email" id="regEmail" placeholder="Email" required>
+      <input type="password" id="regPass" placeholder="Password" required>
+      <input type="password" id="regConfirmPass" placeholder="Confirm Password" required>
+      <button class="btn-primary">Register</button>
+    </form>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="script-auth.js"></script>
 </body>
 </html>
-
-
