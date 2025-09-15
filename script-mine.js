@@ -18,82 +18,45 @@ const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const closeBtn = document.getElementById('closeBtn');
 
-menuBtn.addEventListener('click', () => {
-  sideMenu.classList.add('open');
-});
-
-closeBtn.addEventListener('click', () => {
-  sideMenu.classList.remove('open');
-});
+menuBtn.addEventListener('click', () => sideMenu.classList.add('open'));
+closeBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
 
 auth.onAuthStateChanged(user => {
   const accountIdElem = document.getElementById('accountId');
   const vipLevelElem = document.getElementById('vipLevel');
-  const userEmailElem = document.getElementById('userEmail');
   const userNameElem = document.getElementById('userName');
-  const userPhoneElem = document.getElementById('userPhone');
-  const transactionList = document.getElementById('transactionList');
-
   if (user) {
-    accountIdElem.textContent = user.uid;
-    userEmailElem.textContent = user.email || 'N/A';
-
-    // Fetch user profile from Firestore
+    accountIdElem.textContent = "ID: " + user.uid;
     db.collection('users').doc(user.uid).get()
       .then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          vipLevelElem.textContent = data.vipLevel || 'Standard';
-          userNameElem.textContent = data.name || 'N/A';
-          userPhoneElem.textContent = data.phone || 'N/A';
-        } else {
-          vipLevelElem.textContent = 'Standard';
-          userNameElem.textContent = 'N/A';
-          userPhoneElem.textContent = 'N/A';
-        }
-      })
-      .catch(() => {
-        vipLevelElem.textContent = 'Standard';
-        userNameElem.textContent = 'N/A';
-        userPhoneElem.textContent = 'N/A';
-      });
-
-    // Fetch transaction history (from 'transactions' collection, filter by user)
-    db.collection('transactions').where('uid', '==', user.uid).orderBy('timestamp', 'desc').limit(10).get()
-      .then(snapshot => {
-        if (snapshot.empty) {
-          transactionList.innerHTML = '<li>No transactions found.</li>';
-          return;
-        }
-        let html = '';
-        snapshot.forEach(doc => {
-          const t = doc.data();
-          const date = t.timestamp ? t.timestamp.toDate().toLocaleString() : 'Unknown date';
-          html += `<li>
-                    <span>${t.type || 'Transaction'}</span>
-                    <span>${t.amount ? '₹' + t.amount : '-'}</span>
-                    <span>${date}</span>
-                  </li>`;
-        });
-        transactionList.innerHTML = html;
-      })
-      .catch(() => {
-        transactionList.innerHTML = '<li>Error loading transactions.</li>';
+        const d = doc.exists ? doc.data() : {};
+        vipLevelElem.textContent = "VIP: " + (d.vipLevel || '-');
+        userNameElem.textContent = d.name || user.email || 'User';
       });
   } else {
-    accountIdElem.textContent = 'Guest';
-    vipLevelElem.textContent = 'Guest';
-    userEmailElem.textContent = 'N/A';
-    userNameElem.textContent = 'N/A';
-    userPhoneElem.textContent = 'N/A';
-    transactionList.innerHTML = '<li>Please sign in to see transactions.</li>';
+    accountIdElem.textContent = 'ID: Guest';
+    vipLevelElem.textContent = 'VIP: -';
+    userNameElem.textContent = 'Guest';
   }
 });
 
-document.getElementById('logoutBtnSidebar').addEventListener('click', () => {
+// Button stubs
+document.getElementById('rechargeBtnMain').onclick = () => window.location = 'recharge.html';
+document.getElementById('withdrawBtn').onclick = () => alert('Withdrawal functionality coming soon!');
+document.getElementById('teamBtn').onclick = () => alert('Team functionality coming soon!');
+document.getElementById('bankCardBtn').onclick = () => alert('Bank Card functionality coming soon!');
+document.getElementById('withdrawalRecordsBtn').onclick = () => alert('Withdrawal Records coming soon!');
+document.getElementById('balanceDetailsBtn').onclick = () => alert('Balance Details coming soon!');
+document.getElementById('depositRecordsBtn').onclick = () => alert('Deposit Records coming soon!');
+document.getElementById('customerServiceBtn').onclick = () => window.open('https://t.me/yourcustomerservice', '_blank');
+document.getElementById('telegramBtn').onclick = () => window.open('https://t.me/yourtelegramchannel', '_blank');
+document.getElementById('accountBtn').onclick = () => alert('Account management coming soon!');
+document.getElementById('settingsBtn').onclick = () => window.location = 'settings.html';
+
+document.getElementById('logoutBtnSidebar').onclick =
+document.getElementById('logoutBtnMain').onclick = function() {
   auth.signOut().then(() => {
     alert('Logged out successfully.');
     location.reload();
   }).catch(err => alert('Logout error: ' + err.message));
-});
-            
+}
