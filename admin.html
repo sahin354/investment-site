@@ -1,1 +1,29 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <main class="admin-panel card">
+    <h2>Admin Panel</h2>
+    <nav>
+      <button onclick="showSection('users')">User Management</button>
+      <button onclick="showSection('withdraws')">Withdraw Management</button>
+      <button onclick="showSection('recharges')">Recharge Management</button>
+      <button onclick="showSection('plans')">Plan Management</button>
+    </nav>
+    <section id="users"></section>
+    <section id="withdraws"></section>
+    <section id="recharges"></section>
+    <section id="plans"></section>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="script-admin.js"></script>
+</body>
+</html>
