@@ -1,54 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adani Corporation - Home</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Investment</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-  <!-- Sidebar (include on all pages except login/register/admin) -->
-  <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-top">
-      <div><strong>User ID:</strong> <span id="sidebarUserId"></span></div>
-      <div><strong>VIP Level:</strong> <span id="sidebarVIP"></span></div>
-    </div>
-    <nav class="sidebar-middle">
-      <a href="#" id="sidebarSupport" class="sidebar-link">🧑‍💼 Customer Support</a>
-      <a href="#" id="sidebarTelegram" class="sidebar-link">💬 Telegram Channel</a>
-      <a href="settings.html" class="sidebar-link">⚙️ Settings</a>
-    </nav>
-    <span id="closeBtn" class="close-btn">&times;</span>
-  </aside>
 
-  <header class="top-bar">
-    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
-    Adani Corporation
-  </header>
-  <main>
-    <!-- Home UI (unchanged and ready) -->
-    <img src="banner.jpg" alt="Adani Corporation banner" class="banner-img"/>
-    <nav class="tabs">
-      <button class="tab-button active" data-tab="primary">Primary</button>
-      <button class="tab-button" data-tab="vip">VIP</button>
-      <button class="tab-button" data-tab="purchased">Purchased</button>
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="sidebar-header">
+            <p id="sidebar-user-id">ID: Loading...</p>
+            <p id="sidebar-vip-level">VIP: Loading...</p>
+        </div>
+        <a href="#"> <i class="fas fa-headset"></i> Customer Support</a>
+        <a href="#"> <i class="fab fa-telegram-plane"></i> Telegram Channel</a>
+        <a href="#"> <i class="fas fa-cog"></i> Settings</a>
+    </div>
+
+    <div id="main-wrapper">
+        <header class="top-header">
+            <button class="openbtn" onclick="openNav()">&#9776;</button>
+            <h1 class="header-title">Adani Corporation</h1>
+            <div style="width: 24px;"></div> </header>
+
+        <main class="content">
+            <div class="banner-container">
+                <img src="banner.jpg" alt="Adani Corporation Building">
+            </div>
+
+            <div class="plan-tabs">
+                <button class="tab-button active">Primary</button>
+                <button class="tab-button">VIP</button>
+                <button class="tab-button">Purchased</button>
+            </div>
+
+            <div id="plans-container">
+                <div class="plan-card">
+                    <h3>Tata</h3>
+                    <p>Day Income: ₹500</p>
+                    <p>Income Days: 18 days</p>
+                    <p>Invest Price: ₹200</p>
+                    <button class="invest-now-btn" onclick="invest('plan_id_here')">Invest Now</button>
+                </div>
+                </div>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+        <a href="recharge.html" class="nav-link"><i class="fas fa-wallet"></i> Recharge</a>
+        <a href="refer.html" class="nav-link"><i class="fas fa-users"></i> Refer</a>
+        <a href="mine.html" class="nav-link"><i class="fas fa-user"></i> Mine</a>
     </nav>
-    <section id="primary" class="tab-content active"></section>
-    <section id="vip" class="tab-content"></section>
-    <section id="purchased" class="tab-content"></section>
-  </main>
-  <div class="bottom-nav-spacer"></div>
-  <footer class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
-    <a href="refer.html">Refer</a>
-    <a href="mine.html">Mine</a>
-  </footer>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebaseConfig.js"></script>
-  <script src="script.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+
+    <script src="firebaseConfig.js"></script>
+    
+    <script src="script.js"></script>
+
+    <script>
+        // --- Sidebar Navigation ---
+        function openNav() {
+            document.getElementById("sidebar").style.width = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("sidebar").style.width = "0";
+        }
+
+        // --- Fetch and Display Investment Plans ---
+        const plansContainer = document.getElementById('plans-container');
+        const db = firebase.firestore();
+
+        // Clear the static example before loading from DB
+        plansContainer.innerHTML = ''; 
+
+        db.collection('plans').get().then(querySnapshot => {
+            if (querySnapshot.empty) {
+                plansContainer.innerHTML = '<p>No investment plans available right now.</p>';
+                return;
+            }
+            querySnapshot.forEach(doc => {
+                const plan = doc.data();
+                const planId = doc.id; // Get the document ID
+                const planHTML = `
+                    <div class="plan-card">
+                        <h3>${plan.name || 'N/A'}</h3>
+                        <p>Day Income: ₹${plan.dayIncome || 0}</p>
+                        <p>Income Days: ${plan.incomeDays || 0}</p>
+                        <p>Invest Price: ₹${plan.investPrice || 0}</p>
+                        <button class="invest-now-btn" onclick="invest('${planId}')">Invest Now</button>
+                    </div>
+                `;
+                plansContainer.innerHTML += planHTML;
+            });
+        }).catch(error => {
+            console.error("Error fetching plans: ", error);
+            plansContainer.innerHTML = '<p>Could not load investment plans.</p>';
+        });
+
+        // --- Invest Function (Placeholder) ---
+        function invest(planId) {
+            // This function would handle the investment logic
+            // 1. Check if user has enough rechargeBalance
+            // 2. Deduct the investPrice from their balance
+            // 3. Create a record of the purchase in a 'purchases' collection
+            alert("Investment function for plan ID: " + planId);
+            console.log("User wants to invest in plan:", planId);
+        }
+    </script>
 </body>
-                                                               </html>
+</html>
+
   
