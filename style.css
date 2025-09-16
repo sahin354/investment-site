@@ -120,3 +120,27 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .btn-primary { background: #1976d2; color: #fff; }
 .btn-secondary { background: #e3f2fd; color: #1976d2; }
 
+.card h3 {
+  margin: 0 0 10px 0;
+  color: #1976d2;
+  font-size: 1.17em;
+}
+.card > div {
+  margin-bottom: 7px;
+  font-size: 1.07em;
+}
+.btn-primary {
+  background: #112d4e;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  font-size: 1.1em;
+  padding: 12px 0;
+  margin-top: 8px;
+  width: 100%;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(25,118,210,.15);
+}
+.btn-primary:hover { background: #23325e; }
+
