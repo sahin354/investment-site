@@ -11,33 +11,60 @@
     Refer & Earn
   </header>
 
-  <main class="refer-container">
-    <div class="refer-card">
-      <h2>Your Unique Referral Code</h2>
-      <p>Share this code with your friends. When they sign up, you both get rewards!</p>
-      <div class="refer-code-box">
-        <span id="referralCode">Loading...</span>
-        <button id="copyCodeBtn">Copy</button>
+  <main class="refer-page-container">
+    
+    <div class="card refer-main-card">
+      <h2>Invite Friends, Earn Rewards!</h2>
+      <p>Share your unique link with friends. When they sign up and invest, you'll both receive exclusive bonuses.</p>
+      <div class="refer-link-box">
+        <span id="referralLink">Loading your link...</span>
+        <button id="copyLinkBtn" title="Copy to clipboard">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span id="copyBtnText">Copy</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card how-it-works-card">
+      <h3>How It Works</h3>
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-icon"><span>1</span></div>
+          <h4>Share Link</h4>
+          <p>Share your referral link with friends.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-icon"><span>2</span></div>
+          <h4>Friend Registers</h4>
+          <p>Your friend signs up using your link.</p>
+        </div>
+        <div class="step-item">
+          <div class="step-icon"><span>3</span></div>
+          <h4>Earn Rewards</h4>
+          <p>You both get rewarded automatically.</p>
+        </div>
       </div>
     </div>
     
-    <div class="refer-stats">
+    <div class="card refer-stats-card">
         <div class="stat-item">
-            <h3>Total Referrals</h3>
+            <h4>Total Referrals</h4>
             <p id="totalReferrals">0</p>
         </div>
         <div class="stat-item">
-            <h3>Total Earnings</h3>
+            <h4>Total Earnings</h4>
             <p id="totalEarnings">₹0.00</p>
         </div>
     </div>
+
   </main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
-    <a href="refer.html" class="active">Refer</a> <a href="mine.html">Mine</a>
+    <a href="refer.html" class="active">Refer</a>
+    <a href="mine.html">Mine</a>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
