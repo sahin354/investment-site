@@ -1,55 +1,68 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const referralCodeEl = document.getElementById('referralCode');
-  const copyCodeBtn = document.getElementById('copyCodeBtn');
+  // Get elements from the DOM
+  const referralLinkEl = document.getElementById('referralLink');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const copyBtnText = document.getElementById('copyBtnText');
   const totalReferralsEl = document.getElementById('totalReferrals');
   const totalEarningsEl = document.getElementById('totalEarnings');
 
-  // Check if a user is logged in
+  // Check for logged-in user
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
-      // User is signed in.
       const userId = user.uid;
       const db = firebase.firestore();
-      
-      // Fetch user data from Firestore
+
+      // Fetch user data from the 'users' collection
       db.collection('users').doc(userId).get().then(doc => {
         if (doc.exists) {
           const userData = doc.data();
-          
-          // Display user's referral data
-          referralCodeEl.textContent = userData.referralCode || 'N/A';
+          const referralCode = userData.referralCode || 'NOT-FOUND';
+
+          // Construct the full referral link
+          const baseUrl = window.location.origin + window.location.pathname.replace('refer.html', 'register.html');
+          const fullLink = `${baseUrl}?ref=${referralCode}`;
+          referralLinkEl.textContent = fullLink;
+
+          // Populate stats
           totalReferralsEl.textContent = userData.totalReferrals || 0;
           totalEarningsEl.textContent = `₹${(userData.referralEarnings || 0).toFixed(2)}`;
 
         } else {
-          console.log("No such document!");
-          referralCodeEl.textContent = "Error";
+          console.error("User document not found!");
+          referralLinkEl.textContent = "Could not generate link.";
         }
       }).catch(error => {
-        console.error("Error getting document:", error);
-        referralCodeEl.textContent = "Error";
+        console.error("Error getting user document:", error);
+        referralLinkEl.textContent = "Error loading link.";
       });
 
     } else {
-      // No user is signed in. Redirect to login page.
+      // If no user is signed in, redirect to the login page
       window.location.href = 'login.html';
     }
   });
 
-  // Add functionality to the copy button
-  copyCodeBtn.addEventListener('click', () => {
-    const code = referralCodeEl.textContent;
-    if (code && code !== 'Loading...' && code !== 'Error' && code !== 'N/A') {
-      navigator.clipboard.writeText(code).then(() => {
-        // Success feedback
-        copyCodeBtn.textContent = 'Copied!';
+  // Add click event to the copy button
+  copyLinkBtn.addEventListener('click', () => {
+    const linkToCopy = referralLinkEl.textContent;
+
+    if (linkToCopy && !linkToCopy.includes('...')) {
+      navigator.clipboard.writeText(linkToCopy).then(() => {
+        // Provide visual feedback on success
+        copyBtnText.textContent = 'Copied!';
+        copyLinkBtn.style.backgroundColor = '#d1e7dd'; // A light green success color
+        
         setTimeout(() => {
-          copyCodeBtn.textContent = 'Copy';
-        }, 2000); // Revert back after 2 seconds
+          // Revert back to the original state after 2 seconds
+          copyBtnText.textContent = 'Copy';
+          copyLinkBtn.style.backgroundColor = ''; // Reverts to CSS color
+        }, 2000);
+
       }).catch(err => {
-        console.error('Failed to copy text: ', err);
-        alert('Failed to copy code.');
+        console.error('Failed to copy link: ', err);
+        alert('Could not copy the link.');
       });
     }
   });
 });
+
