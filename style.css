@@ -206,4 +206,141 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 }
 .btn-primary:hover { background: #23325e; }
 
+/* --- Styles for the New Refer Page UI --- */
 
+.refer-page-container {
+  padding: 15px;
+  background-color: #f4f6f9; /* A light background for the whole page */
+  min-height: calc(100vh - 120px); /* Fill the screen height */
+}
+
+/* Card Style */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  border: 1px solid #eef2f7;
+}
+
+/* Main Referral Card */
+.refer-main-card h2 {
+  margin-top: 0;
+  font-size: 1.4em;
+  color: #1a202c;
+}
+
+.refer-main-card p {
+  color: #555;
+  line-height: 1.6;
+}
+
+.refer-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 20px;
+}
+
+#referralLink {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #333;
+}
+
+#copyLinkBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eef2f7;
+  color: #3c4858;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#copyLinkBtn:hover {
+  background-color: #e2e8f0;
+}
+
+#copyLinkBtn svg {
+  stroke: #3c4858;
+}
+
+/* How It Works Card */
+.how-it-works-card h3 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #1a202c;
+}
+
+.steps-container {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.step-item {
+  width: 30%;
+}
+
+.step-item h4 {
+  margin: 10px 0 5px 0;
+  color: #333;
+}
+
+.step-item p {
+  font-size: 0.8em;
+  color: #666;
+  line-height: 1.4;
+}
+
+.step-icon {
+  background-color: #e3f2fd; /* Light blue background */
+  color: #1565c0; /* Darker blue text */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-weight: bold;
+  font-size: 1.2em;
+  border: 2px solid #bbdefb;
+}
+
+/* Referral Stats Card */
+.refer-stats-card {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.stat-item h4 {
+  margin: 0 0 5px 0;
+  color: #555;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.stat-item p {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #1565c0;
+}
+
+  
