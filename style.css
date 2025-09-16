@@ -460,5 +460,72 @@ body.sidebar-open .side-menu {
     color: white;
 }
 
+/* --- Modern 'My Account' Page UI --- */
+.mine-page .card {
+  margin-bottom: 15px;
+}
+.profile-header-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.profile-avatar {
+  font-size: 2.5em;
+  background-color: #eef2f7;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#profileId { font-weight: bold; color: #333; }
+#profileEmail { font-size: 0.9em; color: #666; }
+
+.balance-card { text-align: center; }
+.balance-label { font-size: 0.9em; color: #555; margin-bottom: 5px; }
+.balance-amount { font-size: 2.2em; font-weight: bold; color: #1e3c72; margin-bottom: 20px; }
+.action-buttons { display: flex; gap: 10px; justify-content: center; }
+.action-btn {
+  background-color: #eef2f7;
+  border: 1px solid #dce4f0;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: background-color 0.2s;
+}
+.action-btn:hover { background-color: #dce4f0; }
+
+.options-list-card { padding: 10px; }
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  text-decoration: none;
+  color: #333;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+.option-item:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+.option-item:hover { background-color: #f8fafc; }
+.option-icon { font-size: 1.5em; margin-right: 15px; }
+.option-chevron { margin-left: auto; color: #ccc; font-weight: bold; }
+
+.logout-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #fbebeb;
+  color: #c53030;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+               }
+
 
 
