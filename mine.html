@@ -8,17 +8,20 @@
 </head>
 <body>
   <aside id="sideMenu" class="side-menu">
-  <div class="sidebar-header">
-    <div id="sidebarId" class="sidebar-id">ID: 38844</div>
-    <div id="sidebarVIP" class="sidebar-vip">VIP 2</div>
-  </div>
-  <div class="sidebar-actions">
-    <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-    <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-    <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
-  </div>
-  <span id="closeBtn" class="close-btn">&times;</span>
-</aside>
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-header">
+      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
+      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
+    </div>
+    <div class="sidebar-actions">
+      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
+    </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
 
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
@@ -66,5 +69,8 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="script-mine.js"></script>
+  <script src="common.js"></script>
+   <script src="script.js"></script> 
 </body>
 </html>
+
