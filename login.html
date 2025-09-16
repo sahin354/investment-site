@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login | Adani Corporation</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <div class="container">
-        <h1>Login</h1>
-        <input type="email" id="email" placeholder="Email or Phone Number" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button id="loginBtn">Login</button>
-        <a href="#" id="forgotPassword">Forgot Password?</a>
-        <p>Don't have an account? <a href="register.html">Register now</a></p>
+  <main class="auth-main card">
+    <h2 style="text-align:center;color:#1976d2;margin-bottom:26px;">Sign In to Your Account</h2>
+    <form id="loginForm" autocomplete="on">
+      <input type="text" id="loginEmailPhone" placeholder="Email or Phone" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button class="btn-primary" type="submit">Login</button>
+      <a href="#" id="forgotPass" style="display:block;text-align:right;color:#1976d2;margin-top:-8px;margin-bottom:16px;">Forgot Password?</a>
+    </form>
+    <hr style="margin:26px 0 18px 0;border:0;border-top:1px solid #e3e3e3;">
+    <div style="text-align:center;">
+      <span style="font-size:1.04em;color:#555;">No account yet?</span>
+      <a href="register.html" class="btn-secondary" style="display:inline-block;margin:10px 0 0 10px;">Register Now</a>
     </div>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
-    
-    <script src="firebaseConfig.js"></script>
-    <script src="auth.js"></script>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="script-auth.js"></script>
 </body>
 </html>
