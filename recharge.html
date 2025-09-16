@@ -7,18 +7,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
   <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-header">
-      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
-      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
-    </div>
+    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
     <div class="sidebar-actions">
-      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
+      <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button class="sidebar-btn"><span>⚙️</span> Settings</button>
     </div>
     <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
@@ -28,33 +23,36 @@
     Recharge
   </header>
 
-  <main class="page-container">
-    <div class="card">
-        <h2>Recharge Your Account</h2>
-        <p>Enter the amount you wish to add to your balance. You will be redirected to complete the payment.</p>
-        
-        <div class="recharge-form">
-            <label for="rechargeAmount">Amount (₹)</label>
-            <input type="number" id="rechargeAmount" placeholder="e.g., 500" min="100" />
-            
-            <div class="quick-amounts">
-                <button class="quick-amount-btn" data-amount="500">₹500</button>
-                <button class="quick-amount-btn" data-amount="1000">₹1000</button>
-                <button class="quick-amount-btn" data-amount="2000">₹2000</button>
-                <button class="quick-amount-btn" data-amount="5000">₹5000</button>
-            </div>
+  <main class="page-container recharge-page">
+    <div class="card current-balance-card">
+      <span class="balance-label">Current Balance</span>
+      <span id="currentBalance" class="balance-amount-small">₹0.00</span>
+    </div>
 
-            <button id="submitRecharge" class="submit-btn">Proceed to Pay</button>
+    <div class="card recharge-form-card">
+        <h2>Enter Recharge Amount</h2>
+        <div class="input-container">
+            <span>₹</span>
+            <input type="number" id="rechargeAmount" placeholder="500" />
         </div>
+        
+        <p class="quick-amounts-label">Select a quick amount:</p>
+        <div class="quick-amounts">
+            <button class="quick-amount-btn" data-amount="500">₹500</button>
+            <button class="quick-amount-btn" data-amount="1000">₹1000</button>
+            <button class="quick-amount-btn" data-amount="2000">₹2000</button>
+            <button class="quick-amount-btn" data-amount="5000">₹5000</button>
+            <button class="quick-amount-btn" data-amount="10000">₹10000</button>
+            <button class="quick-amount-btn" data-amount="25000">₹25000</button>
+        </div>
+
+        <button id="submitRecharge" class="submit-btn">Proceed to Pay</button>
     </div>
   </main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="recharge.html" class="active">Recharge</a>
-    <a href="refer.html">Refer</a>
-    <a href="mine.html">Mine</a>
+    <a href="index.html">Home</a><a href="recharge.html" class="active">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
