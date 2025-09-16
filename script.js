@@ -1,50 +1,38 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBqnJpGCtplUIwspovyntn9bbaTY2ygLNE",
-  authDomain: "adani-investment.firebaseapp.com",
-  projectId: "adani-investment",
-  storageBucket: "adani-investment.firebasestorage.app",
-  messagingSenderId: "549652082720",
-  appId: "1:549652082720:web:09bc0f371a498ee5184c45",
-  measurementId: "G-TGFHW9XKF2"
-};
-
-// script.js
-const auth = firebase.auth();
-const db = firebase.firestore();
-let currentUser = null;
-
 auth.onAuthStateChanged(user => {
-    if (user && user.emailVerified) {
-        // User is logged in and verified
-        currentUser = user;
-        console.log("User logged in:", user.uid);
-        populateSidebar(user.uid);
-    } else {
-        // No user is signed in or not verified, redirect to login page.
-        console.log("User not logged in. Redirecting...");
-        window.location.replace('login.html');
-    }
+  if (!user) window.location = 'login.html';
+  document.getElementById('sidebarUserId').textContent = user.uid;
+  db.collection('users').doc(user.uid).get().then(doc => {
+    document.getElementById('sidebarVIP').textContent = doc.data()?.vipLevel || 'Standard';
+  });
 });
+document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
+document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
+document.getElementById('sidebarSupport').onclick = () => window.open("https://yourcustomersupporturl", "_blank");
+document.getElementById('sidebarTelegram').onclick = () => window.open("https://t.me/yourtelegramchannel", "_blank");
 
-function populateSidebar(userId) {
-    const userRef = db.collection('users').doc(userId);
-    userRef.get().then(doc => {
-        if (doc.exists) {
-            const userData = doc.data();
-            // Assuming you have elements with these IDs in your sidebar
-            document.getElementById('sidebar-user-id').textContent = `ID: ${userId.substring(0, 8)}`;
-            document.getElementById('sidebar-vip-level').textContent = `VIP Level: ${userData.vipLevel}`;
-        }
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+tabButtons.forEach(button => {
+  button.onclick = () => {
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(c => c.classList.remove('active'));
+    button.classList.add('active');
+    document.getElementById(button.dataset.tab).classList.add('active');
+    loadTabData(button.dataset.tab);
+  }
+});
+function loadTabData(tabName) {
+  const container = document.getElementById(tabName);
+  container.innerHTML = '<p>Loading...</p>';
+  db.collection(tabName).get().then(snap => {
+    if (snap.empty) return container.innerHTML = '<p>No data.</p>';
+    let html = '<ul>';
+    snap.forEach(doc => {
+      let d = doc.data();
+      html += `<li><b>${d.title||'Item'}</b>: ${d.description||''}</li>`;
     });
+    html += '</ul>';
+    container.innerHTML = html;
+  });
 }
-
-// --- LOGOUT FUNCTIONALITY (for mine.html) ---
-function logout() {
-    auth.signOut().then(() => {
-        // Sign-out successful, will trigger onAuthStateChanged to redirect
-        console.log('User signed out');
-    }).catch((error) => {
-        console.error('Sign out error', error);
-    });
-}
+loadTabData('primary');
