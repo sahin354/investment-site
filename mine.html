@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>User Dashboard</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adani Corporation - My Account</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <aside id="sideMenu" class="side-menu">
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header">
@@ -25,52 +25,50 @@
 
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
-    User Dashboard
+    My Account
   </header>
-  <main>
-    <section class="card-green">
-      <div><b>Name:</b> <span id="userName"></span></div>
-      <div><b>Phone:</b> <span id="userPhone"></span></div>
-    </section>
-    <section class="mine-balances card">
-      <div>Recharge Balance: ₹<span id="rechargeBal"></span></div>
-      <div>Withdrawal Balance: ₹<span id="withdrawBal"></span></div>
-    </section>
-    <section class="card">
-      <form id="withdrawForm">
-        <label for="withdrawAmt">Withdraw Amount (119-50000):</label>
-        <input type="number" id="withdrawAmt" min="119" max="50000" required class="input-box">
-        <span>19% TDS will apply</span>
-        <button class="btn-primary">Withdraw</button>
-      </form>
-    </section>
-    <section class="card">
-      <button id="addBankBtn" class="btn-secondary">Add Bank Account / Card</button>
-    </section>
-    <section class="card">
-      <h3>Withdrawal Records</h3>
-      <div id="withdrawalRecords"></div>
-    </section>
-    <section class="card">
-      <h3>Transactions</h3>
-      <div id="transactionList"></div>
-    </section>
-    <button id="logoutBtnMain" class="logout-btn-wide">Logout</button>
+
+  <main class="page-container">
+    <div class="card profile-header">
+      <div class="profile-info">
+        <div id="profileId">ID: Loading...</div>
+        <div id="profileEmail">Loading...</div>
+      </div>
+      <div class="balance-info">
+        <label>Available Balance</label>
+        <div id="profileBalance">₹0.00</div>
+      </div>
+    </div>
+
+    <div class="card action-buttons">
+      <button id="withdrawBtn" class="action-btn withdraw">Withdraw</button>
+      <button id="rechargeBtn" class="action-btn recharge">Recharge</button>
+    </div>
+
+    <div class="card options-list">
+      <a href="#" class="option-item"><span>🏦</span> Bank Account Details</a>
+      <a href="#" class="option-item"><span>📜</span> Transaction History</a>
+      <a href="#" class="option-item"><span>🔒</span> Change Password</a>
+    </div>
+
+    <div class="card">
+        <button id="logoutBtn" class="logout-btn">Log Out</button>
+    </div>
   </main>
+
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
     <a href="refer.html">Refer</a>
-    <a href="mine.html">Mine</a>
+    <a href="mine.html" class="active">Mine</a>
   </footer>
+
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
-  <script src="script-mine.js"></script>
   <script src="common.js"></script>
-   <script src="script.js"></script> 
+  <script src="script-mine.js"></script>
 </body>
 </html>
-
