@@ -7,18 +7,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
   <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-header">
-      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
-      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
-    </div>
+    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
     <div class="sidebar-actions">
-      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
+      <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button class="sidebar-btn"><span>⚙️</span> Settings</button>
     </div>
     <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
@@ -28,40 +23,50 @@
     My Account
   </header>
 
-  <main class="page-container">
-    <div class="card profile-header">
+  <main class="page-container mine-page">
+    <div class="card profile-header-card">
+      <div class="profile-avatar">👤</div>
       <div class="profile-info">
         <div id="profileId">ID: Loading...</div>
         <div id="profileEmail">Loading...</div>
       </div>
-      <div class="balance-info">
-        <label>Available Balance</label>
-        <div id="profileBalance">₹0.00</div>
+    </div>
+
+    <div class="card balance-card">
+      <div class="balance-label">Available Balance</div>
+      <div id="profileBalance" class="balance-amount">₹0.00</div>
+      <div class="action-buttons">
+        <button id="withdrawBtn" class="action-btn"><span>⬆️</span>Withdraw</button>
+        <button id="rechargeBtn" class="action-btn"><span>⬇️</span>Recharge</button>
       </div>
     </div>
 
-    <div class="card action-buttons">
-      <button id="withdrawBtn" class="action-btn withdraw">Withdraw</button>
-      <button id="rechargeBtn" class="action-btn recharge">Recharge</button>
+    <div class="card options-list-card">
+      <a href="#" class="option-item">
+        <div class="option-icon">🏦</div>
+        <span>Bank Account Details</span>
+        <div class="option-chevron">&gt;</div>
+      </a>
+      <a href="#" class="option-item">
+        <div class="option-icon">📜</div>
+        <span>Transaction History</span>
+        <div class="option-chevron">&gt;</div>
+      </a>
+      <a href="#" class="option-item">
+        <div class="option-icon">🔒</div>
+        <span>Change Password</span>
+        <div class="option-chevron">&gt;</div>
+      </a>
     </div>
 
-    <div class="card options-list">
-      <a href="#" class="option-item"><span>🏦</span> Bank Account Details</a>
-      <a href="#" class="option-item"><span>📜</span> Transaction History</a>
-      <a href="#" class="option-item"><span>🔒</span> Change Password</a>
-    </div>
-
-    <div class="card">
+    <div class="card logout-card">
         <button id="logoutBtn" class="logout-btn">Log Out</button>
     </div>
   </main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
-    <a href="refer.html">Refer</a>
-    <a href="mine.html" class="active">Mine</a>
+    <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html">Refer</a><a href="mine.html" class="active">Mine</a>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
