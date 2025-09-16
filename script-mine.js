@@ -1,47 +1,55 @@
-auth.onAuthStateChanged(user => {
-  if(!user) window.location = 'login.html';
-  else {
-    document.getElementById('sidebarUserId').textContent = user.uid;
-    db.collection('users').doc(user.uid).get().then(doc=>{
-      const d=doc.data()||{};
-      document.getElementById('sidebarVIP').textContent = d.vipLevel || "Standard";
-      document.getElementById('userName').textContent = d.name || user.email || 'User';
-      document.getElementById('userPhone').textContent = d.phone || '-';
-      document.getElementById('rechargeBal').textContent = d.rechargeBalance||'0.00';
-      document.getElementById('withdrawBal').textContent = d.withdrawalBalance||'0.00';
+document.addEventListener('DOMContentLoaded', () => {
+    // Get all the elements from the page that we need to work with
+    const profileIdEl = document.getElementById('profileId');
+    const profileEmailEl = document.getElementById('profileEmail');
+    const profileBalanceEl = document.getElementById('profileBalance');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const rechargeBtn = document.getElementById('rechargeBtn');
+    
+    // Listen for changes in authentication state (e.g., user logs in or out)
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // If a user is logged in, fetch their data from Firestore
+            const db = firebase.firestore();
+            db.collection('users').doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    // Display the user's data on the page
+                    profileIdEl.textContent = `ID: ${userData.userId || 'N/A'}`;
+                    profileEmailEl.textContent = userData.email || user.email;
+                    profileBalanceEl.textContent = `₹${(userData.balance || 0).toFixed(2)}`;
+                } else {
+                    console.error("User document not found in Firestore!");
+                }
+            }).catch(error => {
+                console.error("Error fetching user data:", error);
+            });
+        } else {
+            // If no user is logged in, redirect them to the login page
+            console.log("No user signed in. Redirecting to login.");
+            window.location.href = 'login.html';
+        }
     });
-    db.collection('withdrawals').where('uid','==',user.uid).get()
-      .then(snap => {
-        let records = snap.empty ? "No withdrawals." : "";
-        snap.forEach(doc => {
-          let d=doc.data();
-          records += `₹${d.amount} | Status: ${d.status||'Pending'} | ${d.timestamp?.toDate().toLocaleString()}<br>`;
+
+    // --- LOGOUT BUTTON LOGIC ---
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            firebase.auth().signOut().then(() => {
+                // Sign-out successful.
+                console.log('User signed out successfully.');
+                window.location.href = 'login.html'; // Redirect to login page
+            }).catch((error) => {
+                // An error happened.
+                console.error('Sign out error:', error);
+                alert('Error signing out. Please try again.');
+            });
         });
-        document.getElementById('withdrawalRecords').innerHTML = records;
-      });
-    db.collection('transactions').where('uid','==',user.uid).get()
-      .then(snap => {
-        let records = snap.empty ? "No transactions." : "";
-        snap.forEach(doc => {
-          let d=doc.data();
-          records += `${d.type||'Txn'}: ₹${d.amount||'-'} | ${d.timestamp?.toDate().toLocaleString()}<br>`;
+    }
+    
+    // --- OTHER BUTTONS ---
+    if(rechargeBtn) {
+        rechargeBtn.addEventListener('click', () => {
+            window.location.href = 'recharge.html'; // Redirect to the recharge page
         });
-        document.getElementById('transactionList').innerHTML = records;
-      });
-  }
+    }
 });
-document.getElementById('withdrawForm').onsubmit = e => {
-  e.preventDefault();
-  const amt = +document.getElementById('withdrawAmt').value;
-  if(amt<119||amt>50000) return alert('Invalid amount!');
-  const tds = Math.round(amt*.19);
-  const net = amt-tds;
-  alert(`₹${tds} TDS deducted. Net: ₹${net}`);
-  const uid=auth.currentUser?.uid;
-  if(uid){
-    db.collection('withdrawals').add({uid,amount:amt,tds,netAmount:net,status:'Pending',timestamp:firebase.firestore.FieldValue.serverTimestamp()})
-      .then(()=>alert('Withdrawal requested!'));
-  }
-};
-document.getElementById('addBankBtn').onclick = () => alert('Bank Account Add Form Coming Soon!');
-document.getElementById('logoutBtnMain').onclick = () => auth.signOut().then(()=>window.location='login.html');
