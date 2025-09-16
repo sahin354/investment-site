@@ -1,8 +1,27 @@
-// SIDEBAR: Always working on every page
+// Show sidebar
 document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
 document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
-document.getElementById('sidebarSupport').onclick = () => window.open("https://yourcustomersupporturl", "_blank");
-document.getElementById('sidebarTelegram').onclick = () => window.open("https://t.me/yourtelegramchannel", "_blank");
+
+// Set User ID and VIP dynamically from Firebase
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) window.location = 'login.html';
+  // If using numeric ID, replace user.uid with actual user id (e.g. doc.data().accountId or user.uid.slice(0,5))
+  firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
+    const userData = doc.data();
+    document.getElementById('sidebarId').textContent =
+      'ID: ' + (userData?.accountId || user.uid.slice(0,5)); // use your actual ID logic
+    document.getElementById('sidebarVIP').textContent =
+      'VIP ' + (userData?.vipLevel || 'Standard');
+  });
+});
+
+// Button functions
+document.getElementById('sidebarSupport').onclick = () =>
+  window.open("https://yourcustomersupporturl", "_blank");
+document.getElementById('sidebarTelegram').onclick = () =>
+  window.open("https://t.me/yourtelegramchannel", "_blank");
+document.getElementById('sidebarSettings').onclick = () =>
+  window.location = 'settings.html';
 
 if (typeof firebase !== "undefined") {
   firebase.auth().onAuthStateChanged(user => {
