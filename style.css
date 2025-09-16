@@ -29,19 +29,19 @@ body {
 .menu-btn span { background-color: white; height: 3px; border-radius: 2px; margin-bottom: 3px; }
 /* Sidebar */
 .side-menu {
-  position: fixed;
-  left: -260px;
-  top: 0;
-  width: 260px;
-  height: 100%;
-  background: linear-gradient(160deg, #43e97b 0%, #1976d2 100%);
-  color: #fff;
-  padding: 36px 20px 24px;
-  box-sizing: border-box;
-  transition: left .3s;
-  z-index: 1200;
-  display: flex;
-  flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px; /* Correct fixed width */
+    max-width: 85vw; /* Safety for very small screens */
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
 }
 .side-menu.open { left: 0; }
 .sidebar-header {
@@ -459,5 +459,6 @@ body.sidebar-open .side-menu {
 .close-btn:hover {
     color: white;
 }
+
 
 
