@@ -1,72 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Recharge Account | Adani Corporation</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adani Corporation - Recharge</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- SIDEBAR: Same for all pages -->
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header">
-      <div class="user-avatar">
-        <div class="avatar-circle">👤</div>
-      </div>
-      <div class="user-info">
-        <div id="sidebarId" class="user-id">ID: 38844</div>
-        <div id="sidebarVIP" class="user-vip">VIP 2</div>
-      </div>
+      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
+      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
     </div>
-    <div class="sidebar-menu">
-      <div class="menu-item" id="sidebarSupport">
-        <div class="menu-icon">📞</div>
-        <span>Customer Support</span>
-        <div class="menu-arrow">→</div>
-      </div>
-      <div class="menu-item" id="sidebarTelegram">
-        <div class="menu-icon">💬</div>
-        <span>Telegram Channel</span>
-        <div class="menu-arrow">→</div>
-      </div>
-      <div class="menu-item" id="sidebarSettings">
-        <div class="menu-icon">⚙️</div>
-        <span>Settings</span>
-        <div class="menu-arrow">→</div>
-      </div>
+    <div class="sidebar-actions">
+      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
     </div>
-    <span id="closeBtn" class="close-btn">✕</span>
+    <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
 
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
-    Recharge Account
+    Recharge
   </header>
 
-  <main>
-    <section class="card">
-      <h2 style="color:#1976d2;margin-bottom:18px;">Recharge Your Account</h2>
-      <form id="rechargeForm">
-        <label for="amount" style="font-weight:600;">Amount (₹100 to ₹99000):</label>
-        <input type="number" id="amount" min="100" max="99000" required class="input-box" placeholder="Enter Amount">
+  <main class="page-container">
+    <div class="card">
+        <h2>Recharge Your Account</h2>
+        <p>Enter the amount you wish to add to your balance. You will be redirected to complete the payment.</p>
         
-        <label for="rechargeChannel" style="font-weight:600;margin-top:15px;">Choose Recharge Channel:</label>
-        <select id="rechargeChannel" class="input-select">
-          <option value="Channel 1">Channel 1</option>
-          <option value="Channel 2">Channel 2</option>
-          <option value="Channel 3">Channel 3</option>
-        </select>
-        <button class="btn-primary" type="submit" style="margin-top:22px;">Recharge</button>
-      </form>
+        <div class="recharge-form">
+            <label for="rechargeAmount">Amount (₹)</label>
+            <input type="number" id="rechargeAmount" placeholder="e.g., 500" min="100" />
+            
+            <div class="quick-amounts">
+                <button class="quick-amount-btn" data-amount="500">₹500</button>
+                <button class="quick-amount-btn" data-amount="1000">₹1000</button>
+                <button class="quick-amount-btn" data-amount="2000">₹2000</button>
+                <button class="quick-amount-btn" data-amount="5000">₹5000</button>
+            </div>
 
-      <button id="rechargeRecordBtn" class="btn-secondary" style="margin-top:18px;">View Recharge Records</button>
-      <div id="rechargeMessage" style="margin-top:10px;font-weight:bold;"></div>
-    </section>
+            <button id="submitRecharge" class="submit-btn">Proceed to Pay</button>
+        </div>
+    </div>
   </main>
+
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
+    <a href="recharge.html" class="active">Recharge</a>
     <a href="refer.html">Refer</a>
     <a href="mine.html">Mine</a>
   </footer>
@@ -75,7 +61,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
-  <script src="script-recharge.js"></script>
+  <script src="common.js"></script>
+  <script src="script-recharge.js"></script> 
 </body>
-          </html>
-          
+</html>
