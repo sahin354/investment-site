@@ -525,7 +525,69 @@ body.sidebar-open .side-menu {
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-               }
+}
 
+/* --- Modern 'Recharge' Page UI --- */
+.recharge-page .card { margin-bottom: 15px; }
+.current-balance-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+  padding: 15px 20px;
+}
+.balance-label { font-weight: 500; color: #1e3c72; }
+.balance-amount-small { font-weight: bold; font-size: 1.1em; color: #1e3c72; }
 
+.recharge-form-card h2 { text-align: center; margin-top: 0; color: #333; }
+.input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin: 20px 0;
+}
+.input-container span { font-size: 1.5em; font-weight: bold; color: #555; margin-right: 10px; }
+.input-container input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+.quick-amounts-label { text-align: center; font-size: 0.9em; color: #777; }
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.quick-amount-btn {
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #dce4f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quick-amount-btn.active, .quick-amount-btn:hover {
+  background-color: #1e3c72;
+  color: white;
+  border-color: #1e3c72;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+  
 
