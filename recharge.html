@@ -3,57 +3,79 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Recharge</title>
+  <title>Recharge Account | Adani Corporation</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+  <!-- SIDEBAR: Same for all pages -->
   <aside id="sideMenu" class="side-menu">
-  <div class="sidebar-header">
-    <div id="sidebarId" class="sidebar-id">ID: 38844</div>
-    <div id="sidebarVIP" class="sidebar-vip">VIP 2</div>
-  </div>
-  <div class="sidebar-actions">
-    <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-    <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-    <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
-  </div>
-  <span id="closeBtn" class="close-btn">&times;</span>
-</aside>
+    <div class="sidebar-header">
+      <div class="user-avatar">
+        <div class="avatar-circle">👤</div>
+      </div>
+      <div class="user-info">
+        <div id="sidebarId" class="user-id">ID: 38844</div>
+        <div id="sidebarVIP" class="user-vip">VIP 2</div>
+      </div>
+    </div>
+    <div class="sidebar-menu">
+      <div class="menu-item" id="sidebarSupport">
+        <div class="menu-icon">📞</div>
+        <span>Customer Support</span>
+        <div class="menu-arrow">→</div>
+      </div>
+      <div class="menu-item" id="sidebarTelegram">
+        <div class="menu-icon">💬</div>
+        <span>Telegram Channel</span>
+        <div class="menu-arrow">→</div>
+      </div>
+      <div class="menu-item" id="sidebarSettings">
+        <div class="menu-icon">⚙️</div>
+        <span>Settings</span>
+        <div class="menu-arrow">→</div>
+      </div>
+    </div>
+    <span id="closeBtn" class="close-btn">✕</span>
+  </aside>
 
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Recharge Account
   </header>
+
   <main>
     <section class="card">
-      <h2>Recharge Channel</h2>
-      <select id="rechargeChannel" class="input-select">
-        <option>Channel 1</option>
-        <option>Channel 2</option>
-        <option>Channel 3</option>
-      </select>
+      <h2 style="color:#1976d2;margin-bottom:18px;">Recharge Your Account</h2>
       <form id="rechargeForm">
-        <label for="amount">Enter Amount (100-99000):</label>
-        <input type="number" id="amount" min="100" max="99000" required class="input-box">
-        <button class="btn-primary">Recharge</button>
+        <label for="amount" style="font-weight:600;">Amount (₹100 to ₹99000):</label>
+        <input type="number" id="amount" min="100" max="99000" required class="input-box" placeholder="Enter Amount">
+        
+        <label for="rechargeChannel" style="font-weight:600;margin-top:15px;">Choose Recharge Channel:</label>
+        <select id="rechargeChannel" class="input-select">
+          <option value="Channel 1">Channel 1</option>
+          <option value="Channel 2">Channel 2</option>
+          <option value="Channel 3">Channel 3</option>
+        </select>
+        <button class="btn-primary" type="submit" style="margin-top:22px;">Recharge</button>
       </form>
-      <button id="rechargeRecordBtn" class="btn-secondary">Recharge Records</button>
-      <div id="rechargeMessage"></div>
+
+      <button id="rechargeRecordBtn" class="btn-secondary" style="margin-top:18px;">View Recharge Records</button>
+      <div id="rechargeMessage" style="margin-top:10px;font-weight:bold;"></div>
     </section>
   </main>
   <div class="bottom-nav-spacer"></div>
-  <!-- Add bottom nav just like home! -->
   <footer class="bottom-nav">
     <a href="index.html">Home</a>
     <a href="recharge.html">Recharge</a>
     <a href="refer.html">Refer</a>
     <a href="mine.html">Mine</a>
   </footer>
+
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="script-recharge.js"></script>
 </body>
-      </html>
-    
+          </html>
+          
