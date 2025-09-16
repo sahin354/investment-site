@@ -1,93 +1,42 @@
-auth.onAuthStateChanged(user => {
-  if (!user) window.location = 'login.html';
-  document.getElementById('sidebarUserId').textContent = user.uid;
-  db.collection('users').doc(user.uid).get().then(doc => {
-    document.getElementById('sidebarVIP').textContent = doc.data()?.vipLevel || 'Standard';
-  });
-});
+// SIDEBAR: Always working on every page
 document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
 document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
 document.getElementById('sidebarSupport').onclick = () => window.open("https://yourcustomersupporturl", "_blank");
 document.getElementById('sidebarTelegram').onclick = () => window.open("https://t.me/yourtelegramchannel", "_blank");
 
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
-tabButtons.forEach(button => {
-  button.onclick = () => {
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-    button.classList.add('active');
-    document.getElementById(button.dataset.tab).classList.add('active');
-    loadTabData(button.dataset.tab);
-  }
-});
-function loadTabData(tabName) {
-  const container = document.getElementById(tabName);
-  container.innerHTML = '<p>Loading...</p>';
-  db.collection(tabName).get().then(snap => {
-    if (snap.empty) return container.innerHTML = '<p>No data.</p>';
-    let html = '<ul>';
-    snap.forEach(doc => {
-      let d = doc.data();
-      html += `<li><b>${d.title||'Item'}</b>: ${d.description||''}</li>`;
+if (typeof firebase !== "undefined") {
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) window.location = 'login.html';
+    document.getElementById('sidebarUserId').textContent = user.uid;
+    firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
+      document.getElementById('sidebarVIP').textContent = doc.data()?.vipLevel || 'Standard';
     });
-    html += '</ul>';
-    container.innerHTML = html;
   });
 }
-loadTabData('primary');
 
-// Example plans data for demonstration (replace with Firebase fetch)
+// PLANS: Show cards for Primary and VIP, Purchased tab for what user picks
 const plans = {
   primary: [
-    {
-      name: 'Tata',
-      income: 500,
-      days: 18,
-      price: 200
-    },
-    {
-      name: 'Steel Corp',
-      income: 350,
-      days: 12,
-      price: 120
-    }
+    { name:'Tata', income:500, days:18, price:200 },
+    { name:'Steel Corp', income:350, days:12, price:120 }
   ],
   vip: [
-    {
-      name: 'Reliance',
-      income: 1200,
-      days: 25,
-      price: 850
-    },
-    {
-      name: 'Infosys',
-      income: 950,
-      days: 19,
-      price: 650
-    }
+    { name:'Reliance', income:1200, days:25, price:850 }
   ]
 };
-
-// For demo, store purchases in localStorage (replace with Firebase for live app)
 function getPurchased() {
   return JSON.parse(localStorage.getItem("purchasedPlans") || "[]");
 }
 function setPurchased(arr) {
   localStorage.setItem("purchasedPlans", JSON.stringify(arr));
 }
-
-// Render plans for the current tab
 function renderPlans(tabName) {
   const container = document.getElementById(tabName);
-  container.innerHTML = '';
-
+  container.innerHTML = "";
   const currentPlans = plans[tabName] || [];
   currentPlans.forEach((plan, idx) => {
     const card = document.createElement('div');
     card.className = 'card';
-    card.style.margin = '22px 0';
-
     card.innerHTML =
       `<h3>${plan.name}</h3>
       <div>Day Income: ₹${plan.income}</div>
@@ -97,8 +46,6 @@ function renderPlans(tabName) {
     container.appendChild(card);
   });
 }
-
-// Save purchased plan and show in 'Purchased' tab
 window.purchasePlan = function(tabName, idx) {
   const plan = plans[tabName][idx];
   let purchased = getPurchased();
@@ -107,12 +54,11 @@ window.purchasePlan = function(tabName, idx) {
   alert(`Purchased ${plan.name}!`);
   renderPurchased();
 };
-
-// Render purchased plans
 function renderPurchased() {
   const container = document.getElementById('purchased');
   const purchased = getPurchased();
-  container.innerHTML = purchased.length === 0 ? '<div class="card"><p>No plans purchased yet.</p></div>' : '';
+  container.innerHTML = purchased.length === 0 ?
+    '<div class="card"><p>No plans purchased yet.</p></div>' : "";
   purchased.forEach(plan => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -125,8 +71,7 @@ function renderPurchased() {
     container.appendChild(card);
   });
 }
-
-// Tabs logic (keep this from previous code)
+// Tabs logic
 const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
 tabButtons.forEach(button => {
@@ -140,6 +85,5 @@ tabButtons.forEach(button => {
     else renderPurchased();
   }
 });
-
 // Initial rendering
 renderPlans('primary');
