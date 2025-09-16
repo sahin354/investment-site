@@ -343,4 +343,121 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
   color: #1565c0;
 }
 
-  
+ /* --- Modern Sidebar UI --- */
+
+/* This class will be added to the <body> to trigger the open state */
+body.sidebar-open {
+    overflow: hidden; /* Prevents scrolling of the main content */
+}
+
+/* Background Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Sidebar Menu */
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px; /* A bit wider */
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1);
+
+    /* Initially hidden off-screen to the left */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+body.sidebar-open .side-menu {
+    transform: translateX(0);
+}
+
+/* Sidebar Header (User Info) */
+.sidebar-header {
+    background: linear-gradient(135deg, #1e3c72, #2a5298); /* A nice gradient */
+    color: white;
+    padding: 25px 20px;
+    text-align: left;
+}
+
+.sidebar-id {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sidebar-vip {
+    background-color: rgba(255, 215, 0, 0.8); /* Gold color for VIP */
+    color: #333;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Sidebar Action Buttons */
+.sidebar-actions {
+    flex-grow: 1; /* Pushes the logout button down if you add one */
+    padding-top: 15px;
+}
+
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between icon and text */
+    width: 100%;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-btn:hover {
+    background-color: #f4f6f9;
+    color: #1e3c72;
+}
+
+.sidebar-btn span {
+    font-size: 1.4em; /* Makes emojis/icons a bit bigger */
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2.5em;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+    color: white;
+}
+
+
