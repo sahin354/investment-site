@@ -1,20 +1,69 @@
-<div id="user-info">
-    <h2 id="userName">Loading...</h2>
-    <p id="userMobile">Loading...</p>
-</div>
-<div id="balance-info">
-    <p>Recharge Balance: ₹<span id="rechargeBalance">0</span></p>
-    <p>Withdrawal Balance: ₹<span id="withdrawalBalance">0</span></p>
-</div>
-<div id="withdrawal-section">
-    <h3>Withdraw Funds</h3>
-    <input type="number" id="withdrawAmount" placeholder="Amount (min ₹119)" min="119" max="50000">
-    <p>A 19% TDS charge will be applied.</p>
-    <button id="withdrawBtn">Withdraw</button>
-</div>
-<div id="options-section">
-    <button id="bankCardBtn">Add Bank Account</button>
-    <button id="withdrawalRecordBtn">Withdrawal Record</button>
-    <button id="transactionBtn">All Transactions</button>
-</div>
-<button id="logoutBtn" class="logout-btn-red">Logout</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-top">
+      <div><strong>User ID:</strong> <span id="sidebarUserId"></span></div>
+      <div><strong>VIP Level:</strong> <span id="sidebarVIP"></span></div>
+    </div>
+    <nav class="sidebar-middle">
+      <a href="#" id="sidebarSupport" class="sidebar-link">🧑‍💼 Customer Support</a>
+      <a href="#" id="sidebarTelegram" class="sidebar-link">💬 Telegram Channel</a>
+      <a href="settings.html" class="sidebar-link">⚙️ Settings</a>
+    </nav>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    User Dashboard
+  </header>
+  <main>
+    <section class="card-green">
+      <div><b>Name:</b> <span id="userName"></span></div>
+      <div><b>Phone:</b> <span id="userPhone"></span></div>
+    </section>
+    <section class="mine-balances card">
+      <div>Recharge Balance: ₹<span id="rechargeBal"></span></div>
+      <div>Withdrawal Balance: ₹<span id="withdrawBal"></span></div>
+    </section>
+    <section class="card">
+      <form id="withdrawForm">
+        <label for="withdrawAmt">Withdraw Amount (119-50000):</label>
+        <input type="number" id="withdrawAmt" min="119" max="50000" required class="input-box">
+        <span>19% TDS will apply</span>
+        <button class="btn-primary">Withdraw</button>
+      </form>
+    </section>
+    <section class="card">
+      <button id="addBankBtn" class="btn-secondary">Add Bank Account / Card</button>
+    </section>
+    <section class="card">
+      <h3>Withdrawal Records</h3>
+      <div id="withdrawalRecords"></div>
+    </section>
+    <section class="card">
+      <h3>Transactions</h3>
+      <div id="transactionList"></div>
+    </section>
+    <button id="logoutBtnMain" class="logout-btn-wide">Logout</button>
+  </main>
+  <div class="bottom-nav-spacer"></div>
+  <footer class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="recharge.html">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+  </footer>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="script-mine.js"></script>
+</body>
+</html>
