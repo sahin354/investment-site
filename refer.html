@@ -7,12 +7,28 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-header">
+      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
+      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
+    </div>
+    <div class="sidebar-actions">
+      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
+    </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+
   <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Refer & Earn
   </header>
 
   <main class="refer-page-container">
-    
     <div class="card refer-main-card">
       <h2>Invite Friends, Earn Rewards!</h2>
       <p>Share your unique link with friends. When they sign up and invest, you'll both receive exclusive bonuses.</p>
@@ -24,39 +40,18 @@
         </button>
       </div>
     </div>
-
     <div class="card how-it-works-card">
       <h3>How It Works</h3>
       <div class="steps-container">
-        <div class="step-item">
-          <div class="step-icon"><span>1</span></div>
-          <h4>Share Link</h4>
-          <p>Share your referral link with friends.</p>
-        </div>
-        <div class="step-item">
-          <div class="step-icon"><span>2</span></div>
-          <h4>Friend Registers</h4>
-          <p>Your friend signs up using your link.</p>
-        </div>
-        <div class="step-item">
-          <div class="step-icon"><span>3</span></div>
-          <h4>Earn Rewards</h4>
-          <p>You both get rewarded automatically.</p>
-        </div>
+        <div class="step-item"><div class="step-icon"><span>1</span></div><h4>Share Link</h4><p>Share your referral link with friends.</p></div>
+        <div class="step-item"><div class="step-icon"><span>2</span></div><h4>Friend Registers</h4><p>Your friend signs up using your link.</p></div>
+        <div class="step-item"><div class="step-icon"><span>3</span></div><h4>Earn Rewards</h4><p>You both get rewarded automatically.</p></div>
       </div>
     </div>
-    
     <div class="card refer-stats-card">
-        <div class="stat-item">
-            <h4>Total Referrals</h4>
-            <p id="totalReferrals">0</p>
-        </div>
-        <div class="stat-item">
-            <h4>Total Earnings</h4>
-            <p id="totalEarnings">₹0.00</p>
-        </div>
+        <div class="stat-item"><h4>Total Referrals</h4><p id="totalReferrals">0</p></div>
+        <div class="stat-item"><h4>Total Earnings</h4><p id="totalEarnings">₹0.00</p></div>
     </div>
-
   </main>
 
   <div class="bottom-nav-spacer"></div>
@@ -71,6 +66,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
-  <script src="script-refer.js"></script> 
+  <script src="common.js"></script>
+  <script src="script-refer.js"></script>
 </body>
 </html>
