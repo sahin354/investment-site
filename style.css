@@ -668,4 +668,93 @@ body.sidebar-open .side-menu {
     color: #1e3c72;
 }
 
+/* --- Modern UI for Login & Register Pages --- */
+
+.auth-page-background {
+  background-color: #f4f6f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 400px; /* Limits width on larger screens */
+  padding: 20px;
+}
+
+.auth-card {
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+  border: 1px solid #eef2f7;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #1a202c;
+  font-size: 1.6em;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #dce4f0;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #1e3c72;
+  box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover {
+  background-color: #2a5298;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.auth-switch a {
+  color: #1e3c72;
+  font-weight: bold;
+  text-decoration: none;
+}
+
 
