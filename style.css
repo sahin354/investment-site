@@ -771,4 +771,44 @@ body.sidebar-open .side-menu {
     text-decoration: underline;
 }
 
+/* --- Styles for Team List (Add to bottom of style.css) --- */
+.team-list-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #555;
+    padding: 10px;
+    border-bottom: 2px solid #eef2f7;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+.team-list-container {
+    margin-top: 10px;
+}
+.team-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.team-list-item:last-child {
+    border-bottom: none;
+}
+.recharge-status.recharged {
+    color: #15803d; /* Green */
+    font-weight: bold;
+    background-color: #dcfce7;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+.recharge-status.not-recharged {
+    color: #9ca3af; /* Gray */
+    background-color: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+}
+
 
