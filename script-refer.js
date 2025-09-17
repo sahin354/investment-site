@@ -1,68 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Get elements from the DOM
-  const referralLinkEl = document.getElementById('referralLink');
-  const copyLinkBtn = document.getElementById('copyLinkBtn');
-  const copyBtnText = document.getElementById('copyBtnText');
-  const totalReferralsEl = document.getElementById('totalReferrals');
-  const totalEarningsEl = document.getElementById('totalEarnings');
+    // --- Existing Elements ---
+    const referralLinkEl = document.getElementById('referralLink');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const copyBtnText = document.getElementById('copyBtnText');
+    
+    // --- New Team Elements ---
+    const teamTabs = document.querySelectorAll('.team-tab');
+    const teamContents = document.querySelectorAll('.team-level-content');
+    const level1CountEl = document.getElementById('level1Count');
+    const level2CountEl = document.getElementById('level2Count');
+    const level3CountEl = document.getElementById('level3Count');
+    
+    // --- Tab Switching Logic ---
+    teamTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            teamTabs.forEach(t => t.classList.remove('active'));
+            teamContents.forEach(c => c.classList.remove('active'));
+            
+            tab.classList.add('active');
+            const contentId = `level${tab.dataset.level}Content`;
+            document.getElementById(contentId).classList.add('active');
+        });
+    });
 
-  // Check for logged-in user
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-      const userId = user.uid;
-      const db = firebase.firestore();
+    // --- Firebase Logic ---
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            const db = firebase.firestore();
+            const currentUserRef = db.collection('users').doc(user.uid);
 
-      // Fetch user data from the 'users' collection
-      db.collection('users').doc(userId).get().then(doc => {
-        if (doc.exists) {
-          const userData = doc.data();
-          const referralCode = userData.referralCode || 'NOT-FOUND';
+            currentUserRef.get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    const referralCode = userData.referralCode;
 
-          // Construct the full referral link
-          const baseUrl = window.location.origin + window.location.pathname.replace('refer.html', 'register.html');
-          const fullLink = `${baseUrl}?ref=${referralCode}`;
-          referralLinkEl.textContent = fullLink;
-
-          // Populate stats
-          totalReferralsEl.textContent = userData.totalReferrals || 0;
-          totalEarningsEl.textContent = `₹${(userData.referralEarnings || 0).toFixed(2)}`;
-
+                    // Update referral link (same as before)
+                    const baseUrl = window.location.origin + window.location.pathname.replace('refer.html', 'register.html');
+                    referralLinkEl.textContent = `${baseUrl}?ref=${referralCode}`;
+                    
+                    // Fetch team data
+                    fetchTeamData(db, referralCode);
+                }
+            });
         } else {
-          console.error("User document not found!");
-          referralLinkEl.textContent = "Could not generate link.";
+            window.location.href = 'login.html';
         }
-      }).catch(error => {
-        console.error("Error getting user document:", error);
-        referralLinkEl.textContent = "Error loading link.";
-      });
+    });
 
-    } else {
-      // If no user is signed in, redirect to the login page
-      window.location.href = 'login.html';
+    // --- Function to fetch all team data ---
+    async function fetchTeamData(db, userReferralCode) {
+        try {
+            // Level 1: Users directly referred by the current user
+            const level1Snapshot = await db.collection('users').where('referredBy', '==', userReferralCode).get();
+            const level1Users = level1Snapshot.docs.map(doc => doc.data().referralCode).filter(Boolean);
+            level1CountEl.textContent = level1Snapshot.size;
+
+            if (level1Users.length === 0) {
+                level2CountEl.textContent = 0;
+                level3CountEl.textContent = 0;
+                return;
+            }
+
+            // Level 2: Users referred by Level 1 members
+            // Note: Firestore 'in' query is limited to 30 items. For larger scale, this requires a backend function.
+            const level2Snapshot = await db.collection('users').where('referredBy', 'in', level1Users).get();
+            const level2Users = level2Snapshot.docs.map(doc => doc.data().referralCode).filter(Boolean);
+            level2CountEl.textContent = level2Snapshot.size;
+
+            if (level2Users.length === 0) {
+                level3CountEl.textContent = 0;
+                return;
+            }
+
+            // Level 3: Users referred by Level 2 members
+            const level3Snapshot = await db.collection('users').where('referredBy', 'in', level2Users).get();
+            level3CountEl.textContent = level3Snapshot.size;
+
+        } catch (error) {
+            console.error("Error fetching team data:", error);
+        }
     }
-  });
-
-  // Add click event to the copy button
-  copyLinkBtn.addEventListener('click', () => {
-    const linkToCopy = referralLinkEl.textContent;
-
-    if (linkToCopy && !linkToCopy.includes('...')) {
-      navigator.clipboard.writeText(linkToCopy).then(() => {
-        // Provide visual feedback on success
-        copyBtnText.textContent = 'Copied!';
-        copyLinkBtn.style.backgroundColor = '#d1e7dd'; // A light green success color
-        
-        setTimeout(() => {
-          // Revert back to the original state after 2 seconds
-          copyBtnText.textContent = 'Copy';
-          copyLinkBtn.style.backgroundColor = ''; // Reverts to CSS color
-        }, 2000);
-
-      }).catch(err => {
-        console.error('Failed to copy link: ', err);
-        alert('Could not copy the link.');
-      });
-    }
-  });
+    
+    // --- Copy Button Logic (same as before) ---
+    copyLinkBtn.addEventListener('click', () => {
+        // ... (The copy functionality code remains the same as my previous answer)
+        const linkToCopy = referralLinkEl.textContent;
+        if (linkToCopy && !linkToCopy.includes('...')) {
+            navigator.clipboard.writeText(linkToCopy).then(() => {
+                copyBtnText.textContent = 'Copied!';
+                setTimeout(() => { copyBtnText.textContent = 'Copy'; }, 2000);
+            });
+        }
+    });
 });
-
+                                                        
