@@ -6,7 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // This stops the page from reloading
+            
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true; // Disable button to prevent multiple clicks
+            registerBtn.textContent = 'Registering...';
+
             const name = registerForm.name.value;
             const phone = registerForm.phone.value;
             const email = registerForm.email.value;
@@ -15,13 +20,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // --- Validation Checks ---
             if (!name || !phone || !email || !password || !confirmPassword) {
-                return alert('Please fill in all fields.');
+                alert('Please fill in all fields.');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
             }
             if (password !== confirmPassword) {
-                return alert('Passwords do not match.');
+                alert('Passwords do not match.');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
             }
             if (password.length < 6) {
-                return alert('Password must be at least 6 characters long.');
+                alert('Password must be at least 6 characters long.');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
             }
 
             // --- Check if email or phone already exist ---
@@ -31,14 +45,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const [emailSnapshot, phoneSnapshot] = await Promise.all([emailCheck, phoneCheck]);
 
                 if (!emailSnapshot.empty) {
-                    return alert('This email is already registered. Please log in.');
+                    alert('This email is already registered. Please log in.');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Register';
+                    return;
                 }
                 if (!phoneSnapshot.empty) {
-                    return alert('This phone number is already registered. Please log in.');
+                    alert('This phone number is already registered. Please log in.');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Register';
+                    return;
                 }
             } catch (error) {
                 console.error("Error checking for existing user:", error);
-                return alert("Could not complete registration. Please try again.");
+                alert("Could not complete registration. Please try again.");
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
             }
             
             // --- Create User and Send Verification Email ---
@@ -46,10 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Send the verification email
                 await user.sendEmailVerification();
 
-                // Create the user profile in Firestore
                 const uniqueUserId = Date.now().toString().slice(-5) + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
                 await db.collection('users').doc(user.uid).set({
                     uid: user.uid,
@@ -63,26 +84,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Redirect to the "verify email" page
                 window.location.href = 'verify-email.html';
 
             } catch (error) {
                 console.error("Error during registration: ", error);
                 alert(`Registration failed: ${error.message}`);
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
             }
         });
     }
 
-    // --- LOGIN LOGIC with Email Verification Check ---
+    // --- LOGIN LOGIC ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
+        // ... (login logic remains the same)
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const loginId = loginForm.loginId.value;
             const password = loginForm.password.value;
             let userEmail = loginId;
 
-            // Find email if user logs in with phone number
             if (!loginId.includes('@') && /^\+?[0-9\s]+$/.test(loginId)) {
                 try {
                     const snapshot = await db.collection('users').where('phone', '==', loginId).limit(1).get();
@@ -93,16 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // Attempt to sign in
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
-                
-                // *** CRITICAL STEP: Check if email is verified ***
                 if (userCredential.user.emailVerified) {
-                    // Email is verified, proceed to home page
                     window.location.href = 'index.html';
                 } else {
-                    // Email not verified, log them out and show a message
                     await auth.signOut();
                     alert("Your email has not been verified. Please check your inbox for the verification link.");
                 }
