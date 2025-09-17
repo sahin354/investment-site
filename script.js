@@ -1,108 +1,151 @@
-// Show sidebar
-document.getElementById('menuBtn').onclick = () => sideMenu.classList.add('open');
-document.getElementById('closeBtn').onclick = () => sideMenu.classList.remove('open');
+document.addEventListener('DOMContentLoaded', () => {
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-// Set User ID and VIP dynamically from Firebase
-firebase.auth().onAuthStateChanged(user => {
-  if (!user) window.location = 'login.html';
-  // If using numeric ID, replace user.uid with actual user id (e.g. doc.data().accountId or user.uid.slice(0,5))
-  firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
-    const userData = doc.data();
-    document.getElementById('sidebarId').textContent =
-      'ID: ' + (userData?.accountId || user.uid.slice(0,5)); // use your actual ID logic
-    document.getElementById('sidebarVIP').textContent =
-      'VIP ' + (userData?.vipLevel || 'Standard');
-  });
-});
+    const primaryContainer = document.getElementById('primary');
+    const purchasedContainer = document.getElementById('purchased');
+    const tabs = document.querySelectorAll('.tab-button');
+    const contents = document.querySelectorAll('.tab-content');
 
-// Button functions
-document.getElementById('sidebarSupport').onclick = () =>
-  window.open("https://yourcustomersupporturl", "_blank");
-document.getElementById('sidebarTelegram').onclick = () =>
-  window.open("https://t.me/yourtelegramchannel", "_blank");
-document.getElementById('sidebarSettings').onclick = () =>
-  window.location = 'settings.html';
+    let currentUser = null;
 
-if (typeof firebase !== "undefined") {
-  firebase.auth().onAuthStateChanged(user => {
-    if (!user) window.location = 'login.html';
-    document.getElementById('sidebarUserId').textContent = user.uid;
-    firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
-      document.getElementById('sidebarVIP').textContent = doc.data()?.vipLevel || 'Standard';
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            loadInvestmentPlans();
+        } else {
+            window.location.href = 'login.html';
+        }
     });
-  });
-}
 
-// PLANS: Show cards for Primary and VIP, Purchased tab for what user picks
-const plans = {
-  primary: [
-    { name:'Tata', income:500, days:18, price:200 },
-    { name:'Steel Corp', income:350, days:12, price:120 }
-  ],
-  vip: [
-    { name:'Reliance', income:1200, days:25, price:850 }
-  ]
-};
-function getPurchased() {
-  return JSON.parse(localStorage.getItem("purchasedPlans") || "[]");
-}
-function setPurchased(arr) {
-  localStorage.setItem("purchasedPlans", JSON.stringify(arr));
-}
-function renderPlans(tabName) {
-  const container = document.getElementById(tabName);
-  container.innerHTML = "";
-  const currentPlans = plans[tabName] || [];
-  currentPlans.forEach((plan, idx) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML =
-      `<h3>${plan.name}</h3>
-      <div>Day Income: ₹${plan.income}</div>
-      <div>Income Days: ${plan.days} days</div>
-      <div>Invest Price: ₹${plan.price}</div>
-      <button class="btn-primary" onclick="purchasePlan('${tabName}',${idx})">Invest Now</button>`;
-    container.appendChild(card);
-  });
-}
-window.purchasePlan = function(tabName, idx) {
-  const plan = plans[tabName][idx];
-  let purchased = getPurchased();
-  purchased.push(plan);
-  setPurchased(purchased);
-  alert(`Purchased ${plan.name}!`);
-  renderPurchased();
-};
-function renderPurchased() {
-  const container = document.getElementById('purchased');
-  const purchased = getPurchased();
-  container.innerHTML = purchased.length === 0 ?
-    '<div class="card"><p>No plans purchased yet.</p></div>' : "";
-  purchased.forEach(plan => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML =
-      `<h3>${plan.name}</h3>
-      <div>Day Income: ₹${plan.income}</div>
-      <div>Income Days: ${plan.days} days</div>
-      <div>Invest Price: ₹${plan.price}</div>
-      <div style="color:green;letter-spacing:1px;margin-top:7px;"><b>Purchased</b></div>`;
-    container.appendChild(card);
-  });
-}
-// Tabs logic
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
-tabButtons.forEach(button => {
-  button.onclick = () => {
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabContents.forEach(c => c.classList.remove('active'));
-    button.classList.add('active');
-    document.getElementById(button.dataset.tab).classList.add('active');
-    if (button.dataset.tab === 'primary') renderPlans('primary');
-    else if (button.dataset.tab === 'vip') renderPlans('vip');
-    else renderPurchased();
-  }
+    // Tab switching logic
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(item => item.classList.remove('active'));
+            contents.forEach(item => item.classList.remove('active'));
+
+            tab.classList.add('active');
+            const target = document.getElementById(tab.dataset.tab);
+            target.classList.add('active');
+            
+            // If "Purchased" tab is clicked, load their purchased plans
+            if(tab.dataset.tab === 'purchased') {
+                loadPurchasedPlans();
+            }
+        });
+    });
+
+    // Function to load available investment plans
+    const loadInvestmentPlans = () => {
+        db.collection('plans').where('type', '==', 'primary').get().then(querySnapshot => {
+            primaryContainer.innerHTML = '';
+            querySnapshot.forEach(doc => {
+                const plan = doc.data();
+                const planId = doc.id;
+                const planCard = `
+                    <div class="plan-card">
+                        <img src="${plan.imageUrl || 'logo.png'}" alt="${plan.name}">
+                        <div class="plan-details">
+                            <h4>${plan.name}</h4>
+                            <p>Price: ₹${plan.price}</p>
+                            <p>Daily Income: ₹${plan.dailyIncome}</p>
+                        </div>
+                        <button class="buy-btn" data-id="${planId}">Buy</button>
+                    </div>
+                `;
+                primaryContainer.innerHTML += planCard;
+            });
+        });
+    };
+
+    // Function to load plans the user has already purchased
+    const loadPurchasedPlans = () => {
+        if (!currentUser) return;
+        purchasedContainer.innerHTML = '<h3>Loading your plans...</h3>';
+        
+        db.collection('users').doc(currentUser.uid).collection('purchases').orderBy('purchaseDate', 'desc').get().then(snapshot => {
+            if (snapshot.empty) {
+                purchasedContainer.innerHTML = '<p>You have not purchased any plans yet.</p>';
+                return;
+            }
+            purchasedContainer.innerHTML = '';
+            snapshot.forEach(doc => {
+                const purchase = doc.data();
+                const planCard = `
+                    <div class="plan-card purchased">
+                        <img src="${purchase.imageUrl || 'logo.png'}" alt="${purchase.planName}">
+                        <div class="plan-details">
+                            <h4>${purchase.planName}</h4>
+                            <p>Purchased on: ${new Date(purchase.purchaseDate.toDate()).toLocaleDateString()}</p>
+                            <p>Daily Income: ₹${purchase.dailyIncome}</p>
+                        </div>
+                        <div class="status-tag">Active</div>
+                    </div>
+                `;
+                purchasedContainer.innerHTML += planCard;
+            });
+        });
+    };
+
+    // --- PURCHASE LOGIC ---
+    // Use event delegation to listen for clicks on dynamically added buttons
+    document.body.addEventListener('click', async (e) => {
+        if (e.target && e.target.classList.contains('buy-btn')) {
+            const planId = e.target.dataset.id;
+            if (confirm("Are you sure you want to purchase this plan?")) {
+                await handlePurchase(planId);
+            }
+        }
+    });
+
+    async function handlePurchase(planId) {
+        if (!currentUser) return alert("You must be logged in to purchase.");
+
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const planRef = db.collection('plans').doc(planId);
+
+        try {
+            await db.runTransaction(async (transaction) => {
+                const userDoc = await transaction.get(userRef);
+                const planDoc = await transaction.get(planRef);
+
+                if (!userDoc.exists) throw new Error("User does not exist.");
+                if (!planDoc.exists) throw new Error("Plan does not exist.");
+
+                const userData = userDoc.data();
+                const planData = planDoc.data();
+
+                // 1. Check if user has enough balance
+                if (userData.balance < planData.price) {
+                    throw new Error("Insufficient balance.");
+                }
+
+                // 2. Calculate new balance and update user document
+                const newBalance = userData.balance - planData.price;
+                transaction.update(userRef, {
+                    balance: newBalance,
+                    vipLevel: planData.vipLevel // Update VIP level based on the plan
+                });
+
+                // 3. Record the purchase in a subcollection
+                const purchaseRef = userRef.collection('purchases').doc();
+                transaction.set(purchaseRef, {
+                    planId: planId,
+                    planName: planData.name,
+                    price: planData.price,
+                    dailyIncome: planData.dailyIncome,
+                    imageUrl: planData.imageUrl || null,
+                    purchaseDate: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+
+            alert("Purchase successful!");
+            // You can also update the balance displayed on the page here
+            
+        } catch (error) {
+            console.error("Purchase failed: ", error);
+            alert(`Purchase failed: ${error.message}`);
+        }
+    }
 });
-// Initial rendering
-renderPlans('primary');
+              
