@@ -757,4 +757,18 @@ body.sidebar-open .side-menu {
   text-decoration: none;
 }
 
+/* --- Styles for Forgot Password Link --- */
+.form-options {
+    text-align: right;
+    margin-bottom: 15px;
+}
+.form-options a {
+    color: #555;
+    font-size: 0.9em;
+    text-decoration: none;
+}
+.form-options a:hover {
+    text-decoration: underline;
+}
+
 
