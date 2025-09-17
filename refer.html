@@ -3,22 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adani Corporation - Refer</title>
+  <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
   <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-header">
-      <div id="sidebarId" class="sidebar-id">Loading ID...</div>
-      <div id="sidebarVIP" class="sidebar-vip">Loading VIP...</div>
-    </div>
+    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
     <div class="sidebar-actions">
-      <button id="sidebarSupport" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-      <button id="sidebarTelegram" class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-      <button id="sidebarSettings" class="sidebar-btn"><span>⚙️</span> Settings</button>
+      <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button class="sidebar-btn"><span>⚙️</span> Settings</button>
     </div>
     <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
@@ -35,31 +30,54 @@
       <div class="refer-link-box">
         <span id="referralLink">Loading your link...</span>
         <button id="copyLinkBtn" title="Copy to clipboard">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           <span id="copyBtnText">Copy</span>
         </button>
       </div>
     </div>
-    <div class="card how-it-works-card">
-      <h3>How It Works</h3>
-      <div class="steps-container">
-        <div class="step-item"><div class="step-icon"><span>1</span></div><h4>Share Link</h4><p>Share your referral link with friends.</p></div>
-        <div class="step-item"><div class="step-icon"><span>2</span></div><h4>Friend Registers</h4><p>Your friend signs up using your link.</p></div>
-        <div class="step-item"><div class="step-icon"><span>3</span></div><h4>Earn Rewards</h4><p>You both get rewarded automatically.</p></div>
-      </div>
+    
+    <div class="card commission-card">
+        <h3>Commission Levels</h3>
+        <div class="levels-container">
+            <div class="level-display">
+                <span class="level-title">Level 1</span>
+                <span class="level-percent">21%</span>
+            </div>
+            <div class="level-display">
+                <span class="level-title">Level 2</span>
+                <span class="level-percent">3%</span>
+            </div>
+            <div class="level-display">
+                <span class="level-title">Level 3</span>
+                <span class="level-percent">1%</span>
+            </div>
+        </div>
     </div>
-    <div class="card refer-stats-card">
-        <div class="stat-item"><h4>Total Referrals</h4><p id="totalReferrals">0</p></div>
-        <div class="stat-item"><h4>Total Earnings</h4><p id="totalEarnings">₹0.00</p></div>
+    
+    <div class="card team-card">
+        <h3>My Team</h3>
+        <div class="team-tabs">
+            <button class="team-tab active" data-level="1">Level 1</button>
+            <button class="team-tab" data-level="2">Level 2</button>
+            <button class="team-tab" data-level="3">Level 3</button>
+        </div>
+        <div class="team-content">
+            <div class="team-level-content active" id="level1Content">
+                <p>Total Members: <strong id="level1Count">0</strong></p>
+                </div>
+            <div class="team-level-content" id="level2Content">
+                <p>Total Members: <strong id="level2Count">0</strong></p>
+            </div>
+            <div class="team-level-content" id="level3Content">
+                <p>Total Members: <strong id="level3Count">0</strong></p>
+            </div>
+        </div>
     </div>
   </main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
-    <a href="index.html">Home</a>
-    <a href="recharge.html">Recharge</a>
-    <a href="refer.html" class="active">Refer</a>
-    <a href="mine.html">Mine</a>
+    <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html" class="active">Refer</a><a href="mine.html">Mine</a>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -69,4 +87,5 @@
   <script src="common.js"></script>
   <script src="script-refer.js"></script>
 </body>
-</html>
+                                   </html>
+                                   
