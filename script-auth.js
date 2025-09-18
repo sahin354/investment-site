@@ -1,16 +1,18 @@
-// This is the complete script for all authentication functions.
+// DEBUGGING VERSION: This script will show alert pop-ups with detailed error messages.
 document.addEventListener('DOMContentLoaded', () => {
+    // This alert will show if the new script is loading correctly.
+    alert("DEBUG: The new script-auth.js is running!");
+
     const db = firebase.firestore();
     const auth = firebase.auth();
 
     // --- [ REGISTRATION LOGIC ] ---
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
-        // Capture referral code from URL when the page loads
+        // ... (The logic to capture the referral code from the URL remains the same)
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         if (refCode) {
-            // Store it on the form element to access it later during submission
             registerForm.dataset.referralCode = refCode;
         }
 
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = registerForm.email.value;
             const password = registerForm.password.value;
             const confirmPassword = registerForm.confirmPassword.value;
-            const referredByCode = registerForm.dataset.referralCode || null; // Get the stored ref code
+            const referredByCode = registerForm.dataset.referralCode || null;
 
             if (password !== confirmPassword) {
                 alert('Passwords do not match.');
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
+                // Check if user exists
                 const emailCheck = db.collection('users').where('email', '==', email).get();
                 const phoneCheck = db.collection('users').where('phone', '==', phone).get();
                 const [emailSnapshot, phoneSnapshot] = await Promise.all([emailCheck, phoneCheck]);
@@ -42,23 +45,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!emailSnapshot.empty) throw new Error('This email is already registered.');
                 if (!phoneSnapshot.empty) throw new Error('This phone number is already registered.');
 
+                // Create user in Auth
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 await user.sendEmailVerification();
 
+                // Create user in Firestore
                 const uniqueUserId = Date.now().toString().slice(-5) + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
                 await db.collection('users').doc(user.uid).set({
                     uid: user.uid, name, phone, email, userId: uniqueUserId,
                     balance: 0, vipLevel: 0, totalRechargeAmount: 0,
                     referralCode: `REF${Date.now().toString().slice(-7)}`,
-                    referredBy: referredByCode, // Save the referral code here
+                    referredBy: referredByCode,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
                 window.location.href = 'verify-email.html';
 
             } catch (error) {
-                alert(`Registration failed: ${error.message}`);
+                // DEBUGGING: This will show the EXACT registration error
+                alert(`REGISTRATION ERROR: ${error.message}`);
+                console.error("Full Registration Error:", error);
                 registerBtn.disabled = false;
                 registerBtn.textContent = 'Register';
             }
@@ -74,20 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = loginForm.password.value;
             let userEmail = loginId;
 
-            // Find email if user logs in with phone number
-            if (!loginId.includes('@') && /^\+?[0-9\s]+$/.test(loginId)) {
-                try {
+            try {
+                // Find email if user logs in with phone number
+                if (!loginId.includes('@') && /^\+?[0-9\s]+$/.test(loginId)) {
                     const snapshot = await db.collection('users').where('phone', '==', loginId).limit(1).get();
                     if (snapshot.empty) throw new Error("No account found with this phone number.");
                     userEmail = snapshot.docs[0].data().email;
-                } catch (error) {
-                    return alert(error.message);
                 }
-            }
-            
-            // Attempt to sign in
-            try {
+                
+                // Attempt to sign in
                 const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
+                
                 if (userCredential.user.emailVerified) {
                     window.location.href = 'index.html';
                 } else {
@@ -95,29 +99,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Your email has not been verified. Please check your inbox for the verification link.");
                 }
             } catch (error) {
-                console.error("Error during login:", error);
-                alert(`Login failed: Invalid credentials.`);
+                // DEBUGGING: This will show the EXACT login error
+                alert(`LOGIN ERROR: ${error.message}`);
+                console.error("Full Login Error:", error);
             }
         });
 
         // --- [ FORGOT PASSWORD LOGIC ] ---
+        // This logic remains the same
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
         if (forgotPasswordLink) {
             forgotPasswordLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                const email = prompt("Please enter your registered email address to receive a password reset link:");
+                const email = prompt("Please enter your registered email address:");
                 if (email) {
                     auth.sendPasswordResetEmail(email)
-                        .then(() => {
-                            alert("Password reset email sent! Please check your inbox.");
-                        })
-                        .catch((error) => {
-                            console.error("Error sending password reset email:", error);
-                            alert("Could not send reset email. Please ensure the email address is correct.");
-                        });
+                        .then(() => alert("Password reset email sent!"))
+                        .catch((error) => alert(`Error: ${error.message}`));
                 }
             });
         }
     }
 });
-        
