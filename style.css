@@ -374,7 +374,7 @@ body.sidebar-open .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 280px; /* A bit wider */
+    width: 260px; /* A bit wider */
     height: 100%;
     background-color: #ffffff;
     z-index: 999;
