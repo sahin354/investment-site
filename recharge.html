@@ -9,15 +9,14 @@
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
-    <div class="sidebar-actions">
-      <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-      <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-      <button class="sidebar-btn"><span>⚙️</span> Settings</button>
-    </div>
-    <span id="closeBtn" class="close-btn">&times;</span>
+      <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+      <div class="sidebar-actions">
+        <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+        <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+        <button class="sidebar-btn"><span>⚙️</span> Settings</button>
+      </div>
+      <span id="closeBtn" class="close-btn">&times;</span>
   </aside>
-
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Recharge
@@ -28,24 +27,19 @@
       <span class="balance-label">Current Balance</span>
       <span id="currentBalance" class="balance-amount-small">₹0.00</span>
     </div>
-
     <div class="card recharge-form-card">
         <h2>Enter Recharge Amount</h2>
         <div class="input-container">
             <span>₹</span>
             <input type="number" id="rechargeAmount" placeholder="500" />
         </div>
-        
         <p class="quick-amounts-label">Select a quick amount:</p>
         <div class="quick-amounts">
             <button class="quick-amount-btn" data-amount="500">₹500</button>
             <button class="quick-amount-btn" data-amount="1000">₹1000</button>
             <button class="quick-amount-btn" data-amount="2000">₹2000</button>
             <button class="quick-amount-btn" data-amount="5000">₹5000</button>
-            <button class="quick-amount-btn" data-amount="10000">₹10000</button>
-            <button class="quick-amount-btn" data-amount="25000">₹25000</button>
         </div>
-
         <button id="submitRecharge" class="submit-btn">Proceed to Pay</button>
     </div>
   </main>
@@ -54,7 +48,6 @@
   <footer class="bottom-nav">
     <a href="index.html">Home</a><a href="recharge.html" class="active">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
   </footer>
-
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
