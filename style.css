@@ -8,15 +8,12 @@
     --border-color: #eef2f7;
     --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
 }
-
 body {
-    /* This is the new, clean font that matches modern websites */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     background-color: var(--bg-light);
     color: var(--text-dark);
 }
-
 /* --- Core Layout Components --- */
 .top-bar {
     background: var(--primary-color); color: white; padding: 15px 20px;
@@ -32,7 +29,6 @@ main { padding-top: 60px; }
 .bottom-nav a { color: var(--text-light); text-decoration: none; font-size: 0.9em; }
 .bottom-nav a.active { color: var(--primary-color); font-weight: bold; }
 .bottom-nav-spacer { height: 70px; }
-
 /* --- Reusable Components --- */
 .card {
   background: #ffffff; border-radius: 12px; padding: 20px;
@@ -46,7 +42,6 @@ main { padding-top: 60px; }
 }
 .submit-btn:hover { background-color: var(--secondary-color); }
 .submit-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
-
 /* --- Hamburger Menu & Sidebar --- */
 .menu-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; }
 .menu-btn span { display: block; width: 22px; height: 2px; background-color: white; margin: 5px 0; }
@@ -73,32 +68,19 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-btn span { font-size: 1.4em; }
 .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
 .close-btn:hover { color: white; }
-
 /* --- Home Page (index.html) --- */
 .banner-img { width: 100%; display: block; }
 .tabs { display: flex; background-color: white; }
-.tab-button {
-    flex: 1; padding: 15px; border: none; background: none;
-    font-size: 1em; font-weight: 500; color: var(--text-light);
-    border-bottom: 3px solid transparent; cursor: pointer;
-}
+.tab-button { flex: 1; padding: 15px; border: none; background: none; font-size: 1em; font-weight: 500; color: var(--text-light); border-bottom: 3px solid transparent; cursor: pointer; }
 .tab-button.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
 .tab-content { display: none; padding: 15px; }
 .tab-content.active { display: block; }
-.plan-card {
-    display: flex; background-color: white; border-radius: 8px;
-    box-shadow: var(--card-shadow); margin-bottom: 15px; overflow: hidden;
-}
+.plan-card { display: flex; background-color: white; border-radius: 8px; box-shadow: var(--card-shadow); margin-bottom: 15px; overflow: hidden; }
 .plan-card img { width: 100px; height: 100px; object-fit: cover; }
 .plan-details { flex-grow: 1; padding: 10px 15px; }
 .plan-details h4 { margin: 0 0 5px 0; }
 .plan-details p { margin: 5px 0; font-size: 0.9em; color: var(--text-light); }
-.buy-btn {
-    background-color: var(--primary-color); color: white; border: none;
-    padding: 10px 20px; font-weight: bold; cursor: pointer;
-    align-self: center; margin-right: 15px; border-radius: 6px;
-}
-
+.buy-btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; align-self: center; margin-right: 15px; border-radius: 6px; }
 /* --- Auth Pages (login.html, register.html) --- */
 .auth-page-background { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 .auth-container { width: 100%; max-width: 400px; padding: 20px; }
@@ -107,11 +89,13 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .input-group { margin-bottom: 20px; }
 .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
 .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #dce4f0; border-radius: 8px; font-size: 1em; }
+.password-wrapper { position: relative; display: flex; align-items: center; }
+.password-wrapper input { padding-right: 40px; }
+.password-toggle-icon { position: absolute; right: 12px; cursor: pointer; user-select: none; font-size: 1.2em; color: #888; }
 .form-options { text-align: right; margin-bottom: 15px; }
 .form-options a { color: #555; font-size: 0.9em; text-decoration: none; }
 .auth-switch { text-align: center; margin-top: 20px; font-size: 0.9em; color: #555; }
 .auth-switch a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
-
 /* --- Refer Page (refer.html) --- */
 .refer-page-container { padding: 15px; }
 .refer-main-card h2 { margin-top: 0; }
@@ -133,12 +117,10 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .team-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; }
 .recharge-status.recharged { color: #15803d; font-weight: bold; background-color: #dcfce7; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
 .recharge-status.not-recharged { color: #9ca3af; background-color: #f3f4f6; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
-
 /* --- My Account Page (mine.html) --- */
 .profile-header-card { display: flex; align-items: center; gap: 15px; }
 .profile-avatar { font-size: 2.5em; background-color: #eef2f7; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-#profileId { font-weight: bold; }
-#profileEmail { font-size: 0.9em; color: var(--text-light); }
+#profileId { font-weight: bold; } #profileEmail { font-size: 0.9em; color: var(--text-light); }
 .balance-card { text-align: center; }
 .balance-label { font-size: 0.9em; color: var(--text-light); margin-bottom: 5px; }
 .balance-amount { font-size: 2.2em; font-weight: bold; color: var(--primary-color); margin-bottom: 20px; }
@@ -150,7 +132,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .option-icon { font-size: 1.5em; margin-right: 15px; }
 .option-chevron { margin-left: auto; color: #ccc; font-weight: bold; }
 .logout-btn { width: 100%; padding: 12px; border: none; background-color: #fbebeb; color: #c53030; font-size: 1em; font-weight: bold; border-radius: 8px; cursor: pointer; }
-
 /* --- Recharge Page (recharge.html) --- */
 .current-balance-card { display: flex; justify-content: space-between; align-items: center; background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 15px 20px; }
 .balance-amount-small { font-weight: bold; font-size: 1.1em; color: var(--primary-color); }
@@ -161,22 +142,3 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
 .quick-amount-btn.active, .quick-amount-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-/* --- Styles for Password Toggle Icon --- */
-.password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.password-wrapper input {
-    width: 100%;
-    padding-right: 40px; /* Make space for the icon */
-}
-.password-toggle-icon {
-    position: absolute;
-    right: 12px;
-    cursor: pointer;
-    user-select: none; /* Prevents text selection on double click */
-    font-size: 1.2em;
-    color: #888;
-}
