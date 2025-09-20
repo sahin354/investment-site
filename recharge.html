@@ -1,58 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adani Corporation - Recharge</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adani Corporation - Register</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div id="sidebarOverlay" class="sidebar-overlay"></div>
-  <aside id="sideMenu" class="side-menu">
-      <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
-      <div class="sidebar-actions">
-        <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
-        <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
-        <button class="sidebar-btn"><span>⚙️</span> Settings</button>
-      </div>
-      <span id="closeBtn" class="close-btn">&times;</span>
-  </aside>
-  <header class="top-bar">
-    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
-    Recharge
-  </header>
-
-  <main class="page-container recharge-page">
-    <div class="card current-balance-card">
-      <span class="balance-label">Current Balance</span>
-      <span id="currentBalance" class="balance-amount-small">₹0.00</span>
-    </div>
-    <div class="card recharge-form-card">
-        <h2>Enter Recharge Amount</h2>
-        <div class="input-container">
-            <span>₹</span>
-            <input type="number" id="rechargeAmount" placeholder="500" />
+<body class="auth-page-background">
+    <main class="auth-container">
+        <div class="auth-card">
+            <h2>Create Your Account</h2>
+            <form id="registerForm">
+                <div class="input-group"><label for="name">Full Name</label><input type="text" id="name" name="name" required></div>
+                <div class="input-group"><label for="phone">Phone Number</label><input type="tel" id="phone" name="phone" required></div>
+                <div class="input-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <span id="togglePassword" class="password-toggle-icon">👁️</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                        <span id="toggleConfirmPassword" class="password-toggle-icon">👁️</span>
+                    </div>
+                </div>
+                <button type="submit" id="registerBtn" class="submit-btn">Register</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="login.html">Log In</a></p>
         </div>
-        <p class="quick-amounts-label">Select a quick amount:</p>
-        <div class="quick-amounts">
-            <button class="quick-amount-btn" data-amount="500">₹500</button>
-            <button class="quick-amount-btn" data-amount="1000">₹1000</button>
-            <button class="quick-amount-btn" data-amount="2000">₹2000</button>
-            <button class="quick-amount-btn" data-amount="5000">₹5000</button>
-        </div>
-        <button id="submitRecharge" class="submit-btn">Proceed to Pay</button>
-    </div>
-  </main>
-
-  <div class="bottom-nav-spacer"></div>
-  <footer class="bottom-nav">
-    <a href="index.html">Home</a><a href="recharge.html" class="active">Recharge</a><a href="refer.html">Refer</a><a href="mine.html">Mine</a>
-  </footer>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebaseConfig.js"></script>
-  <script src="common.js"></script>
-  <script src="script-recharge.js"></script> 
+    </main>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="firebaseConfig.js"></script>
+    <script src="script-auth.js"></script>
 </body>
 </html>
