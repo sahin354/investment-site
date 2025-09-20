@@ -161,3 +161,22 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
 .quick-amount-btn.active, .quick-amount-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+/* --- Styles for Password Toggle Icon --- */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px; /* Make space for the icon */
+}
+.password-toggle-icon {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    user-select: none; /* Prevents text selection on double click */
+    font-size: 1.2em;
+    color: #888;
+}
