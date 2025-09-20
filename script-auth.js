@@ -1,11 +1,31 @@
-// This is the final, complete script for all authentication functions.
+// This is the complete and final script for all authentication functions.
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // --- [ REUSABLE PASSWORD TOGGLE FUNCTION ] ---
+    function setupPasswordToggle(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleId);
+        if (passwordInput && toggleIcon) {
+            toggleIcon.addEventListener('click', () => {
+                // Toggle the type attribute
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle the icon text
+                toggleIcon.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+        }
+    }
+
     // --- [ REGISTRATION LOGIC ] ---
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
+        // Setup eye icons for both password fields
+        setupPasswordToggle('password', 'togglePassword');
+        setupPasswordToggle('confirmPassword', 'toggleConfirmPassword');
+
         // Capture referral code from URL when the page loads
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
@@ -68,6 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- [ LOGIN LOGIC ] ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
+        // Setup eye icon for the password field
+        setupPasswordToggle('password', 'togglePassword');
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const loginId = loginForm.loginId.value;
@@ -75,12 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let userEmail = loginId;
 
             try {
+                // Find email if user logs in with phone number
                 if (!loginId.includes('@') && /^\+?[0-9\s]+$/.test(loginId)) {
                     const snapshot = await db.collection('users').where('phone', '==', loginId).limit(1).get();
                     if (snapshot.empty) throw new Error("No account found with this phone number.");
                     userEmail = snapshot.docs[0].data().email;
                 }
                 
+                // Attempt to sign in
                 const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
                 
                 if (userCredential.user.emailVerified) {
@@ -103,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const email = prompt("Please enter your registered email address:");
                 if (email) {
                     auth.sendPasswordResetEmail(email)
-                        .then(() => alert("Password reset email sent!"))
+                        .then(() => alert("Password reset email sent! Please check your inbox."))
                         .catch((error) => alert(`Error: ${error.message}`));
                 }
             });
