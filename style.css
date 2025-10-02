@@ -219,3 +219,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   font-size: 0.9rem;
   color: #666;
     }
+/* --- Fix for long user IDs --- */
+#profileId {
+  word-break: break-all;
+}
