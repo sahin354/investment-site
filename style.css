@@ -181,3 +181,41 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   font-size: 0.9rem;
   color: #666;
 }
+
+/* --- More Specific CSS for the Mine Page --- */
+
+/* By adding .mine-page, we make these rules apply more strongly */
+/* on the "My Account" page. */
+.mine-page .profile-header-card {
+  display: flex !important; /* The !important rule gives this style top priority */
+  align-items: center;
+  gap: 15px;
+}
+
+.mine-page .profile-avatar {
+  font-size: 2.5rem;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Prevents the avatar from shrinking */
+}
+
+.mine-page .profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mine-page #profileId {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.mine-page #profileEmail {
+  font-size: 0.9rem;
+  color: #666;
+    }
