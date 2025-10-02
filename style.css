@@ -142,3 +142,42 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
 .quick-amount-btn.active, .quick-amount-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+/* --- Add this code to your style.css file --- */
+
+/* This is the main container for the profile header */
+.profile-header-card {
+  display: flex; /* This is the key property to align items horizontally */
+  align-items: center; /* This vertically aligns the avatar with the text */
+  gap: 15px; /* Adds a nice space between the avatar and the text */
+}
+
+/* Optional: Styles for the avatar to make it look better */
+.profile-avatar {
+  font-size: 2.5rem; /* Makes the emoji icon bigger */
+  background-color: #e0e0e0;
+  border-radius: 50%; /* Makes the background circular */
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Styles for the info block containing ID and Email */
+.profile-info {
+  display: flex;
+  flex-direction: column; /* Stacks the ID and Email vertically */
+}
+
+/* Optional: Styles for the text itself */
+#profileId {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+#profileEmail {
+  font-size: 0.9rem;
+  color: #666;
+}
