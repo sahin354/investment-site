@@ -223,3 +223,61 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 #profileId {
   word-break: break-all;
 }
+
+/* Fix for Mine Page Profile Layout */
+.mine-page .profile-header-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.mine-page .profile-avatar {
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mine-page .profile-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.mine-page #profileId {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    word-break: break-all;
+}
+
+.mine-page #profileEmail {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Fix action buttons alignment */
+.mine-page .action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.mine-page .action-btn {
+    flex: 1;
+    max-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+}
