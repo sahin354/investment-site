@@ -88,3 +88,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Real-time data updates
+function setupRealTimeUpdates(userId) {
+    // Listen for balance changes in Firestore
+    const userDoc = firebase.firestore().collection('users').doc(userId);
+    
+    userDoc.onSnapshot((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            
+            // Update balance
+            const balanceElement = document.getElementById('profileBalance');
+            if (balanceElement && userData.balance !== undefined) {
+                balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
+            }
+            
+            // Update profile info
+            const profileId = document.getElementById('profileId');
+            const profileEmail = document.getElementById('profileEmail');
+            
+            if (profileId) {
+                profileId.textContent = `ID: ${userId.substring(0, 8)}...`;
+            }
+            if (profileEmail && userData.email) {
+                profileEmail.textContent = userData.email;
+            }
+        }
+    }, (error) => {
+        console.error('Error in real-time update:', error);
+    });
+}
