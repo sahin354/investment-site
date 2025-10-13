@@ -144,37 +144,329 @@ function searchUsers() {
     });
 }
 
-// Add all the other functions from script-admin.js (loadUserDropdown, updateUserBalance, etc.)
-// Copy all the remaining functions from your existing script-admin.js file here
-
-function logoutControl() {
-    if (confirm('Are you sure you want to securely logout?')) {
-        firebase.auth().signOut().then(() => {
-            window.location.href = 'system-control.html';
-        });
-    }
+function loadUserDropdown() {
+    const select = document.getElementById('userSelect');
+    select.innerHTML = '<option value="">Select a user...</option>';
+    
+    allUsers.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = `${user.email} (₹${(user.balance || 0).toFixed(2)})`;
+        select.appendChild(option);
+    });
 }
 
-// Add status badges CSS
-const style = document.createElement('style');
-style.textContent = `
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        font-weight: bold;
+function updateUserBalance() {
+    const userId = document.getElementById('userSelect').value;
+    const action = document.getElementById('balanceAction').value;
+    const amount = parseFloat(document.getElementById('balanceAmount').value);
+    const reason = document.getElementById('balanceReason').value;
+    
+    if (!userId || !amount || amount <= 0) {
+        alert('Please select a user and enter a valid amount.');
+        return;
     }
-    .status-badge.active {
-        background: #d4edda;
-        color: #155724;
-    }
-    .status-badge.blocked {
-        background: #f8d7da;
-        color: #721c24;
-    }
-`;
-document.head.appendChild(style);
+    
+    const userRef = firebase.firestore().collection('users').doc(userId);
+    
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            let newBalance = userData.balance || 0;
+            
+            switch(action) {
+                case 'add':
+                    newBalance += amount;
+                    break;
+                case 'subtract':
+                    newBalance = Math.max(0, newBalance - amount);
+                    break;
+                case 'set':
+                    newBalance = amount;
+                    break;
+            }
+            
+            // Update balance
+            return userRef.update({
+                balance: newBalance,
+                lastBalanceUpdate: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                // Record transaction
+                const transactionRef = firebase.firestore().collection('transactions').doc();
+                return transactionRef.set({
+                    userId: userId,
+                    type: 'admin_adjustment',
+                    amount: action === 'add' ? amount : -amount,
+                    previousBalance: userData.balance || 0,
+                    newBalance: newBalance,
+                    reason: reason || 'Admin adjustment',
+                    adminId: currentAdmin.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+        }
+    }).then(() => {
+        alert('Balance updated successfully!');
+        document.getElementById('balanceAmount').value = '';
+        document.getElementById('balanceReason').value = '';
+        loadUsers(); // Refresh users list
+        loadDashboardStats(); // Refresh stats
+    }).catch((error) => {
+        console.error('Error updating balance:', error);
+        alert('Error updating balance. Please try again.');
+    });
+}
 
-// COPY ALL REMAINING FUNCTIONS FROM YOUR EXISTING script-admin.js FILE
-// Functions to copy: loadUserDropdown, updateUserBalance, toggleUserBlock, deleteUser, 
-// loadPlans, showAddPlanForm, saveNewPlan, saveSystemSettings, etc.
+function toggleUserBlock(userId, block) {
+    if (!confirm(`Are you sure you want to ${block ? 'block' : 'unblock'} this user?`)) {
+        return;
+    }
+    
+    firebase.firestore().collection('users').doc(userId).update({
+        isBlocked: block,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert(`User ${block ? 'blocked' : 'unblocked'} successfully!`);
+        loadUsers();
+    }).catch((error) => {
+        console.error('Error updating user:', error);
+        alert('Error updating user status.');
+    });
+}
+
+function deleteUser(userId) {
+    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        return;
+    }
+    
+    firebase.firestore().collection('users').doc(userId).delete().then(() => {
+        alert('User deleted successfully!');
+        loadUsers();
+        loadDashboardStats();
+    }).catch((error) => {
+        console.error('Error deleting user:', error);
+        alert('Error deleting user.');
+    });
+}
+
+// Investment Plans Management
+function loadPlans() {
+    const plansRef = firebase.firestore().collection('investmentPlans');
+    const plansList = document.getElementById('plansList');
+    
+    plansList.innerHTML = '<p>Loading investment plans...</p>';
+    
+    plansRef.orderBy('isVIP', 'desc').orderBy('minAmount', 'asc').get().then((snapshot) => {
+        if (snapshot.empty) {
+            plansList.innerHTML = '<p>No investment plans found. <button onclick="showAddPlanForm()">Create First Plan</button></p>';
+            return;
+        }
+        
+        plansList.innerHTML = '<h4>Investment Plans</h4>';
+        snapshot.forEach(doc => {
+            const plan = doc.data();
+            const planCard = document.createElement('div');
+            planCard.className = 'card';
+            planCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <h4>${plan.name} ${plan.isVIP ? '🌟 VIP' : ''}</h4>
+                        <p><strong>Investment:</strong> ₹${plan.minAmount.toLocaleString()} - ₹${plan.maxAmount.toLocaleString()}</p>
+                        <p><strong>Daily Return:</strong> ${plan.dailyReturn}%</p>
+                        <p><strong>Duration:</strong> ${plan.duration} days</p>
+                        <p><strong>Total Return:</strong> ${plan.totalReturn || (plan.dailyReturn * plan.duration)}%</p>
+                        <p><strong>Status:</strong> ${plan.isActive ? '🟢 Active' : '🔴 Inactive'}</p>
+                    </div>
+                    <div class="control-actions">
+                        <button class="action-btn edit-btn" onclick="editPlan('${doc.id}')">Edit</button>
+                        <button class="action-btn ${plan.isActive ? 'block-btn' : 'edit-btn'}" onclick="togglePlanStatus('${doc.id}', ${!plan.isActive})">
+                            ${plan.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deletePlan('${doc.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+            plansList.appendChild(planCard);
+        });
+        
+        // Add button to create new plan
+        const addButton = document.createElement('div');
+        addButton.style.marginTop = '20px';
+        addButton.innerHTML = '<button class="submit-btn" onclick="showAddPlanForm()">➕ Add New Investment Plan</button>';
+        plansList.appendChild(addButton);
+    });
+}
+
+function showAddPlanForm() {
+    const planForm = `
+        <div class="card">
+            <h4>Create New Investment Plan</h4>
+            <div class="form-group">
+                <label>Plan Name</label>
+                <input type="text" id="planName" placeholder="Enter plan name">
+            </div>
+            <div class="form-group">
+                <label>Minimum Investment (₹)</label>
+                <input type="number" id="planMinAmount" placeholder="Minimum investment amount">
+            </div>
+            <div class="form-group">
+                <label>Maximum Investment (₹)</label>
+                <input type="number" id="planMaxAmount" placeholder="Maximum investment amount">
+            </div>
+            <div class="form-group">
+                <label>Daily Return (%)</label>
+                <input type="number" id="planDailyReturn" placeholder="Daily return percentage" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Plan Duration (days)</label>
+                <input type="number" id="planDuration" placeholder="Duration in days">
+            </div>
+            <div class="form-group">
+                <label>Total Return (%)</label>
+                <input type="number" id="planTotalReturn" placeholder="Auto-calculated" readonly>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="planIsVIP"> VIP Plan (Special benefits)
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Plan Description</label>
+                <textarea id="planDescription" placeholder="Describe this plan"></textarea>
+            </div>
+            <div class="control-actions">
+                <button class="submit-btn" onclick="saveNewPlan()">💾 Save Plan</button>
+                <button class="action-btn block-btn" onclick="cancelAddPlan()">Cancel</button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('plansList').innerHTML = planForm;
+    
+    // Auto-calculate total return
+    document.getElementById('planDailyReturn').addEventListener('input', calculateTotalReturn);
+    document.getElementById('planDuration').addEventListener('input', calculateTotalReturn);
+}
+
+function calculateTotalReturn() {
+    const dailyReturn = parseFloat(document.getElementById('planDailyReturn').value) || 0;
+    const duration = parseInt(document.getElementById('planDuration').value) || 0;
+    const totalReturn = dailyReturn * duration;
+    document.getElementById('planTotalReturn').value = totalReturn;
+}
+
+function saveNewPlan() {
+    const planData = {
+        name: document.getElementById('planName').value,
+        minAmount: parseFloat(document.getElementById('planMinAmount').value),
+        maxAmount: parseFloat(document.getElementById('planMaxAmount').value),
+        dailyReturn: parseFloat(document.getElementById('planDailyReturn').value),
+        duration: parseInt(document.getElementById('planDuration').value),
+        totalReturn: parseFloat(document.getElementById('planTotalReturn').value),
+        isVIP: document.getElementById('planIsVIP').checked,
+        description: document.getElementById('planDescription').value,
+        isActive: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // Validation
+    if (!planData.name || !planData.minAmount || !planData.maxAmount || !planData.dailyReturn || !planData.duration) {
+        alert('Please fill all required fields.');
+        return;
+    }
+    
+    if (planData.minAmount >= planData.maxAmount) {
+        alert('Maximum amount must be greater than minimum amount.');
+        return;
+    }
+    
+    firebase.firestore().collection('investmentPlans').add(planData).then(() => {
+        alert('✅ Investment plan created successfully!');
+        loadPlans();
+    }).catch((error) => {
+        console.error('Error adding plan:', error);
+        alert('Error creating plan: ' + error.message);
+    });
+}
+
+function editPlan(planId) {
+    const planRef = firebase.firestore().collection('investmentPlans').doc(planId);
+    
+    planRef.get().then((doc) => {
+        if (doc.exists) {
+            const plan = doc.data();
+            const editForm = `
+                <div class="card">
+                    <h4>Edit Investment Plan</h4>
+                    <div class="form-group">
+                        <label>Plan Name</label>
+                        <input type="text" id="editPlanName" value="${plan.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum Investment (₹)</label>
+                        <input type="number" id="editPlanMinAmount" value="${plan.minAmount}">
+                    </div>
+                    <div class="form-group">
+                        <label>Maximum Investment (₹)</label>
+                        <input type="number" id="editPlanMaxAmount" value="${plan.maxAmount}">
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Return (%)</label>
+                        <input type="number" id="editPlanDailyReturn" value="${plan.dailyReturn}" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Plan Duration (days)</label>
+                        <input type="number" id="editPlanDuration" value="${plan.duration}">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Return (%)</label>
+                        <input type="number" id="editPlanTotalReturn" value="${plan.totalReturn || plan.dailyReturn * plan.duration}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editPlanIsVIP" ${plan.isVIP ? 'checked' : ''}> VIP Plan
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Plan Description</label>
+                        <textarea id="editPlanDescription">${plan.description || ''}</textarea>
+                    </div>
+                    <div class="control-actions">
+                        <button class="submit-btn" onclick="updatePlan('${planId}')">💾 Update Plan</button>
+                        <button class="action-btn block-btn" onclick="loadPlans()">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('plansList').innerHTML = editForm;
+            
+            // Auto-calculate total return
+            document.getElementById('editPlanDailyReturn').addEventListener('input', function() {
+                const dailyReturn = parseFloat(this.value) || 0;
+                const duration = parseInt(document.getElementById('editPlanDuration').value) || 0;
+                document.getElementById('editPlanTotalReturn').value = dailyReturn * duration;
+            });
+            
+            document.getElementById('editPlanDuration').addEventListener('input', function() {
+                const dailyReturn = parseFloat(document.getElementById('editPlanDailyReturn').value) || 0;
+                const duration = parseInt(this.value) || 0;
+                document.getElementById('editPlanTotalReturn').value = dailyReturn * duration;
+            });
+        }
+    });
+}
+
+function updatePlan(planId) {
+    const planData = {
+        name: document.getElementById('editPlanName').value,
+        minAmount: parseFloat(document.getElementById('editPlanMinAmount').value),
+        maxAmount: parseFloat(document.getElementById('editPlanMaxAmount').value),
+        dailyReturn: parseFloat(document.getElementById('editPlanDailyReturn').value),
+        duration: parseInt(document.getElementById('editPlanDuration').value),
+        totalReturn: parseFloat(document.getElementById('editPlanTotalReturn').value),
+        isVIP: document.getElementById('editPlanIsVIP').checked,
+        description: document.getElementById('editPlanDescription').value,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    firebase.firestore().collection('investme
