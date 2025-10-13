@@ -117,17 +117,20 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .team-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; }
 .recharge-status.recharged { color: #15803d; font-weight: bold; background-color: #dcfce7; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
 .recharge-status.not-recharged { color: #9ca3af; background-color: #f3f4f6; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
-/* --- My Account Page (mine.html) --- */
-.profile-header-card {
+
+/* ===== MINE PAGE SPECIFIC STYLES ===== */
+.mine-page .profile-header-card {
     display: flex;
     align-items: center;
     gap: 15px;
     padding: 20px;
+    flex-direction: row;
 }
 
-.profile-avatar {
+.mine-page .profile-avatar {
     font-size: 2.5em;
-    background-color: #eef2f7;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -137,53 +140,54 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     flex-shrink: 0;
 }
 
-.profile-info {
+.mine-page .profile-info {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 }
 
-#profileId {
+.mine-page #profileId {
     font-weight: bold;
     color: #333;
     margin-bottom: 5px;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    word-break: break-all;
 }
 
-#profileEmail {
+.mine-page #profileEmail {
     font-size: 0.9em;
     color: #666;
 }
 
-.balance-card {
+.mine-page .balance-card {
     text-align: center;
     padding: 20px;
 }
 
-.balance-label {
+.mine-page .balance-label {
     font-size: 0.9em;
     color: var(--text-light);
     margin-bottom: 5px;
 }
 
-.balance-amount {
+.mine-page .balance-amount {
     font-size: 2.2em;
     font-weight: bold;
     color: var(--primary-color);
     margin-bottom: 20px;
 }
 
-.action-buttons {
+.mine-page .action-buttons {
     display: flex;
     gap: 10px;
     justify-content: center;
 }
 
-.action-btn {
+.mine-page .action-btn {
     background-color: #eef2f7;
     border: 1px solid #dce4f0;
     color: #333;
-    padding: 10px 20px;
+    padding: 12px 15px;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -192,13 +196,14 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     flex: 1;
     max-width: 140px;
     justify-content: center;
+    font-size: 0.9em;
 }
 
-.options-list-card {
+.mine-page .options-list-card {
     padding: 10px;
 }
 
-.option-item {
+.mine-page .option-item {
     display: flex;
     align-items: center;
     padding: 15px;
@@ -207,22 +212,22 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border-radius: 8px;
 }
 
-.option-item:not(:last-child) {
+.mine-page .option-item:not(:last-child) {
     border-bottom: 1px solid #f0f0f0;
 }
 
-.option-icon {
+.mine-page .option-icon {
     font-size: 1.5em;
     margin-right: 15px;
 }
 
-.option-chevron {
+.mine-page .option-chevron {
     margin-left: auto;
     color: #ccc;
     font-weight: bold;
 }
 
-.logout-btn {
+.mine-page .logout-btn {
     width: 100%;
     padding: 12px;
     border: none;
@@ -234,10 +239,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     cursor: pointer;
 }
 
-/* Fix for long user IDs */
-#profileId {
-    word-break: break-all;
-}
 /* --- Recharge Page (recharge.html) --- */
 .current-balance-card { display: flex; justify-content: space-between; align-items: center; background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 15px 20px; }
 .balance-amount-small { font-weight: bold; font-size: 1.1em; color: var(--primary-color); }
