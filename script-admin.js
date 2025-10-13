@@ -1,35 +1,31 @@
-// Admin Panel JavaScript
+// Admin Panel JavaScript - SECURE VERSION
 let allUsers = [];
 let currentAdmin = null;
+
+// Pre-defined admin emails - ONLY these emails can access admin panel
+const ALLOWED_ADMINS = [
+    "sahin54481@gmail.com",
+    "adminadani.com"
+    // Add more admin emails here as needed
+];
 
 // Check admin authentication
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-        // Check if user is admin
-        checkAdminStatus(user);
-    } else {
-        // Redirect to login if not authenticated
-        window.location.href = 'admin-login.html';
-    }
-});
-
-function checkAdminStatus(user) {
-    const adminDoc = firebase.firestore().collection('admins').doc(user.uid);
-    
-    adminDoc.get().then((doc) => {
-        if (doc.exists) {
+        // Check if user email is in allowed admins list
+        if (ALLOWED_ADMINS.includes(user.email)) {
             currentAdmin = user;
             initializeAdminPanel();
         } else {
             alert('Access denied. Admin privileges required.');
             firebase.auth().signOut();
-            window.location.href = 'admin-login.html';
+            window.location.href = 'login.html';
         }
-    }).catch((error) => {
-        console.error('Admin check error:', error);
-        alert('Error verifying admin access.');
-    });
-}
+    } else {
+        // Redirect to main login if not authenticated
+        window.location.href = 'login.html';
+    }
+});
 
 function initializeAdminPanel() {
     console.log('Admin panel initialized for:', currentAdmin.email);
@@ -82,7 +78,7 @@ function loadDashboardStats() {
         document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
     });
     
-    // Today's revenue (you need to implement this based on your transaction system)
+    // Today's revenue
     document.getElementById('todayRevenue').textContent = '₹0';
 }
 
@@ -376,7 +372,7 @@ function saveSystemSettings() {
 function logoutAdmin() {
     if (confirm('Are you sure you want to logout?')) {
         firebase.auth().signOut().then(() => {
-            window.location.href = 'admin-login.html';
+            window.location.href = 'login.html';
         });
     }
 }
