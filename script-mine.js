@@ -34,3 +34,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Fix recharge button event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication state
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            // Redirect to login if not authenticated
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // User is signed in, proceed with page setup
+        setupMinePage(user);
+    });
+
+    function setupMinePage(user) {
+        // Recharge button with proper authentication
+        const rechargeBtn = document.getElementById('rechargeBtn');
+        if (rechargeBtn) {
+            rechargeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Check if user is still authenticated
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    alert('Please log in again');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Redirect to recharge page
+                window.location.href = 'recharge.html';
+            });
+        }
+
+        // Withdraw button
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        if (withdrawBtn) {
+            withdrawBtn.addEventListener('click', function() {
+                alert('Withdraw functionality coming soon!');
+            });
+        }
+
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            });
+        }
+    }
+});
