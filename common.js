@@ -1,69 +1,28 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Sidebar Functionality ---
-    const menuBtn = document.getElementById('menuBtn');
-    const sideMenu = document.getElementById('sideMenu');
-    const closeBtn = document.getElementById('closeBtn');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    const openSidebar = () => {
-        document.body.classList.add('sidebar-open');
-    };
-
-    const closeSidebar = () => {
-        document.body.classList.remove('sidebar-open');
-    };
-
-    if (menuBtn && sideMenu && closeBtn && sidebarOverlay) {
-        menuBtn.addEventListener('click', openSidebar);
-        closeBtn.addEventListener('click', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    }
-
-    // --- Firebase User Data for Sidebar ---
-    const sidebarIdEl = document.getElementById('sidebarId');
-    const sidebarVIPEl = document.getElementById('sidebarVIP');
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // User is signed in
-            const db = firebase.firestore();
-            db.collection('users').doc(user.uid).get().then(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    if (sidebarIdEl) {
-                        sidebarIdEl.textContent = `ID: ${userData.userId || 'N/A'}`; // Assuming you have a shorter userId field
-                    }
-                    if (sidebarVIPEl) {
-                        sidebarVIPEl.textContent = `VIP ${userData.vipLevel || 0}`;
-                    }
-                }
-            }).catch(error => {
-                console.error("Error fetching user data for sidebar:", error);
-            });
-        } else {
-            // No user is signed in.
-            // On pages that require auth, the page-specific script should handle the redirect.
-            console.log("No user signed in.");
-        }
-    });
-});
-
-// Enhanced authentication state management
+// Firebase Auth State Management
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     .then(() => {
+        console.log("Auth persistence set to LOCAL");
+        
         // Auth state observer
         firebase.auth().onAuthStateChanged((user) => {
+            const currentPage = window.location.pathname.split('/').pop();
+            const authPages = ['login.html', 'register.html', 'verify-email.html'];
+            
             if (user) {
                 // User is signed in
-                console.log('User is signed in:', user.uid);
-                updateSidebarUserInfo(user);
+                console.log('User signed in:', user.uid);
+                updateUserInfo(user);
+                
+                // Redirect away from auth pages if already logged in
+                if (authPages.includes(currentPage)) {
+                    window.location.href = 'index.html';
+                }
             } else {
                 // User is signed out
-                console.log('User is signed out');
-                // Only redirect if not on auth pages
-                if (!window.location.pathname.includes('login.html') && 
-                    !window.location.pathname.includes('register.html') &&
-                    !window.location.pathname.includes('verify-email.html')) {
+                console.log('User signed out');
+                
+                // Redirect to login if not on auth pages
+                if (!authPages.includes(currentPage)) {
                     window.location.href = 'login.html';
                 }
             }
@@ -73,16 +32,28 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         console.error('Auth persistence error:', error);
     });
 
-function updateSidebarUserInfo(user) {
-    // Update sidebar with user info
+// Update user information in sidebar and profile
+function updateUserInfo(user) {
+    // Update sidebar
     const sidebarId = document.getElementById('sidebarId');
     const sidebarVIP = document.getElementById('sidebarVIP');
     
     if (sidebarId) {
-        sidebarId.textContent = `ID: ${user.uid.substring(0, 8)}...`;
+        sidebarId.innerHTML = `<div class="sidebar-id">ID: ${user.uid.substring(0, 10)}...</div>`;
     }
     if (sidebarVIP) {
-        sidebarVIP.textContent = 'VIP Member';
+        sidebarVIP.innerHTML = '<div class="sidebar-vip">VIP Member</div>';
+    }
+    
+    // Update profile page
+    const profileId = document.getElementById('profileId');
+    const profileEmail = document.getElementById('profileEmail');
+    
+    if (profileId) {
+        profileId.textContent = `ID: ${user.uid.substring(0, 10)}...`;
+    }
+    if (profileEmail) {
+        profileEmail.textContent = user.email || 'No email';
     }
 }
 
@@ -110,4 +81,42 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('sidebar-open');
         });
     }
+    
+    // Initialize user data if user is logged in
+    const user = firebase.auth().currentUser;
+    if (user) {
+        updateUserInfo(user);
+        loadUserData(user.uid);
+    }
 });
+
+// Load additional user data from Firestore
+function loadUserData(userId) {
+    const userDoc = firebase.firestore().collection('users').doc(userId);
+    
+    userDoc.get().then((doc) => {
+        if (doc.exists) {
+            const userData = doc.data();
+            
+            // Update balance
+            const balanceElement = document.getElementById('profileBalance');
+            if (balanceElement && userData.balance !== undefined) {
+                balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
+            }
+            
+            // Update other user data as needed
+            console.log('User data loaded:', userData);
+        } else {
+            // Create user document if it doesn't exist
+            userDoc.set({
+                email: firebase.auth().currentUser.email,
+                balance: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                console.log('New user document created');
+            });
+        }
+    }).catch((error) => {
+        console.error('Error loading user data:', error);
+    });
+                    }
