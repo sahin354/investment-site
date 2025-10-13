@@ -118,20 +118,161 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .recharge-status.recharged { color: #15803d; font-weight: bold; background-color: #dcfce7; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
 .recharge-status.not-recharged { color: #9ca3af; background-color: #f3f4f6; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
 /* --- My Account Page (mine.html) --- */
-.profile-header-card { display: flex; align-items: center; gap: 15px; }
-.profile-avatar { font-size: 2.5em; background-color: #eef2f7; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-#profileId { font-weight: bold; } #profileEmail { font-size: 0.9em; color: var(--text-light); }
-.balance-card { text-align: center; }
-.balance-label { font-size: 0.9em; color: var(--text-light); margin-bottom: 5px; }
-.balance-amount { font-size: 2.2em; font-weight: bold; color: var(--primary-color); margin-bottom: 20px; }
-.action-buttons { display: flex; gap: 10px; justify-content: center; }
-.action-btn { background-color: #eef2f7; border: 1px solid #dce4f0; color: #333; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-.options-list-card { padding: 10px; }
-.option-item { display: flex; align-items: center; padding: 15px; text-decoration: none; color: #333; border-radius: 8px; }
-.option-item:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
-.option-icon { font-size: 1.5em; margin-right: 15px; }
-.option-chevron { margin-left: auto; color: #ccc; font-weight: bold; }
-.logout-btn { width: 100%; padding: 12px; border: none; background-color: #fbebeb; color: #c53030; font-size: 1em; font-weight: bold; border-radius: 8px; cursor: pointer; }
+.mine-page .profile-header-card {
+    display: flex !important;
+    align-items: center;
+    gap: 20px;
+    padding: 25px 20px;
+    flex-direction: row;
+    margin-bottom: 0;
+}
+.mine-page .profile-avatar {
+    font-size: 2.8rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 0;
+}
+.mine-page .profile-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+.mine-page #profileId {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    word-break: break-all;
+    overflow-wrap: break-word;
+    margin: 0;
+    line-height: 1.3;
+}
+.mine-page #profileEmail {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.3;
+    word-break: break-all;
+}
+.mine-page .balance-card {
+    text-align: center;
+    padding: 25px 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.mine-page .balance-label {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+.mine-page .balance-amount {
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    line-height: 1.2;
+}
+.mine-page .action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 0;
+}
+.mine-page .action-btn {
+    flex: 1;
+    max-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.mine-page .action-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+.mine-page .action-btn span {
+    font-size: 1.2rem;
+}
+.mine-page .options-list-card {
+    padding: 5px 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.mine-page .option-item {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+}
+.mine-page .option-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+.mine-page .option-item:hover {
+    background-color: #f8fafc;
+}
+.mine-page .option-icon {
+    font-size: 1.4rem;
+    margin-right: 15px;
+    width: 24px;
+    text-align: center;
+}
+.mine-page .option-chevron {
+    margin-left: auto;
+    color: #cbd5e0;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.mine-page .logout-card {
+    padding: 15px 20px;
+    margin-top: 15px;
+}
+.mine-page .logout-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: linear-gradient(135deg, #fed7d7, #feb2b2);
+    color: #c53030;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.mine-page .logout-btn:hover {
+    background: linear-gradient(135deg, #feb2b2, #fc8181);
+    transform: translateY(-2px);
+}
+.mine-page .card {
+    margin: 10px 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eef2f7;
+}
+.mine-page .page-container {
+    padding-bottom: 10px;
+}
 /* --- Recharge Page (recharge.html) --- */
 .current-balance-card { display: flex; justify-content: space-between; align-items: center; background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 15px 20px; }
 .balance-amount-small { font-weight: bold; font-size: 1.1em; color: var(--primary-color); }
@@ -143,207 +284,51 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
 .quick-amount-btn.active, .quick-amount-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-/* --- Add this code to your style.css file --- */
-
-/* This is the main container for the profile header */
-.profile-header-card {
-  display: flex; /* This is the key property to align items horizontally */
-  align-items: center; /* This vertically aligns the avatar with the text */
-  gap: 15px; /* Adds a nice space between the avatar and the text */
-}
-
-/* Optional: Styles for the avatar to make it look better */
-.profile-avatar {
-  font-size: 2.5rem; /* Makes the emoji icon bigger */
-  background-color: #e0e0e0;
-  border-radius: 50%; /* Makes the background circular */
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Styles for the info block containing ID and Email */
-.profile-info {
-  display: flex;
-  flex-direction: column; /* Stacks the ID and Email vertically */
-}
-
-/* Optional: Styles for the text itself */
-#profileId {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-
-#profileEmail {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-/* --- More Specific CSS for the Mine Page --- */
-
-/* By adding .mine-page, we make these rules apply more strongly */
-/* on the "My Account" page. */
-.mine-page .profile-header-card {
-  display: flex !important; /* The !important rule gives this style top priority */
-  align-items: center;
-  gap: 15px;
-}
-
-.mine-page .profile-avatar {
-  font-size: 2.5rem;
-  background-color: #e0e0e0;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0; /* Prevents the avatar from shrinking */
-}
-
-.mine-page .profile-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.mine-page #profileId {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #333;
-}
-
-.mine-page #profileEmail {
-  font-size: 0.9rem;
-  color: #666;
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .mine-page .profile-header-card {
+        gap: 15px;
+        padding: 20px 15px;
     }
-/* --- Fix for long user IDs --- */
-#profileId {
-  word-break: break-all;
-}
-
-/* Fix for Mine Page Profile Layout */
-.mine-page .profile-header-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-}
-
-.mine-page .profile-avatar {
-    font-size: 3rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.mine-page .profile-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.mine-page #profileId {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--text-dark);
-    word-break: break-all;
-}
-
-.mine-page #profileEmail {
-    font-size: 0.9rem;
-    color: var(--text-light);
-}
-
-/* Fix action buttons alignment */
-.mine-page .action-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 15px;
-}
-
-.mine-page .action-btn {
-    flex: 1;
-    max-width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-}
-
-/* ===== FIX FOR MINE PAGE LAYOUT ===== */
-.mine-page .profile-header-card {
-    display: flex !important;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    flex-direction: row;
-}
-
-.mine-page .profile-avatar {
-    font-size: 3rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.mine-page .profile-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.mine-page #profileId {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--text-dark);
-    word-break: break-all;
-}
-
-.mine-page #profileEmail {
-    font-size: 1rem;
-    color: var(--text-light);
-}
-
-.mine-page .action-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.mine-page .action-btn {
-    flex: 1;
-    max-width: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 15px;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-/* Fix for long content */
-#profileId, #sidebarId {
-    word-break: break-all;
-    overflow-wrap: break-word;
+    .mine-page .profile-avatar {
+        width: 65px;
+        height: 65px;
+        font-size: 2.5rem;
     }
+    .mine-page #profileId {
+        font-size: 1rem;
+    }
+    .mine-page #profileEmail {
+        font-size: 0.9rem;
+    }
+    .mine-page .balance-amount {
+        font-size: 2.1rem;
+    }
+    .mine-page .action-btn {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+        max-width: 130px;
+    }
+    .mine-page .card {
+        margin: 8px 12px;
+    }
+}
+@media (max-width: 360px) {
+    .mine-page .profile-header-card {
+        gap: 12px;
+        padding: 15px 12px;
+    }
+    .mine-page .profile-avatar {
+        width: 55px;
+        height: 55px;
+        font-size: 2rem;
+    }
+    .mine-page .action-buttons {
+        gap: 8px;
+    }
+    .mine-page .action-btn {
+        max-width: 120px;
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+            }
