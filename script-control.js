@@ -10,17 +10,22 @@ const SYSTEM_ADMINS = [
 
 // Check system administrator access
 firebase.auth().onAuthStateChanged(function(user) {
+    console.log('Auth state changed:', user ? user.email : 'No user');
+    
     if (user) {
         // Check if user is system administrator
         if (SYSTEM_ADMINS.includes(user.email)) {
             currentAdmin = user;
+            console.log('Admin access granted for:', user.email);
             initializeControlPanel();
         } else {
+            console.log('Access denied for:', user.email);
             alert('Unauthorized access attempt detected.');
             firebase.auth().signOut();
             window.location.href = 'login.html';
         }
     } else {
+        console.log('No user, redirecting to system login');
         // Redirect to system login
         window.location.href = 'system-control.html';
     }
@@ -75,6 +80,8 @@ function loadDashboardStats() {
             totalBalance += userData.balance || 0;
         });
         document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
+    }).catch((error) => {
+        console.error('Error loading dashboard stats:', error);
     });
 }
 
@@ -85,6 +92,11 @@ function loadUsers() {
     usersRef.orderBy('createdAt', 'desc').get().then((snapshot) => {
         allUsers = [];
         tbody.innerHTML = '';
+        
+        if (snapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found</td></tr>';
+            return;
+        }
         
         snapshot.forEach(doc => {
             const userData = doc.data();
@@ -110,6 +122,9 @@ function loadUsers() {
             `;
             tbody.appendChild(tr);
         });
+    }).catch((error) => {
+        console.error('Error loading users:', error);
+        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center;">Error loading users</td></tr>';
     });
 }
 
@@ -123,6 +138,11 @@ function searchUsers() {
         user.email.toLowerCase().includes(searchTerm) ||
         user.id.toLowerCase().includes(searchTerm)
     );
+    
+    if (filteredUsers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found</td></tr>';
+        return;
+    }
     
     filteredUsers.forEach(user => {
         const tr = document.createElement('tr');
@@ -204,6 +224,8 @@ function updateUserBalance() {
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
             });
+        } else {
+            alert('User not found!');
         }
     }).then(() => {
         alert('Balance updated successfully!');
@@ -258,7 +280,7 @@ function loadPlans() {
     
     plansRef.orderBy('isVIP', 'desc').orderBy('minAmount', 'asc').get().then((snapshot) => {
         if (snapshot.empty) {
-            plansList.innerHTML = '<p>No investment plans found. <button onclick="showAddPlanForm()">Create First Plan</button></p>';
+            plansList.innerHTML = '<p>No investment plans found. <button class="submit-btn" onclick="showAddPlanForm()">Create First Plan</button></p>';
             return;
         }
         
@@ -294,6 +316,9 @@ function loadPlans() {
         addButton.style.marginTop = '20px';
         addButton.innerHTML = '<button class="submit-btn" onclick="showAddPlanForm()">➕ Add New Investment Plan</button>';
         plansList.appendChild(addButton);
+    }).catch((error) => {
+        console.error('Error loading plans:', error);
+        plansList.innerHTML = '<p>Error loading investment plans.</p>';
     });
 }
 
@@ -447,26 +472,4 @@ function editPlan(planId) {
                 document.getElementById('editPlanTotalReturn').value = dailyReturn * duration;
             });
             
-            document.getElementById('editPlanDuration').addEventListener('input', function() {
-                const dailyReturn = parseFloat(document.getElementById('editPlanDailyReturn').value) || 0;
-                const duration = parseInt(this.value) || 0;
-                document.getElementById('editPlanTotalReturn').value = dailyReturn * duration;
-            });
-        }
-    });
-}
-
-function updatePlan(planId) {
-    const planData = {
-        name: document.getElementById('editPlanName').value,
-        minAmount: parseFloat(document.getElementById('editPlanMinAmount').value),
-        maxAmount: parseFloat(document.getElementById('editPlanMaxAmount').value),
-        dailyReturn: parseFloat(document.getElementById('editPlanDailyReturn').value),
-        duration: parseInt(document.getElementById('editPlanDuration').value),
-        totalReturn: parseFloat(document.getElementById('editPlanTotalReturn').value),
-        isVIP: document.getElementById('editPlanIsVIP').checked,
-        description: document.getElementById('editPlanDescription').value,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    firebase.firestore().collection('investme
+            document.getElementById('editPlanDur
