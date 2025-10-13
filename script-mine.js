@@ -1,121 +1,132 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const profileIdEl = document.getElementById('profileId');
-    const profileEmailEl = document.getElementById('profileEmail');
-    const profileBalanceEl = document.getElementById('profileBalance');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const rechargeBtn = document.getElementById('rechargeBtn');
-    
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            firebase.firestore().collection('users').doc(user.uid).onSnapshot(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    profileIdEl.textContent = `ID: ${userData.userId || 'N/A'}`;
-                    profileEmailEl.textContent = userData.email || user.email;
-                    profileBalanceEl.textContent = `₹${(userData.balance || 0).toFixed(2)}`;
-                }
-            });
-        } else {
-            window.location.href = 'login.html';
-        }
-    });
-
-    if (rechargeBtn) {
-        rechargeBtn.addEventListener('click', () => {
-            window.location.href = 'recharge.html';
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'login.html';
-            });
-        });
-    }
-});
-
-// Fix recharge button event listener
+// Mine Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // Check authentication state
+    // Check authentication
     firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
-            // Redirect to login if not authenticated
+            console.log('User not authenticated, redirecting to login');
             window.location.href = 'login.html';
             return;
         }
         
-        // User is signed in, proceed with page setup
-        setupMinePage(user);
+        console.log('User authenticated:', user.uid);
+        initializeMinePage(user);
     });
 
-    function setupMinePage(user) {
-        // Recharge button with proper authentication
+    function initializeMinePage(user) {
+        // Update user info
+        updateProfileInfo(user);
+        
+        // Load user data from Firestore
+        loadUserBalance(user.uid);
+        
+        // Setup event listeners
+        setupEventListeners(user);
+        
+        // Setup real-time updates
+        setupRealTimeUpdates(user.uid);
+    }
+
+    function updateProfileInfo(user) {
+        const profileId = document.getElementById('profileId');
+        const profileEmail = document.getElementById('profileEmail');
+        
+        if (profileId) {
+            profileId.textContent = `ID: ${user.uid.substring(0, 10)}...`;
+        }
+        if (profileEmail) {
+            profileEmail.textContent = user.email || 'No email available';
+        }
+    }
+
+    function loadUserBalance(userId) {
+        const userDoc = firebase.firestore().collection('users').doc(userId);
+        
+        userDoc.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const balanceElement = document.getElementById('profileBalance');
+                
+                if (balanceElement && userData.balance !== undefined) {
+                    balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
+                } else {
+                    balanceElement.textContent = '₹0.00';
+                }
+            }
+        }).catch((error) => {
+            console.error('Error loading balance:', error);
+            document.getElementById('profileBalance').textContent = '₹0.00';
+        });
+    }
+
+    function setupEventListeners(user) {
+        // Recharge Button - FIXED
         const rechargeBtn = document.getElementById('rechargeBtn');
         if (rechargeBtn) {
             rechargeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log('Recharge button clicked');
                 
-                // Check if user is still authenticated
+                // Double check authentication
                 const currentUser = firebase.auth().currentUser;
                 if (!currentUser) {
-                    alert('Please log in again');
+                    alert('Session expired. Please login again.');
                     window.location.href = 'login.html';
                     return;
                 }
                 
-                // Redirect to recharge page
+                console.log('Redirecting to recharge page');
                 window.location.href = 'recharge.html';
             });
         }
 
-        // Withdraw button
+        // Withdraw Button
         const withdrawBtn = document.getElementById('withdrawBtn');
         if (withdrawBtn) {
-            withdrawBtn.addEventListener('click', function() {
-                alert('Withdraw functionality coming soon!');
+            withdrawBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Withdraw functionality will be available soon!');
             });
         }
 
-        // Logout button
+        // Logout Button
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', function() {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 firebase.auth().signOut().then(() => {
+                    console.log('User signed out');
                     window.location.href = 'login.html';
+                }).catch((error) => {
+                    console.error('Sign out error:', error);
                 });
             });
         }
+
+        // Other option items
+        const optionItems = document.querySelectorAll('.option-item');
+        optionItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('This feature is coming soon!');
+            });
+        });
+    }
+
+    function setupRealTimeUpdates(userId) {
+        const userDoc = firebase.firestore().collection('users').doc(userId);
+        
+        userDoc.onSnapshot((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                const balanceElement = document.getElementById('profileBalance');
+                
+                if (balanceElement && userData.balance !== undefined) {
+                    balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
+                    console.log('Balance updated in real-time:', userData.balance);
+                }
+            }
+        }, (error) => {
+            console.error('Real-time update error:', error);
+        });
     }
 });
-
-// Real-time data updates
-function setupRealTimeUpdates(userId) {
-    // Listen for balance changes in Firestore
-    const userDoc = firebase.firestore().collection('users').doc(userId);
-    
-    userDoc.onSnapshot((doc) => {
-        if (doc.exists) {
-            const userData = doc.data();
-            
-            // Update balance
-            const balanceElement = document.getElementById('profileBalance');
-            if (balanceElement && userData.balance !== undefined) {
-                balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
-            }
-            
-            // Update profile info
-            const profileId = document.getElementById('profileId');
-            const profileEmail = document.getElementById('profileEmail');
-            
-            if (profileId) {
-                profileId.textContent = `ID: ${userId.substring(0, 8)}...`;
-            }
-            if (profileEmail && userData.email) {
-                profileEmail.textContent = userData.email;
-            }
-        }
-    }, (error) => {
-        console.error('Error in real-time update:', error);
-    });
-}
