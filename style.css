@@ -253,3 +253,51 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 /* Investment Plan Cards */
 .plan-card {
     background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.buy-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.buy-btn:hover {
+    background: var(--secondary-color);
+}
+
+/* VIP Plan Styling */
+.plan-card:has(h4:contains('VIP')) {
+    border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #fffaf0, #fff5e6);
+}
+
+/* Progress Bars */
+.progress-bar {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 8px;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
