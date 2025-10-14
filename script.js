@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
             initializeApp();
         } else {
             console.log('No user logged in, redirecting...');
-            // Redirect to your user login page, for example 'login.html'
             // window.location.href = 'login.html'; 
         }
     });
@@ -23,11 +22,8 @@ function setupTabs() {
 
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Remove active class from all buttons and content
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to the clicked button and corresponding content
             button.classList.add('active');
             const tabId = button.dataset.tab;
             document.getElementById(tabId).classList.add('active');
@@ -45,10 +41,9 @@ function loadInvestmentPlans() {
     const db = firebase.firestore();
 
     db.collection("investmentPlans")
-      .where("isActive", "==", true) // Only show active plans to users
+      .where("isActive", "==", true)
       .orderBy("minAmount", "asc")
       .onSnapshot((querySnapshot) => {
-          // Clear existing content
           primaryContainer.innerHTML = '';
           vipContainer.innerHTML = '';
 
@@ -64,10 +59,12 @@ function loadInvestmentPlans() {
               const plan = doc.data();
               const planId = doc.id;
 
+              // --- UPDATED HTML STRUCTURE ---
               const planCardHTML = `
-                  <div class="plan-card" data-plan-id="${planId}">
+                  <div class="plan-card ${plan.isVIP ? 'vip' : ''}" data-plan-id="${planId}">
                       <div class="plan-card-header">
                           <h3>${plan.name}</h3>
+                          ${plan.isVIP ? '<span class="vip-badge">VIP</span>' : ''}
                       </div>
                       <div class="plan-card-body">
                           <div class="plan-detail">
@@ -78,13 +75,13 @@ function loadInvestmentPlans() {
                               <span class="plan-label">Daily Income</span>
                               <span class="plan-value">₹${((plan.minAmount * plan.dailyReturnPercent) / 100).toFixed(2)}</span>
                           </div>
-                           <div class="plan-detail">
-                              <span class="plan-label">Total Income</span>
-                              <span class="plan-value">₹${((plan.minAmount * plan.totalReturnPercent) / 100).toLocaleString()}</span>
-                          </div>
                           <div class="plan-detail">
                               <span class="plan-label">Cycle</span>
                               <span class="plan-value">${plan.durationDays} Days</span>
+                          </div>
+                          <div class="plan-detail">
+                              <span class="plan-label">Total Income</span>
+                              <span class="plan-value">₹${((plan.minAmount * plan.totalReturnPercent) / 100).toLocaleString()}</span>
                           </div>
                       </div>
                       <div class="plan-card-footer">
@@ -102,7 +99,6 @@ function loadInvestmentPlans() {
               }
           });
 
-          // Show a message if a category has no plans
           if (!primaryPlansExist) {
               primaryContainer.innerHTML = "<p>No primary plans are available right now.</p>";
           }
@@ -115,6 +111,4 @@ function loadInvestmentPlans() {
           primaryContainer.innerHTML = "<p style='color:red;'>Could not load investment plans.</p>";
           vipContainer.innerHTML = "<p style='color:red;'>Could not load VIP plans.</p>";
       });
-}
-
-          
+      }
