@@ -1,4 +1,6 @@
-// System Control Panel JavaScript - FIXED VERSION
+// System Control Panel JavaScript - COMPLETE FIX
+console.log('🔧 Admin panel script loading...');
+
 let allUsers = [];
 let currentAdmin = null;
 
@@ -8,55 +10,81 @@ const SYSTEM_ADMINS = [
     "admin@adani.com"
 ];
 
-// Initialize when page loads
+// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Control panel loaded, checking auth...');
-    checkAdminAuth();
+    console.log('✅ DOM loaded, initializing admin panel...');
+    initializeAdminPanel();
 });
 
+function initializeAdminPanel() {
+    console.log('🚀 Starting admin panel initialization...');
+    
+    // Check authentication first
+    checkAdminAuth();
+}
+
 function checkAdminAuth() {
+    console.log('🔐 Checking admin authentication...');
+    
     firebase.auth().onAuthStateChanged(function(user) {
-        console.log('Auth state changed:', user ? user.email : 'No user');
+        console.log('📡 Auth state changed:', user ? user.email : 'No user');
         
         if (user) {
             // Check if user is system administrator
             if (SYSTEM_ADMINS.includes(user.email)) {
                 currentAdmin = user;
                 console.log('✅ Admin access granted for:', user.email);
-                initializeControlPanel();
+                showControlPanel();
             } else {
                 console.log('❌ Access denied for:', user.email);
                 alert('Access Denied: Administrator privileges required.');
                 firebase.auth().signOut();
                 setTimeout(() => {
                     window.location.href = 'login.html';
-                }, 1000);
+                }, 2000);
             }
         } else {
-            console.log('🔐 No user, redirecting to login');
+            console.log('🔐 No authenticated user, redirecting to login...');
             window.location.href = 'system-control.html';
         }
+    }, function(error) {
+        console.error('❌ Auth state error:', error);
+        alert('Authentication error. Please try again.');
+        window.location.href = 'system-control.html';
     });
 }
 
-function initializeControlPanel() {
-    console.log('🚀 Control panel initialized for:', currentAdmin.email);
+function showControlPanel() {
+    console.log('🎯 Showing control panel...');
+    
+    // Make sure we're on the correct page
+    if (!document.querySelector('.control-container')) {
+        console.error('❌ Not on control panel page!');
+        return;
+    }
     
     // Update admin info in header
-    document.querySelector('.control-header h1').innerHTML = `🔒 System Control Panel - <small>${currentAdmin.email}</small>`;
+    const header = document.querySelector('.control-header h1');
+    if (header) {
+        header.innerHTML = `🔒 Admin Panel - <small>${currentAdmin.email}</small>`;
+    }
     
+    // Setup all functionality
+    setupAllEventListeners();
     loadDashboardStats();
     loadUsers();
-    setupEventListeners();
+    
+    console.log('✅ Control panel fully loaded!');
 }
 
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
+function setupAllEventListeners() {
+    console.log('⚙️ Setting up event listeners...');
     
     // Tab switching
     const tabs = document.querySelectorAll('.control-tab');
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
+            console.log('📑 Tab clicked:', this.getAttribute('data-tab'));
             const tabName = this.getAttribute('data-tab');
             
             // Update active tab
@@ -67,25 +95,57 @@ function setupEventListeners() {
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            document.getElementById(tabName + 'Tab').classList.add('active');
             
-            // Load tab-specific data
-            if (tabName === 'plans') {
-                loadPlans();
-            } else if (tabName === 'balance') {
-                loadUserDropdown();
+            const tabContent = document.getElementById(tabName + 'Tab');
+            if (tabContent) {
+                tabContent.classList.add('active');
+                
+                // Load tab-specific data
+                if (tabName === 'plans') {
+                    loadPlans();
+                } else if (tabName === 'balance') {
+                    loadUserDropdown();
+                }
             }
         });
     });
     
-    // Logout button
+    // Search users
+    const searchInput = document.getElementById('searchUser');
+    if (searchInput) {
+        searchInput.addEventListener('input', searchUsers);
+    }
+    
+    // Update balance button
+    const updateBalanceBtn = document.querySelector('button[onclick="updateUserBalance()"]');
+    if (updateBalanceBtn) {
+        updateBalanceBtn.addEventListener('click', updateUserBalance);
+    }
+    
+    // Save settings button
+    const saveSettingsBtn = document.querySelector('button[onclick="saveSystemSettings()"]');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', saveSystemSettings);
+    }
+    
+    // Logout button - FIXED
     const logoutBtn = document.querySelector('.logout-control');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', logoutControl);
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            logoutControl();
+        });
+        console.log('✅ Logout button event listener added');
+    } else {
+        console.log('❌ Logout button not found');
     }
+    
+    console.log('✅ All event listeners setup complete');
 }
 
 function loadDashboardStats() {
+    console.log('📊 Loading dashboard stats...');
+    
     const usersRef = firebase.firestore().collection('users');
     
     usersRef.get().then((snapshot) => {
@@ -100,15 +160,22 @@ function loadDashboardStats() {
         });
         document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
         
-        console.log('📊 Dashboard stats loaded:', { users: userCount, balance: totalBalance });
+        console.log('✅ Dashboard stats loaded');
     }).catch((error) => {
-        console.error('Error loading dashboard stats:', error);
+        console.error('❌ Error loading dashboard stats:', error);
     });
 }
 
 function loadUsers() {
+    console.log('👥 Loading users...');
+    
     const usersRef = firebase.firestore().collection('users');
     const tbody = document.getElementById('usersTableBody');
+    
+    if (!tbody) {
+        console.error('❌ Users table body not found');
+        return;
+    }
     
     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading users...</td></tr>';
     
@@ -136,8 +203,8 @@ function loadUsers() {
                 <td>${userData.createdAt ? userData.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
                 <td><span class="status-badge ${userData.isBlocked ? 'blocked' : 'active'}">${userData.isBlocked ? 'Blocked' : 'Active'}</span></td>
                 <td>
-                    <button class="action-btn edit-btn" onclick="editUser('${doc.id}')">Edit</button>
-                    <button class="action-btn block-btn" onclick="toggleUserBlock('${doc.id}', ${!userData.isBlocked})">
+                    <button class="action-btn edit-btn" data-userid="${doc.id}">Edit</button>
+                    <button class="action-btn block-btn" data-userid="${doc.id}" data-block="${!userData.isBlocked}">
                         ${userData.isBlocked ? 'Unblock' : 'Block'}
                     </button>
                 </td>
@@ -145,9 +212,27 @@ function loadUsers() {
             tbody.appendChild(tr);
         });
         
-        console.log('👥 Users loaded:', allUsers.length);
+        // Add event listeners to action buttons
+        setTimeout(() => {
+            document.querySelectorAll('.block-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    const block = this.getAttribute('data-block') === 'true';
+                    toggleUserBlock(userId, block);
+                });
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-userid');
+                    editUser(userId);
+                });
+            });
+        }, 100);
+        
+        console.log('✅ Users loaded:', allUsers.length);
     }).catch((error) => {
-        console.error('Error loading users:', error);
+        console.error('❌ Error loading users:', error);
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users</td></tr>';
     });
 }
@@ -182,18 +267,36 @@ function searchUsers() {
             <td>${user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A'}</td>
             <td><span class="status-badge ${user.isBlocked ? 'blocked' : 'active'}">${user.isBlocked ? 'Blocked' : 'Active'}</span></td>
             <td>
-                <button class="action-btn edit-btn" onclick="editUser('${user.id}')">Edit</button>
-                <button class="action-btn block-btn" onclick="toggleUserBlock('${user.id}', ${!user.isBlocked})">
+                <button class="action-btn edit-btn" data-userid="${user.id}">Edit</button>
+                <button class="action-btn block-btn" data-userid="${user.id}" data-block="${!user.isBlocked}">
                     ${user.isBlocked ? 'Unblock' : 'Block'}
                 </button>
             </td>
         `;
         tbody.appendChild(tr);
     });
+    
+    // Re-attach event listeners
+    setTimeout(() => {
+        document.querySelectorAll('.block-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.getAttribute('data-userid');
+                const block = this.getAttribute('data-block') === 'true';
+                toggleUserBlock(userId, block);
+            });
+        });
+    }, 100);
 }
 
 function loadUserDropdown() {
+    console.log('📋 Loading user dropdown...');
+    
     const select = document.getElementById('userSelect');
+    if (!select) {
+        console.error('❌ User select dropdown not found');
+        return;
+    }
+    
     select.innerHTML = '<option value="">Select a user...</option>';
     
     allUsers.forEach(user => {
@@ -202,9 +305,13 @@ function loadUserDropdown() {
         option.textContent = `${user.email} (₹${(user.balance || 0).toFixed(2)})`;
         select.appendChild(option);
     });
+    
+    console.log('✅ User dropdown loaded');
 }
 
 function updateUserBalance() {
+    console.log('💰 Updating user balance...');
+    
     const userId = document.getElementById('userSelect').value;
     const action = document.getElementById('balanceAction').value;
     const amount = parseFloat(document.getElementById('balanceAmount').value);
@@ -266,8 +373,8 @@ function updateUserBalance() {
         loadUsers();
         loadDashboardStats();
     }).catch((error) => {
-        console.error('Error updating balance:', error);
-        alert('❌ Error: ' + error.message);
+        console.error('❌ Error updating balance:', error);
+        alert('Error: ' + error.message);
     });
 }
 
@@ -284,19 +391,26 @@ function toggleUserBlock(userId, block) {
         alert(`✅ User ${action}ed successfully!`);
         loadUsers();
     }).catch((error) => {
-        console.error('Error updating user:', error);
-        alert('❌ Error updating user status.');
+        console.error('❌ Error updating user:', error);
+        alert('Error updating user status.');
     });
 }
 
 function editUser(userId) {
-    alert('Edit user functionality coming soon!');
+    alert('Edit user functionality coming soon! User ID: ' + userId);
 }
 
 // Investment Plans Management
 function loadPlans() {
+    console.log('📈 Loading investment plans...');
+    
     const plansRef = firebase.firestore().collection('investmentPlans');
     const plansList = document.getElementById('plansList');
+    
+    if (!plansList) {
+        console.error('❌ Plans list container not found');
+        return;
+    }
     
     plansList.innerHTML = '<div style="text-align: center; padding: 20px;">Loading investment plans...</div>';
     
@@ -305,9 +419,11 @@ function loadPlans() {
             plansList.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
                     <p>No investment plans found.</p>
-                    <button class="submit-btn" onclick="showAddPlanForm()">Create First Plan</button>
+                    <button class="submit-btn" id="createFirstPlan">Create First Plan</button>
                 </div>
             `;
+            
+            document.getElementById('createFirstPlan').addEventListener('click', showAddPlanForm);
             return;
         }
         
@@ -328,8 +444,8 @@ function loadPlans() {
                         <p><strong>Status:</strong> ${plan.isActive ? '🟢 Active' : '🔴 Inactive'}</p>
                     </div>
                     <div class="control-actions">
-                        <button class="action-btn edit-btn" onclick="editPlan('${doc.id}')">Edit</button>
-                        <button class="action-btn ${plan.isActive ? 'block-btn' : 'edit-btn'}" onclick="togglePlanStatus('${doc.id}', ${!plan.isActive})">
+                        <button class="action-btn edit-btn" data-planid="${doc.id}">Edit</button>
+                        <button class="action-btn ${plan.isActive ? 'block-btn' : 'edit-btn'}" data-planid="${doc.id}" data-status="${!plan.isActive}">
                             ${plan.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                     </div>
@@ -340,17 +456,42 @@ function loadPlans() {
         
         const addButton = document.createElement('div');
         addButton.style.marginTop = '20px';
-        addButton.innerHTML = '<button class="submit-btn" onclick="showAddPlanForm()">➕ Add New Investment Plan</button>';
+        addButton.innerHTML = '<button class="submit-btn" id="addNewPlan">➕ Add New Investment Plan</button>';
         plansList.appendChild(addButton);
         
+        // Add event listeners
+        setTimeout(() => {
+            document.getElementById('addNewPlan').addEventListener('click', showAddPlanForm);
+            
+            document.querySelectorAll('.edit-btn[data-planid]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const planId = this.getAttribute('data-planid');
+                    editPlan(planId);
+                });
+            });
+            
+            document.querySelectorAll('.block-btn[data-planid], .edit-btn[data-planid]').forEach(btn => {
+                if (btn.classList.contains('block-btn') || btn.classList.contains('edit-btn')) {
+                    btn.addEventListener('click', function() {
+                        const planId = this.getAttribute('data-planid');
+                        const newStatus = this.getAttribute('data-status') === 'true';
+                        togglePlanStatus(planId, newStatus);
+                    });
+                }
+            });
+        }, 100);
+        
     }).catch((error) => {
-        console.error('Error loading plans:', error);
+        console.error('❌ Error loading plans:', error);
         plansList.innerHTML = '<div style="text-align: center; color: red;">Error loading investment plans</div>';
     });
 }
 
 function showAddPlanForm() {
-    const planForm = `
+    console.log('➕ Showing add plan form...');
+    
+    const plansList = document.getElementById('plansList');
+    plansList.innerHTML = `
         <div class="card">
             <h4>Create New Investment Plan</h4>
             <div class="form-group">
@@ -359,23 +500,23 @@ function showAddPlanForm() {
             </div>
             <div class="form-group">
                 <label>Minimum Investment (₹)</label>
-                <input type="number" id="planMinAmount" placeholder="Minimum investment amount" class="form-control">
+                <input type="number" id="planMinAmount" placeholder="1000" class="form-control" value="1000">
             </div>
             <div class="form-group">
                 <label>Maximum Investment (₹)</label>
-                <input type="number" id="planMaxAmount" placeholder="Maximum investment amount" class="form-control">
+                <input type="number" id="planMaxAmount" placeholder="50000" class="form-control" value="50000">
             </div>
             <div class="form-group">
                 <label>Daily Return (%)</label>
-                <input type="number" id="planDailyReturn" placeholder="Daily return percentage" step="0.01" class="form-control">
+                <input type="number" id="planDailyReturn" placeholder="5.0" step="0.1" class="form-control" value="5.0">
             </div>
             <div class="form-group">
                 <label>Plan Duration (days)</label>
-                <input type="number" id="planDuration" placeholder="Duration in days" class="form-control">
+                <input type="number" id="planDuration" placeholder="30" class="form-control" value="30">
             </div>
             <div class="form-group">
                 <label>Total Return (%)</label>
-                <input type="number" id="planTotalReturn" placeholder="Auto-calculated" readonly class="form-control">
+                <input type="number" id="planTotalReturn" placeholder="150" readonly class="form-control" value="150">
             </div>
             <div class="form-group">
                 <label>
@@ -383,130 +524,4 @@ function showAddPlanForm() {
                 </label>
             </div>
             <div class="form-group">
-                <label>Plan Description</label>
-                <textarea id="planDescription" placeholder="Describe this plan" class="form-control"></textarea>
-            </div>
-            <div class="control-actions">
-                <button class="submit-btn" onclick="saveNewPlan()">💾 Save Plan</button>
-                <button class="action-btn block-btn" onclick="loadPlans()">Cancel</button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('plansList').innerHTML = planForm;
-    
-    // Auto-calculate total return
-    document.getElementById('planDailyReturn').addEventListener('input', calculateTotalReturn);
-    document.getElementById('planDuration').addEventListener('input', calculateTotalReturn);
-}
-
-function calculateTotalReturn() {
-    const dailyReturn = parseFloat(document.getElementById('planDailyReturn').value) || 0;
-    const duration = parseInt(document.getElementById('planDuration').value) || 0;
-    const totalReturn = dailyReturn * duration;
-    document.getElementById('planTotalReturn').value = totalReturn;
-}
-
-function saveNewPlan() {
-    const planData = {
-        name: document.getElementById('planName').value,
-        minAmount: parseFloat(document.getElementById('planMinAmount').value),
-        maxAmount: parseFloat(document.getElementById('planMaxAmount').value),
-        dailyReturn: parseFloat(document.getElementById('planDailyReturn').value),
-        duration: parseInt(document.getElementById('planDuration').value),
-        totalReturn: parseFloat(document.getElementById('planTotalReturn').value),
-        isVIP: document.getElementById('planIsVIP').checked,
-        description: document.getElementById('planDescription').value,
-        isActive: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    // Validation
-    if (!planData.name || !planData.minAmount || !planData.maxAmount || !planData.dailyReturn || !planData.duration) {
-        alert('Please fill all required fields.');
-        return;
-    }
-    
-    if (planData.minAmount >= planData.maxAmount) {
-        alert('Maximum amount must be greater than minimum amount.');
-        return;
-    }
-    
-    firebase.firestore().collection('investmentPlans').add(planData).then(() => {
-        alert('✅ Investment plan created successfully!');
-        loadPlans();
-    }).catch((error) => {
-        console.error('Error adding plan:', error);
-        alert('❌ Error creating plan: ' + error.message);
-    });
-}
-
-function editPlan(planId) {
-    alert('Edit plan functionality coming soon!');
-}
-
-function togglePlanStatus(planId, newStatus) {
-    const action = newStatus ? 'activate' : 'deactivate';
-    if (!confirm(`Are you sure you want to ${action} this plan?`)) {
-        return;
-    }
-    
-    firebase.firestore().collection('investmentPlans').doc(planId).update({
-        isActive: newStatus,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        alert(`✅ Plan ${action}d successfully!`);
-        loadPlans();
-    }).catch((error) => {
-        console.error('Error updating plan status:', error);
-        alert('❌ Error updating plan status.');
-    });
-}
-
-function saveSystemSettings() {
-    const settings = {
-        commission1: parseInt(document.getElementById('commission1').value) || 21,
-        commission2: parseInt(document.getElementById('commission2').value) || 3,
-        commission3: parseInt(document.getElementById('commission3').value) || 1,
-        minWithdrawal: parseInt(document.getElementById('minWithdrawal').value) || 100,
-        maxWithdrawal: parseInt(document.getElementById('maxWithdrawal').value) || 50000,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    firebase.firestore().collection('systemSettings').doc('commissionRates').set(settings)
-    .then(() => {
-        alert('✅ Settings saved successfully!');
-    })
-    .catch((error) => {
-        console.error('Error saving settings:', error);
-        alert('❌ Error saving settings.');
-    });
-}
-
-function logoutControl() {
-    if (confirm('Are you sure you want to logout from admin panel?')) {
-        console.log('Logging out admin...');
-        firebase.auth().signOut().then(() => {
-            console.log('Admin logged out successfully');
-            window.location.href = 'system-control.html';
-        }).catch((error) => {
-            console.error('Logout error:', error);
-            alert('Logout failed. Please try again.');
-        });
-    }
-}
-
-// Add CSS for status badges
-const style = document.createElement('style');
-style.textContent = `
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        font-weight: bold;
-    }
-    .status-badge.active {
-        background: #d4edda;
-        color: #155724;
-    }
-    .status-badge.blocke
+       
