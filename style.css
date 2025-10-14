@@ -301,3 +301,97 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border-radius: 10px;
     transition: width 0.3s ease;
 }
+
+/* --- Modern Investment Plan Card Styles --- */
+
+.plan-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    margin: 15px 0;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card.vip {
+    border-left: 5px solid #9b59b6; /* A distinct color for VIP plans */
+}
+
+.plan-card-header {
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    position: relative; /* For VIP badge positioning */
+}
+
+.plan-card-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #1a237e; /* Matches your admin panel theme */
+}
+
+.vip-badge {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    background-color: #9b59b6;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.plan-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Creates a clean 2x2 grid */
+    gap: 18px;
+    flex-grow: 1; /* Allows the body to take up available space */
+}
+
+.plan-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-label {
+    font-size: 0.8em;
+    color: #6c757d; /* Muted color for labels */
+    margin-bottom: 4px;
+}
+
+.plan-value {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.plan-card-footer {
+    margin-top: 20px;
+}
+
+.buy-button {
+    width: 100%;
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.buy-button:hover {
+    background: linear-gradient(135deg, #161d6a, #212b7a);
+    transform: scale(1.02);
+}
