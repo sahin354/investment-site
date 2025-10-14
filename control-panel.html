@@ -17,6 +17,9 @@
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .stats-grid {
             display: grid;
@@ -111,6 +114,7 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            box-sizing: border-box;
             font-size: 1em;
         }
         .control-actions {
@@ -125,7 +129,6 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            margin-left: auto;
         }
         .system-alert {
             background: #fff3cd;
@@ -141,9 +144,11 @@
 <body>
     <div class="control-container">
         <div class="control-header">
-            <h1>🔒 System Control Panel</h1>
-            <p>Secure System Management Interface</p>
-            <button class="logout-control" onclick="logoutControl()">Secure Logout</button>
+            <div>
+                <h1>🔒 System Control Panel</h1>
+                <p>Secure System Management Interface</p>
+            </div>
+            <button id="logoutButton" class="logout-control">Secure Logout</button>
         </div>
 
         <div class="system-alert">
@@ -176,7 +181,6 @@
             <button class="control-tab" data-tab="settings">System Config</button>
         </div>
 
-        <!-- Users Management Tab -->
         <div id="usersTab" class="tab-content active">
             <h3>👥 User Account Management</h3>
             <div class="form-group">
@@ -195,23 +199,21 @@
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <!-- Users will be loaded here -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Balance Control Tab -->
         <div id="balanceTab" class="tab-content">
             <h3>💰 Financial Management</h3>
             <div class="form-group">
-                <label>Select User Account</label>
+                <label for="userSelect">Select User Account</label>
                 <select id="userSelect">
                     <option value="">Select user account...</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Transaction Type</label>
+                <label for="balanceAction">Transaction Type</label>
                 <select id="balanceAction">
                     <option value="add">Add Funds</option>
                     <option value="subtract">Deduct Funds</option>
@@ -219,51 +221,45 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Amount (₹)</label>
+                <label for="balanceAmount">Amount (₹)</label>
                 <input type="number" id="balanceAmount" placeholder="Enter amount">
             </div>
             <div class="form-group">
-                <label>Transaction Note</label>
+                <label for="balanceReason">Transaction Note</label>
                 <textarea id="balanceReason" placeholder="Reason for this transaction"></textarea>
             </div>
-            <button class="submit-btn" onclick="updateUserBalance()">Execute Transaction</button>
+            <button id="updateBalanceButton" class="submit-btn">Execute Transaction</button>
         </div>
 
-        <!-- Plans Management Tab -->
         <div id="plansTab" class="tab-content">
             <h3>📊 Investment Plan Settings</h3>
-            <div class="control-actions">
-                <button class="submit-btn" onclick="showAddPlanForm()">➕ Create New Plan</button>
-            </div>
             <div id="plansList">
-                <!-- Plans will be loaded here -->
-            </div>
+                </div>
         </div>
 
-        <!-- System Settings Tab -->
         <div id="settingsTab" class="tab-content">
             <h3>⚙️ System Configuration</h3>
             <div class="form-group">
-                <label>Referral Commission - Level 1 (%)</label>
+                <label for="commission1">Referral Commission - Level 1 (%)</label>
                 <input type="number" id="commission1" value="21" min="0" max="100">
             </div>
             <div class="form-group">
-                <label>Referral Commission - Level 2 (%)</label>
+                <label for="commission2">Referral Commission - Level 2 (%)</label>
                 <input type="number" id="commission2" value="3" min="0" max="100">
             </div>
             <div class="form-group">
-                <label>Referral Commission - Level 3 (%)</label>
+                <label for="commission3">Referral Commission - Level 3 (%)</label>
                 <input type="number" id="commission3" value="1" min="0" max="100">
             </div>
             <div class="form-group">
-                <label>Minimum Withdrawal Limit</label>
+                <label for="minWithdrawal">Minimum Withdrawal Limit</label>
                 <input type="number" id="minWithdrawal" value="100">
             </div>
             <div class="form-group">
-                <label>Maximum Withdrawal Limit</label>
+                <label for="maxWithdrawal">Maximum Withdrawal Limit</label>
                 <input type="number" id="maxWithdrawal" value="50000">
             </div>
-            <button class="submit-btn" onclick="saveSystemSettings()">💾 Save Configuration</button>
+            <button id="saveSettingsButton" class="submit-btn">💾 Save Configuration</button>
         </div>
     </div>
 
@@ -273,4 +269,4 @@
     <script src="firebaseConfig.js"></script>
     <script src="script-control.js"></script>
 </body>
-                    </html>
+</html>
