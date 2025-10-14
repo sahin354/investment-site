@@ -9,26 +9,28 @@ const SYSTEM_ADMINS = [
 ];
 
 // Check system administrator access
-firebase.auth().onAuthStateChanged(function(user) {
-    console.log('Auth state changed:', user ? user.email : 'No user');
-    
-    if (user) {
-        // Check if user is system administrator
-        if (SYSTEM_ADMINS.includes(user.email)) {
-            currentAdmin = user;
-            console.log('Admin access granted for:', user.email);
-            initializeControlPanel();
+document.addEventListener('DOMContentLoaded', function() {
+    firebase.auth().onAuthStateChanged(function(user) {
+        console.log('Auth state changed:', user ? user.email : 'No user');
+        
+        if (user) {
+            // Check if user is system administrator
+            if (SYSTEM_ADMINS.includes(user.email)) {
+                currentAdmin = user;
+                console.log('Admin access granted for:', user.email);
+                initializeControlPanel();
+            } else {
+                console.log('Access denied for:', user.email);
+                alert('Unauthorized access attempt detected.');
+                firebase.auth().signOut();
+                window.location.href = 'login.html';
+            }
         } else {
-            console.log('Access denied for:', user.email);
-            alert('Unauthorized access attempt detected.');
-            firebase.auth().signOut();
-            window.location.href = 'login.html';
+            console.log('No user, redirecting to system login');
+            // Redirect to system login
+            window.location.href = 'system-control.html';
         }
-    } else {
-        console.log('No user, redirecting to system login');
-        // Redirect to system login
-        window.location.href = 'system-control.html';
-    }
+    });
 });
 
 function initializeControlPanel() {
@@ -469,7 +471,4 @@ function editPlan(planId) {
             document.getElementById('editPlanDailyReturn').addEventListener('input', function() {
                 const dailyReturn = parseFloat(this.value) || 0;
                 const duration = parseInt(document.getElementById('editPlanDuration').value) || 0;
-                document.getElementById('editPlanTotalReturn').value = dailyReturn * duration;
-            });
-            
-            document.getElementById('editPlanDur
+                document.
