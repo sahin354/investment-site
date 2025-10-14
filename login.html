@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Adani Corporation - Login</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Uzumaki</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page-background">
-    <main class="auth-container">
-        <div class="auth-card">
-            <h2>Welcome Back!</h2>
+    <div class="auth-container-wrapper">
+        <header class="auth-header">
+            <h1>Hello, Welcome!</h1>
+            <p>Don't have an account?</p>
+            <a href="register.html" class="header-link">Register</a>
+        </header>
+        <main class="auth-content">
+            <h2>Login</h2>
             <form id="loginForm">
                 <div class="input-group">
-                    <label for="loginId">Email or Phone Number</label>
-                    <input type="text" id="loginId" name="loginId" placeholder="Enter your email or phone" required>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" required>
                 </div>
                 <div class="input-group">
-                    <label for="password">Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" name="password" placeholder="••••••••" required>
-                        <span id="togglePassword" class="password-toggle-icon">👁️</span>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <span id="toggleLoginPassword" class="password-toggle-icon">👁️</span>
                     </div>
                 </div>
-                <div class="form-options">
-                    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                <div class="auth-options">
+                    <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
-                <button type="submit" class="submit-btn">Log In</button>
+                <button type="submit" class="submit-btn">Login</button>
             </form>
-            <p class="auth-switch">Don't have an account? <a href="register.html">Register</a></p>
-        </div>
-    </main>
+            <div class="social-login">
+                <p>or contact us via</p>
+                <div class="social-icons">
+                    <a href="https://t.me/your_telegram_channel" class="social-icon" target="_blank">✉️</a> <a href="https://t.me/your_support_bot" class="social-icon" target="_blank">📞</a>    </div>
+            </div>
+        </main>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="firebaseConfig.js"></script>
-    <script src="script-auth.js"></script>
+    <script src="login.js"></script>
 </body>
 </html>
