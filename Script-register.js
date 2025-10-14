@@ -1,12 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-    const registerForm = document.getElementById('registerForm');
     
-    if (registerForm) {
-        registerForm.addEventListener('submit', handleRegistration);
-    }
-
-    // --- NEW: Setup for password visibility toggles ---
+    document.getElementById('registerForm').addEventListener('submit', handleRegistration);
     setupPasswordToggle('togglePassword', 'password');
     setupPasswordToggle('toggleConfirmPassword', 'confirmPassword');
 
@@ -22,7 +16,7 @@ function handleRegistration(e) {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (password !== confirmPassword) {
-        alert("Passwords do not match. Please try again.");
+        alert("Passwords do not match.");
         return;
     }
 
@@ -49,7 +43,7 @@ function handleRegistration(e) {
             });
         })
         .then(() => {
-            console.log('User registered and profile created in Firestore.');
+            console.log('User registered and profile created.');
             window.location.href = 'login.html';
         })
         .catch((error) => {
@@ -62,20 +56,15 @@ function handleRegistration(e) {
         });
 }
 
-// --- NEW: Reusable function to control the eye icon ---
 function setupPasswordToggle(toggleId, passwordId) {
     const toggleElement = document.getElementById(toggleId);
     const passwordElement = document.getElementById(passwordId);
 
     if (toggleElement && passwordElement) {
         toggleElement.addEventListener('click', function() {
-            // Check the current type of the password input
             const type = passwordElement.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordElement.setAttribute('type', type);
-            
-            // Change the icon based on the visibility
             this.textContent = type === 'password' ? '👁️' : '🔒';
         });
     }
-        }
-              
+}
