@@ -1,4 +1,4 @@
-// System Control Panel JavaScript
+// System Control Panel JavaScript - FIXED VERSION
 let allUsers = [];
 let currentAdmin = null;
 
@@ -8,8 +8,13 @@ const SYSTEM_ADMINS = [
     "admin@adani.com"
 ];
 
-// Check system administrator access
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Control panel loaded, checking auth...');
+    checkAdminAuth();
+});
+
+function checkAdminAuth() {
     firebase.auth().onAuthStateChanged(function(user) {
         console.log('Auth state changed:', user ? user.email : 'No user');
         
@@ -17,30 +22,37 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if user is system administrator
             if (SYSTEM_ADMINS.includes(user.email)) {
                 currentAdmin = user;
-                console.log('Admin access granted for:', user.email);
+                console.log('✅ Admin access granted for:', user.email);
                 initializeControlPanel();
             } else {
-                console.log('Access denied for:', user.email);
-                alert('Unauthorized access attempt detected.');
+                console.log('❌ Access denied for:', user.email);
+                alert('Access Denied: Administrator privileges required.');
                 firebase.auth().signOut();
-                window.location.href = 'login.html';
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
             }
         } else {
-            console.log('No user, redirecting to system login');
-            // Redirect to system login
+            console.log('🔐 No user, redirecting to login');
             window.location.href = 'system-control.html';
         }
     });
-});
+}
 
 function initializeControlPanel() {
-    console.log('Control panel initialized for:', currentAdmin.email);
+    console.log('🚀 Control panel initialized for:', currentAdmin.email);
+    
+    // Update admin info in header
+    document.querySelector('.control-header h1').innerHTML = `🔒 System Control Panel - <small>${currentAdmin.email}</small>`;
+    
     loadDashboardStats();
     loadUsers();
     setupEventListeners();
 }
 
 function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    
     // Tab switching
     const tabs = document.querySelectorAll('.control-tab');
     tabs.forEach(tab => {
@@ -65,23 +77,30 @@ function setupEventListeners() {
             }
         });
     });
+    
+    // Logout button
+    const logoutBtn = document.querySelector('.logout-control');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logoutControl);
+    }
 }
 
 function loadDashboardStats() {
     const usersRef = firebase.firestore().collection('users');
     
-    // Total users count
     usersRef.get().then((snapshot) => {
-        document.getElementById('totalUsers').textContent = snapshot.size;
-        document.getElementById('activeUsers').textContent = snapshot.size;
+        const userCount = snapshot.size;
+        document.getElementById('totalUsers').textContent = userCount;
+        document.getElementById('activeUsers').textContent = userCount;
         
-        // Calculate total balance
         let totalBalance = 0;
         snapshot.forEach(doc => {
             const userData = doc.data();
             totalBalance += userData.balance || 0;
         });
         document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
+        
+        console.log('📊 Dashboard stats loaded:', { users: userCount, balance: totalBalance });
     }).catch((error) => {
         console.error('Error loading dashboard stats:', error);
     });
@@ -90,6 +109,8 @@ function loadDashboardStats() {
 function loadUsers() {
     const usersRef = firebase.firestore().collection('users');
     const tbody = document.getElementById('usersTableBody');
+    
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading users...</td></tr>';
     
     usersRef.orderBy('createdAt', 'desc').get().then((snapshot) => {
         allUsers = [];
@@ -119,14 +140,15 @@ function loadUsers() {
                     <button class="action-btn block-btn" onclick="toggleUserBlock('${doc.id}', ${!userData.isBlocked})">
                         ${userData.isBlocked ? 'Unblock' : 'Block'}
                     </button>
-                    <button class="action-btn delete-btn" onclick="deleteUser('${doc.id}')">Delete</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+        
+        console.log('👥 Users loaded:', allUsers.length);
     }).catch((error) => {
         console.error('Error loading users:', error);
-        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center;">Error loading users</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users</td></tr>';
     });
 }
 
@@ -134,15 +156,20 @@ function searchUsers() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
     
-    tbody.innerHTML = '';
+    if (!searchTerm) {
+        loadUsers();
+        return;
+    }
     
     const filteredUsers = allUsers.filter(user => 
         user.email.toLowerCase().includes(searchTerm) ||
         user.id.toLowerCase().includes(searchTerm)
     );
     
+    tbody.innerHTML = '';
+    
     if (filteredUsers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No matching users found</td></tr>';
         return;
     }
     
@@ -159,7 +186,6 @@ function searchUsers() {
                 <button class="action-btn block-btn" onclick="toggleUserBlock('${user.id}', ${!user.isBlocked})">
                     ${user.isBlocked ? 'Unblock' : 'Block'}
                 </button>
-                <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -184,8 +210,13 @@ function updateUserBalance() {
     const amount = parseFloat(document.getElementById('balanceAmount').value);
     const reason = document.getElementById('balanceReason').value;
     
-    if (!userId || !amount || amount <= 0) {
-        alert('Please select a user and enter a valid amount.');
+    if (!userId) {
+        alert('Please select a user.');
+        return;
+    }
+    
+    if (!amount || amount <= 0) {
+        alert('Please enter a valid amount.');
         return;
     }
     
@@ -208,7 +239,6 @@ function updateUserBalance() {
                     break;
             }
             
-            // Update balance
             return userRef.update({
                 balance: newBalance,
                 lastBalanceUpdate: firebase.firestore.FieldValue.serverTimestamp()
@@ -227,22 +257,23 @@ function updateUserBalance() {
                 });
             });
         } else {
-            alert('User not found!');
+            throw new Error('User not found');
         }
     }).then(() => {
-        alert('Balance updated successfully!');
+        alert('✅ Balance updated successfully!');
         document.getElementById('balanceAmount').value = '';
         document.getElementById('balanceReason').value = '';
-        loadUsers(); // Refresh users list
-        loadDashboardStats(); // Refresh stats
+        loadUsers();
+        loadDashboardStats();
     }).catch((error) => {
         console.error('Error updating balance:', error);
-        alert('Error updating balance. Please try again.');
+        alert('❌ Error: ' + error.message);
     });
 }
 
 function toggleUserBlock(userId, block) {
-    if (!confirm(`Are you sure you want to ${block ? 'block' : 'unblock'} this user?`)) {
+    const action = block ? 'block' : 'unblock';
+    if (!confirm(`Are you sure you want to ${action} this user?`)) {
         return;
     }
     
@@ -250,27 +281,16 @@ function toggleUserBlock(userId, block) {
         isBlocked: block,
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-        alert(`User ${block ? 'blocked' : 'unblocked'} successfully!`);
+        alert(`✅ User ${action}ed successfully!`);
         loadUsers();
     }).catch((error) => {
         console.error('Error updating user:', error);
-        alert('Error updating user status.');
+        alert('❌ Error updating user status.');
     });
 }
 
-function deleteUser(userId) {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-        return;
-    }
-    
-    firebase.firestore().collection('users').doc(userId).delete().then(() => {
-        alert('User deleted successfully!');
-        loadUsers();
-        loadDashboardStats();
-    }).catch((error) => {
-        console.error('Error deleting user:', error);
-        alert('Error deleting user.');
-    });
+function editUser(userId) {
+    alert('Edit user functionality coming soon!');
 }
 
 // Investment Plans Management
@@ -278,22 +298,28 @@ function loadPlans() {
     const plansRef = firebase.firestore().collection('investmentPlans');
     const plansList = document.getElementById('plansList');
     
-    plansList.innerHTML = '<p>Loading investment plans...</p>';
+    plansList.innerHTML = '<div style="text-align: center; padding: 20px;">Loading investment plans...</div>';
     
     plansRef.orderBy('isVIP', 'desc').orderBy('minAmount', 'asc').get().then((snapshot) => {
         if (snapshot.empty) {
-            plansList.innerHTML = '<p>No investment plans found. <button class="submit-btn" onclick="showAddPlanForm()">Create First Plan</button></p>';
+            plansList.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <p>No investment plans found.</p>
+                    <button class="submit-btn" onclick="showAddPlanForm()">Create First Plan</button>
+                </div>
+            `;
             return;
         }
         
-        plansList.innerHTML = '<h4>Investment Plans</h4>';
+        plansList.innerHTML = '<h4>📊 Investment Plans</h4>';
         snapshot.forEach(doc => {
             const plan = doc.data();
             const planCard = document.createElement('div');
             planCard.className = 'card';
+            planCard.style.marginBottom = '15px';
             planCard.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
+                    <div style="flex: 1;">
                         <h4>${plan.name} ${plan.isVIP ? '🌟 VIP' : ''}</h4>
                         <p><strong>Investment:</strong> ₹${plan.minAmount.toLocaleString()} - ₹${plan.maxAmount.toLocaleString()}</p>
                         <p><strong>Daily Return:</strong> ${plan.dailyReturn}%</p>
@@ -306,21 +332,20 @@ function loadPlans() {
                         <button class="action-btn ${plan.isActive ? 'block-btn' : 'edit-btn'}" onclick="togglePlanStatus('${doc.id}', ${!plan.isActive})">
                             ${plan.isActive ? 'Deactivate' : 'Activate'}
                         </button>
-                        <button class="action-btn delete-btn" onclick="deletePlan('${doc.id}')">Delete</button>
                     </div>
                 </div>
             `;
             plansList.appendChild(planCard);
         });
         
-        // Add button to create new plan
         const addButton = document.createElement('div');
         addButton.style.marginTop = '20px';
         addButton.innerHTML = '<button class="submit-btn" onclick="showAddPlanForm()">➕ Add New Investment Plan</button>';
         plansList.appendChild(addButton);
+        
     }).catch((error) => {
         console.error('Error loading plans:', error);
-        plansList.innerHTML = '<p>Error loading investment plans.</p>';
+        plansList.innerHTML = '<div style="text-align: center; color: red;">Error loading investment plans</div>';
     });
 }
 
@@ -330,27 +355,27 @@ function showAddPlanForm() {
             <h4>Create New Investment Plan</h4>
             <div class="form-group">
                 <label>Plan Name</label>
-                <input type="text" id="planName" placeholder="Enter plan name">
+                <input type="text" id="planName" placeholder="Enter plan name" class="form-control">
             </div>
             <div class="form-group">
                 <label>Minimum Investment (₹)</label>
-                <input type="number" id="planMinAmount" placeholder="Minimum investment amount">
+                <input type="number" id="planMinAmount" placeholder="Minimum investment amount" class="form-control">
             </div>
             <div class="form-group">
                 <label>Maximum Investment (₹)</label>
-                <input type="number" id="planMaxAmount" placeholder="Maximum investment amount">
+                <input type="number" id="planMaxAmount" placeholder="Maximum investment amount" class="form-control">
             </div>
             <div class="form-group">
                 <label>Daily Return (%)</label>
-                <input type="number" id="planDailyReturn" placeholder="Daily return percentage" step="0.01">
+                <input type="number" id="planDailyReturn" placeholder="Daily return percentage" step="0.01" class="form-control">
             </div>
             <div class="form-group">
                 <label>Plan Duration (days)</label>
-                <input type="number" id="planDuration" placeholder="Duration in days">
+                <input type="number" id="planDuration" placeholder="Duration in days" class="form-control">
             </div>
             <div class="form-group">
                 <label>Total Return (%)</label>
-                <input type="number" id="planTotalReturn" placeholder="Auto-calculated" readonly>
+                <input type="number" id="planTotalReturn" placeholder="Auto-calculated" readonly class="form-control">
             </div>
             <div class="form-group">
                 <label>
@@ -359,11 +384,11 @@ function showAddPlanForm() {
             </div>
             <div class="form-group">
                 <label>Plan Description</label>
-                <textarea id="planDescription" placeholder="Describe this plan"></textarea>
+                <textarea id="planDescription" placeholder="Describe this plan" class="form-control"></textarea>
             </div>
             <div class="control-actions">
                 <button class="submit-btn" onclick="saveNewPlan()">💾 Save Plan</button>
-                <button class="action-btn block-btn" onclick="cancelAddPlan()">Cancel</button>
+                <button class="action-btn block-btn" onclick="loadPlans()">Cancel</button>
             </div>
         </div>
     `;
@@ -412,63 +437,76 @@ function saveNewPlan() {
         loadPlans();
     }).catch((error) => {
         console.error('Error adding plan:', error);
-        alert('Error creating plan: ' + error.message);
+        alert('❌ Error creating plan: ' + error.message);
     });
 }
 
 function editPlan(planId) {
-    const planRef = firebase.firestore().collection('investmentPlans').doc(planId);
+    alert('Edit plan functionality coming soon!');
+}
+
+function togglePlanStatus(planId, newStatus) {
+    const action = newStatus ? 'activate' : 'deactivate';
+    if (!confirm(`Are you sure you want to ${action} this plan?`)) {
+        return;
+    }
     
-    planRef.get().then((doc) => {
-        if (doc.exists) {
-            const plan = doc.data();
-            const editForm = `
-                <div class="card">
-                    <h4>Edit Investment Plan</h4>
-                    <div class="form-group">
-                        <label>Plan Name</label>
-                        <input type="text" id="editPlanName" value="${plan.name}">
-                    </div>
-                    <div class="form-group">
-                        <label>Minimum Investment (₹)</label>
-                        <input type="number" id="editPlanMinAmount" value="${plan.minAmount}">
-                    </div>
-                    <div class="form-group">
-                        <label>Maximum Investment (₹)</label>
-                        <input type="number" id="editPlanMaxAmount" value="${plan.maxAmount}">
-                    </div>
-                    <div class="form-group">
-                        <label>Daily Return (%)</label>
-                        <input type="number" id="editPlanDailyReturn" value="${plan.dailyReturn}" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label>Plan Duration (days)</label>
-                        <input type="number" id="editPlanDuration" value="${plan.duration}">
-                    </div>
-                    <div class="form-group">
-                        <label>Total Return (%)</label>
-                        <input type="number" id="editPlanTotalReturn" value="${plan.totalReturn || plan.dailyReturn * plan.duration}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="editPlanIsVIP" ${plan.isVIP ? 'checked' : ''}> VIP Plan
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Plan Description</label>
-                        <textarea id="editPlanDescription">${plan.description || ''}</textarea>
-                    </div>
-                    <div class="control-actions">
-                        <button class="submit-btn" onclick="updatePlan('${planId}')">💾 Update Plan</button>
-                        <button class="action-btn block-btn" onclick="loadPlans()">Cancel</button>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('plansList').innerHTML = editForm;
-            
-            // Auto-calculate total return
-            document.getElementById('editPlanDailyReturn').addEventListener('input', function() {
-                const dailyReturn = parseFloat(this.value) || 0;
-                const duration = parseInt(document.getElementById('editPlanDuration').value) || 0;
-                document.
+    firebase.firestore().collection('investmentPlans').doc(planId).update({
+        isActive: newStatus,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert(`✅ Plan ${action}d successfully!`);
+        loadPlans();
+    }).catch((error) => {
+        console.error('Error updating plan status:', error);
+        alert('❌ Error updating plan status.');
+    });
+}
+
+function saveSystemSettings() {
+    const settings = {
+        commission1: parseInt(document.getElementById('commission1').value) || 21,
+        commission2: parseInt(document.getElementById('commission2').value) || 3,
+        commission3: parseInt(document.getElementById('commission3').value) || 1,
+        minWithdrawal: parseInt(document.getElementById('minWithdrawal').value) || 100,
+        maxWithdrawal: parseInt(document.getElementById('maxWithdrawal').value) || 50000,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    firebase.firestore().collection('systemSettings').doc('commissionRates').set(settings)
+    .then(() => {
+        alert('✅ Settings saved successfully!');
+    })
+    .catch((error) => {
+        console.error('Error saving settings:', error);
+        alert('❌ Error saving settings.');
+    });
+}
+
+function logoutControl() {
+    if (confirm('Are you sure you want to logout from admin panel?')) {
+        console.log('Logging out admin...');
+        firebase.auth().signOut().then(() => {
+            console.log('Admin logged out successfully');
+            window.location.href = 'system-control.html';
+        }).catch((error) => {
+            console.error('Logout error:', error);
+            alert('Logout failed. Please try again.');
+        });
+    }
+}
+
+// Add CSS for status badges
+const style = document.createElement('style');
+style.textContent = `
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: bold;
+    }
+    .status-badge.active {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-badge.blocke
