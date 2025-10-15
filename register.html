@@ -1,48 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Adani Corporation - Register</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="your-styles.css"> <!-- Your CSS file -->
 </head>
 <body class="auth-page-background">
+    <div class="auth-container-wrapper">
+        <!-- Welcome Section -->
+        <div class="auth-header">
+            <h1>Registration</h1>
+            <p>Welcome to Our Platform!</p>
+            <p>Join us today and start your journey!</p>
+            <p>Create your account in simple steps.</p>
+            <a href="login.html" class="header-link">Already have account?</a>
+        </div>
 
-    <main class="auth-container">
-        <div class="auth-card">
-            <h2>Create Your Account</h2>
+        <!-- Registration Form -->
+        <div class="auth-content">
+            <h2>Create Account</h2>
             <form id="registerForm">
                 <div class="input-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-                </div>
-                <div class="input-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" required>
-                </div>
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="••••••••" required>
-                </div>
-                <div class="input-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                    <input type="text" id="regUsername" placeholder="User name" required>
                 </div>
                 
-                <button type="submit" id="registerBtn" class="submit-btn">Register</button>
-            </form>
-            <p class="auth-switch">Already have an account? <a href="login.html">Log In</a></p>
-        </div>
-    </main>
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email address" required>
+                </div>
+                
+                <div class="input-group">
+                    <div class="password-wrapper">
+                        <input type="password" id="regPassword" placeholder="Password" required>
+                        <span class="password-toggle-icon">👁️</span>
+                    </div>
+                </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="firebaseConfig.js"></script>
-    <script src="script-auth.js"></script>
+                <div class="input-group">
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                        <span class="password-toggle-icon">👁️</span>
+                    </div>
+                </div>
+
+                <div class="input-group" style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                    <input type="checkbox" id="regFingerprint" style="width: auto;">
+                    <label for="regFingerprint" style="margin: 0;">Enable Finger password</label>
+                </div>
+
+                <div class="input-group" style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                    <input type="checkbox" id="terms" style="width: auto;" required>
+                    <label for="terms" style="margin: 0;">I agree to Terms & Conditions</label>
+                </div>
+
+                <button type="submit" class="submit-btn">Register</button>
+
+                <div class="social-login">
+                    <p>Or register with social platforms</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon">f</a> <!-- Facebook -->
+                        <a href="#" class="social-icon">G</a> <!-- Google -->
+                        <a href="#" class="social-icon">t</a> <!-- Twitter -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="login.html" style="color: #6A7BFF; text-decoration: none;">
+                        Already have an account? Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Password toggle functionality
+        document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const passwordInput = this.parentElement.querySelector('input');
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🔒';
+            });
+        });
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Add your registration logic here
+            alert('Registration functionality would be implemented here');
+        });
+    </script>
 </body>
 </html>
