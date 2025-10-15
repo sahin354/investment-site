@@ -678,44 +678,43 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border-color: #6A7BFF;
 }
 
-/* === AUTH PAGES SPECIFIC STYLES === */
-/* These styles only apply to login and register pages */
+/* === ENHANCED AUTH PAGES STYLES ONLY === */
+/* These styles only affect login and register pages */
 .auth-page-background {
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    padding: 20px !important;
 }
 
 .auth-container-wrapper {
     width: 100%;
     max-width: 420px;
-    background-color: #FFFFFF;
-    border-radius: 24px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     overflow: hidden;
 }
 
 .auth-header {
-    background-color: #6A7BFF;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 40px 30px;
     text-align: center;
-    border-bottom-left-radius: 60px;
 }
 
 .auth-header h1 {
-    margin: 0 0 10px 0;
-    font-size: 2.5em;
+    margin: 0 0 15px 0;
+    font-size: 2.2em;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .auth-header p {
-    margin: 5px 0;
-    font-size: 1.1em;
+    margin: 8px 0;
+    font-size: 1em;
     opacity: 0.9;
 }
 
@@ -724,325 +723,41 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     margin-top: 20px;
     padding: 10px 25px;
     border: 2px solid white;
-    border-radius: 30px;
+    border-radius: 25px;
     color: white;
     text-decoration: none;
     font-weight: 600;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.auth-header .header-link:hover {
-    background-color: white;
-    color: #6A7BFF;
-}
-
-.auth-content {
-    padding: 40px 30px;
-}
-
-.auth-content h2 {
-    text-align: center;
-    font-size: 2em;
-    color: #333;
-    margin-bottom: 30px;
-}
-
-/* Input styles specific to auth pages */
-.auth-page-background .input-group {
-    margin-bottom: 20px;
-}
-
-.auth-page-background .input-group input {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #E0E0E0;
-    border-radius: 12px;
     font-size: 1em;
-    background-color: #F9F9F9;
-    transition: all 0.3s;
-}
-
-.auth-page-background .input-group input:focus {
-    outline: none;
-    border-color: #6A7BFF;
-    background-color: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(106, 123, 255, 0.1);
-}
-
-.auth-page-background .password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.auth-page-background .password-toggle-icon {
-    position: absolute;
-    right: 15px;
-    cursor: pointer;
-    color: #999;
-    font-size: 1.2em;
-    user-select: none;
-}
-
-.auth-page-background .auth-options {
-    text-align: right;
-    margin-top: -10px;
-    margin-bottom: 25px;
-}
-
-.auth-page-background .auth-options .forgot-password {
-    color: #6A7BFF;
-    text-decoration: none;
-    font-size: 0.9em;
-    font-weight: 500;
-}
-
-/* Submit button specific to auth pages */
-.auth-page-background .submit-btn {
-    width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 12px;
-    background: #6A7BFF;
-    color: white;
-    font-size: 1.1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-}
-
-.auth-page-background .submit-btn:hover {
-    box-shadow: 0 5px 15px rgba(106, 123, 255, 0.4);
-    transform: translateY(-2px);
-}
-
-.auth-page-background .submit-btn:disabled {
-    background: #B0B8E0;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Social login specific to auth pages */
-.auth-page-background .social-login {
-    text-align: center;
-    margin-top: 30px;
-}
-
-.auth-page-background .social-login p {
-    color: #AAA;
-    margin-bottom: 20px;
-    font-size: 0.9em;
-}
-
-.auth-page-background .social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.auth-page-background .social-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 1px solid #E0E0E0;
-    text-decoration: none;
-    color: #555;
-    font-size: 1.2em;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-.auth-page-background .social-icon:hover {
-    background-color: #F5F5F5;
-    color: #6A7BFF;
-    border-color: #6A7BFF;
-    transform: translateY(-2px);
-}
-
-/* Checkbox styles for auth pages */
-.auth-page-background .fingerprint-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-    cursor: pointer;
-}
-
-.auth-page-background .fingerprint-option input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.auth-page-background .fingerprint-option label {
-    margin: 0;
-    cursor: pointer;
-    color: #555;
-}
-
-/* Terms and conditions checkbox */
-.auth-page-background .terms-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-    cursor: pointer;
-}
-
-.auth-page-background .terms-option input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.auth-page-background .terms-option label {
-    margin: 0;
-    cursor: pointer;
-    color: #555;
-    font-size: 0.9em;
-}
-
-/* Auth footer links */
-.auth-page-background .auth-footer-link {
-    text-align: center;
-    margin-top: 25px;
-    color: #666;
-    font-size: 0.9em;
-}
-
-.auth-page-background .auth-footer-link a {
-    color: #6A7BFF;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-/* Responsive design for auth pages */
-@media (max-width: 480px) {
-    .auth-container-wrapper {
-        margin: 10px;
-        border-radius: 20px;
-    }
-    
-    .auth-header {
-        padding: 30px 20px;
-        border-bottom-left-radius: 50px;
-    }
-    
-    .auth-header h1 {
-        font-size: 2em;
-    }
-    
-    .auth-content {
-        padding: 30px 20px;
-    }
-    
-    .auth-content h2 {
-        font-size: 1.7em;
-    }
-    
-    .auth-page-background .social-icons {
-        gap: 15px;
-    }
-    
-    .auth-page-background .social-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.1em;
-    }
-}
-
-/* Ensure these styles don't affect other pages */
-body:not(.auth-page-background) .auth-container-wrapper,
-body:not(.auth-page-background) .auth-header,
-body:not(.auth-page-background) .auth-content {
-    display: none;
-    }
-
-/* === ENHANCED AUTH STYLES (Matches Reference Image) === */
-.auth-page-background {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.auth-container-wrapper {
-    width: 100%;
-    max-width: 420px;
-    background-color: #FFFFFF;
-    border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-.auth-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 40px 30px;
-    text-align: center;
-    border-bottom-left-radius: 60px;
-}
-
-.auth-header h1 {
-    margin: 0 0 15px 0;
-    font-size: 2.5em;
-    font-weight: 800;
-    line-height: 1.1;
-}
-
-.auth-header p {
-    margin: 8px 0;
-    font-size: 1.1em;
-    opacity: 0.9;
-}
-
-.auth-header .header-link {
-    display: inline-block;
-    margin-top: 25px;
-    padding: 12px 30px;
-    border: 2px solid white;
-    border-radius: 30px;
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1em;
     transition: all 0.3s ease;
 }
 
 .auth-header .header-link:hover {
     background: white;
-    color: #667eea;
+    color: var(--primary-color);
 }
 
 .auth-content {
-    padding: 40px 30px;
+    padding: 35px 30px;
 }
 
 .auth-content h2 {
     text-align: center;
-    font-size: 2.2em;
+    font-size: 1.8em;
     color: #333;
-    margin-bottom: 30px;
-    font-weight: 700;
+    margin-bottom: 25px;
+    font-weight: 600;
 }
 
+/* Input styles specific to auth pages */
 .auth-page-background .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .auth-page-background .input-group input {
     width: 100%;
-    padding: 16px 20px;
+    padding: 14px 16px;
     border: 2px solid #e1e5ee;
-    border-radius: 12px;
+    border-radius: 8px;
     font-size: 1em;
     background: #f8f9fa;
     transition: all 0.3s ease;
@@ -1050,43 +765,43 @@ body:not(.auth-page-background) .auth-content {
 
 .auth-page-background .input-group input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary-color);
     background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
 }
 
 .auth-page-background .input-group input::placeholder {
     color: #999;
-    font-weight: 500;
 }
 
 .auth-page-background .password-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
 }
 
 .auth-page-background .password-toggle-icon {
     position: absolute;
     right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
     color: #888;
-    font-size: 1.3em;
+    font-size: 1.2em;
     user-select: none;
 }
 
+/* Fingerprint option */
 .fingerprint-option {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 20px 0;
-    padding: 10px 0;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 8px 0;
 }
 
 .fingerprint-option input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #667eea;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
     cursor: pointer;
 }
 
@@ -1095,16 +810,18 @@ body:not(.auth-page-background) .auth-content {
     font-weight: 500;
     cursor: pointer;
     margin: 0;
+    font-size: 0.95em;
 }
 
+/* Submit button for auth pages */
 .auth-page-background .submit-btn {
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1.2em;
+    border-radius: 8px;
+    font-size: 1.1em;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1113,7 +830,7 @@ body:not(.auth-page-background) .auth-content {
 
 .auth-page-background .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
 }
 
 .auth-page-background .submit-btn:disabled {
@@ -1123,9 +840,10 @@ body:not(.auth-page-background) .auth-content {
     box-shadow: none;
 }
 
+/* Divider */
 .divider {
     text-align: center;
-    margin: 30px 0;
+    margin: 25px 0;
     position: relative;
     color: #777;
     font-size: 0.9em;
@@ -1143,25 +861,26 @@ body:not(.auth-page-background) .auth-content {
 
 .divider span {
     background: white;
-    padding: 0 20px;
+    padding: 0 15px;
     position: relative;
     z-index: 1;
 }
 
+/* Social login */
 .social-login {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .social-icon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1169,27 +888,28 @@ body:not(.auth-page-background) .auth-content {
     border: 2px solid #e1e5ee;
     background: white;
     color: #555;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: bold;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .social-icon:hover {
-    transform: translateY(-3px);
-    border-color: #667eea;
-    color: #667eea;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Auth footer links */
 .auth-footer-link {
     text-align: center;
     color: #666;
-    font-size: 0.95em;
+    font-size: 0.9em;
 }
 
 .auth-footer-link a {
-    color: #667eea;
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 600;
 }
@@ -1198,27 +918,59 @@ body:not(.auth-page-background) .auth-content {
     text-decoration: underline;
 }
 
+/* Forgot password link */
+.auth-options {
+    text-align: right;
+    margin: -10px 0 15px 0;
+}
+
+.auth-options .forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.auth-options .forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Hide old auth container styles */
+.auth-page-background .auth-container,
+.auth-page-background .auth-card {
+    display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
     .auth-container-wrapper {
         margin: 10px;
-        border-radius: 20px;
+        border-radius: 12px;
     }
     
     .auth-header {
         padding: 30px 20px;
-        border-bottom-left-radius: 50px;
     }
     
     .auth-header h1 {
-        font-size: 2em;
+        font-size: 1.8em;
     }
     
     .auth-content {
-        padding: 30px 20px;
+        padding: 25px 20px;
     }
     
     .auth-content h2 {
-        font-size: 1.8em;
+        font-size: 1.6em;
     }
-}
+    
+    .social-icons {
+        gap: 12px;
+    }
+    
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1em;
+    }
+    }
