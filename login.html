@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="your-styles.css"> <!-- Your CSS file -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adani Corporation - Login</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body class="auth-page-background">
     <div class="auth-container-wrapper">
@@ -17,61 +17,51 @@
             <a href="register.html" class="header-link">Create Account</a>
         </div>
 
-        <!-- Login Form -->
+        <!-- Login Form Section -->
         <div class="auth-content">
             <h2>Login</h2>
             <form id="loginForm">
                 <div class="input-group">
-                    <input type="text" id="username" placeholder="User name" required>
+                    <input type="text" id="loginId" name="loginId" placeholder="User name" required>
                 </div>
                 
                 <div class="input-group">
                     <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Password" required>
-                        <span class="password-toggle-icon">👁️</span>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <span id="togglePassword" class="password-toggle-icon">👁️</span>
                     </div>
                 </div>
 
-                <div class="input-group" style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
-                    <input type="checkbox" id="fingerprint" style="width: auto;">
-                    <label for="fingerprint" style="margin: 0;">Finger password</label>
+                <div class="fingerprint-option">
+                    <input type="checkbox" id="fingerprint">
+                    <label for="fingerprint">Finger password</label>
                 </div>
 
                 <button type="submit" class="submit-btn">Login</button>
 
+                <div class="divider">
+                    <span>Or login with social platforms</span>
+                </div>
+
                 <div class="social-login">
-                    <p>Or login with social platforms</p>
                     <div class="social-icons">
-                        <a href="#" class="social-icon">f</a> <!-- Facebook -->
-                        <a href="#" class="social-icon">G</a> <!-- Google -->
-                        <a href="#" class="social-icon">t</a> <!-- Twitter -->
+                        <a href="#" class="social-icon">f</a>
+                        <a href="#" class="social-icon">G</a>
+                        <a href="#" class="social-icon">t</a>
                     </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="register.html" style="color: #6A7BFF; text-decoration: none;">
-                        Don't have an account? Register
-                    </a>
+                <div class="auth-footer-link">
+                    Don't have an account? <a href="register.html">Register</a>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
-        // Password toggle functionality
-        document.querySelector('.password-toggle-icon').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-
-        // Form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            // Add your login logic here
-            alert('Login functionality would be implemented here');
-        });
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="firebaseConfig.js"></script>
+    <script src="script-auth.js"></script>
 </body>
 </html>
