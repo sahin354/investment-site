@@ -81,21 +81,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .plan-details h4 { margin: 0 0 5px 0; }
 .plan-details p { margin: 5px 0; font-size: 0.9em; color: var(--text-light); }
 .buy-btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; align-self: center; margin-right: 15px; border-radius: 6px; }
-/* --- Auth Pages (login.html, register.html) --- */
-.auth-page-background { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-.auth-container { width: 100%; max-width: 400px; padding: 20px; }
-.auth-card { background: #ffffff; padding: 30px 25px; border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); }
-.auth-card h2 { text-align: center; margin-top: 0; margin-bottom: 25px; color: var(--text-dark); font-size: 1.6em; }
-.input-group { margin-bottom: 20px; }
-.input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
-.input-group input { width: 100%; padding: 12px 15px; border: 1px solid #dce4f0; border-radius: 8px; font-size: 1em; }
-.password-wrapper { position: relative; display: flex; align-items: center; }
-/* REMOVED: password-wrapper input padding-right: 40px - THIS FIXES THE GAP */
-.password-toggle-icon { position: absolute; right: 12px; cursor: pointer; user-select: none; font-size: 1.2em; color: #888; }
-.form-options { text-align: right; margin-bottom: 15px; }
-.form-options a { color: #555; font-size: 0.9em; text-decoration: none; }
-.auth-switch { text-align: center; margin-top: 20px; font-size: 0.9em; color: #555; }
-.auth-switch a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
 /* --- Refer Page (refer.html) --- */
 .refer-page-container { padding: 15px; }
 .refer-main-card h2 { margin-top: 0; }
@@ -279,121 +264,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 
 .buy-btn:hover {
     background: var(--secondary-color);
-}
-
-/* VIP Plan Styling */
-.plan-card:has(h4:contains('VIP')) {
-    border: 2px solid #ffd700;
-    background: linear-gradient(135deg, #fffaf0, #fff5e6);
-}
-
-/* Progress Bars */
-.progress-bar {
-    background: #f0f0f0;
-    border-radius: 10px;
-    height: 8px;
-    margin: 10px 0;
-}
-
-.progress-fill {
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    height: 100%;
-    border-radius: 10px;
-    transition: width 0.3s ease;
-}
-
-/* --- Modern Investment Plan Card Styles --- */
-
-.plan-card {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-    margin: 15px 0;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.plan-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.plan-card.vip {
-    border-left: 5px solid #9b59b6; /* A distinct color for VIP plans */
-}
-
-.plan-card-header {
-    border-bottom: 1px solid #f1f1f1;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    position: relative; /* For VIP badge positioning */
-}
-
-.plan-card-header h3 {
-    margin: 0;
-    font-size: 1.4em;
-    color: #1a237e; /* Matches your admin panel theme */
-}
-
-.vip-badge {
-    position: absolute;
-    top: -5px;
-    right: 0;
-    background-color: #9b59b6;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 0.75em;
-    font-weight: bold;
-}
-
-.plan-card-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Creates a clean 2x2 grid */
-    gap: 18px;
-    flex-grow: 1; /* Allows the body to take up available space */
-}
-
-.plan-detail {
-    display: flex;
-    flex-direction: column;
-}
-
-.plan-label {
-    font-size: 0.8em;
-    color: #6c757d; /* Muted color for labels */
-    margin-bottom: 4px;
-}
-
-.plan-value {
-    font-size: 1.3em;
-    font-weight: 600;
-    color: #343a40;
-}
-
-.plan-card-footer {
-    margin-top: 20px;
-}
-
-.buy-button {
-    width: 100%;
-    background: linear-gradient(135deg, #1a237e, #283593);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.buy-button:hover {
-    background: linear-gradient(135deg, #161d6a, #212b7a);
-    transform: scale(1.02);
 }
 
 /* === ENHANCED AUTH PAGES STYLES ONLY === */
@@ -652,4 +522,21 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     .auth-container-wrapper {
         margin: 10px;
         max-width: 350px;
-   
+    }
+    
+    .auth-header {
+        padding: 25px 20px;
+    }
+    
+    .company-name {
+        font-size: 2.4em;
+    }
+    
+    .auth-content {
+        padding: 20px;
+    }
+    
+    .auth-content h2 {
+        font-size: 1.5em;
+    }
+}
