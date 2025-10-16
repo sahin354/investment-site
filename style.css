@@ -686,12 +686,12 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-    padding: 20px !important;
+    padding: 15px !important;
 }
 
 .auth-container-wrapper {
     width: 100%;
-    max-width: 420px;
+    max-width: 380px;
     background: #ffffff;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -701,18 +701,23 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .auth-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: 40px 30px;
+    padding: 30px 25px;
     text-align: center;
 }
 
-.auth-header h1 {
-    margin: 0 0 15px 0;
-    font-size: 2.2em;
-    font-weight: 700;
-    line-height: 1.2;
+.company-name {
+    font-size: 2.8em;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    background: linear-gradient(45deg, #fff, #e3f2fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
 }
 
-.auth-header p {
+.auth-header .welcome-text {
     margin: 8px 0;
     font-size: 1em;
     opacity: 0.9;
@@ -720,14 +725,14 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 
 .auth-header .header-link {
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 15px;
     padding: 10px 25px;
     border: 2px solid white;
     border-radius: 25px;
     color: white;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1em;
+    font-size: 0.95em;
     transition: all 0.3s ease;
 }
 
@@ -737,20 +742,20 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 }
 
 .auth-content {
-    padding: 35px 30px;
+    padding: 25px;
 }
 
 .auth-content h2 {
     text-align: center;
-    font-size: 1.8em;
+    font-size: 1.6em;
     color: #333;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 /* Input styles specific to auth pages */
 .auth-page-background .input-group {
-    margin-bottom: 18px;
+    margin-bottom: 15px;
 }
 
 .auth-page-background .input-group input {
@@ -843,7 +848,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 /* Divider */
 .divider {
     text-align: center;
-    margin: 25px 0;
+    margin: 20px 0;
     position: relative;
     color: #777;
     font-size: 0.9em;
@@ -869,18 +874,18 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 /* Social login */
 .social-login {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .social-icon {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -888,7 +893,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border: 2px solid #e1e5ee;
     background: white;
     color: #555;
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: bold;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -918,23 +923,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     text-decoration: underline;
 }
 
-/* Forgot password link */
-.auth-options {
-    text-align: right;
-    margin: -10px 0 15px 0;
-}
-
-.auth-options .forgot-password {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-size: 0.9em;
-    font-weight: 500;
-}
-
-.auth-options .forgot-password:hover {
-    text-decoration: underline;
-}
-
 /* Hide old auth container styles */
 .auth-page-background .auth-container,
 .auth-page-background .auth-card {
@@ -945,32 +933,22 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 @media (max-width: 480px) {
     .auth-container-wrapper {
         margin: 10px;
-        border-radius: 12px;
+        max-width: 350px;
     }
     
     .auth-header {
-        padding: 30px 20px;
-    }
-    
-    .auth-header h1 {
-        font-size: 1.8em;
-    }
-    
-    .auth-content {
         padding: 25px 20px;
     }
     
+    .company-name {
+        font-size: 2.4em;
+    }
+    
+    .auth-content {
+        padding: 20px;
+    }
+    
     .auth-content h2 {
-        font-size: 1.6em;
-    }
-    
-    .social-icons {
-        gap: 12px;
-    }
-    
-    .social-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1em;
+        font-size: 1.5em;
     }
     }
