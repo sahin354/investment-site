@@ -960,7 +960,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 
 .auth-page-background .password-toggle-icon {
     position: absolute;
-    right: 15px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
