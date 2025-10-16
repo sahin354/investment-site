@@ -952,3 +952,23 @@ body.sidebar-open .side-menu { transform: translateX(0); }
         font-size: 1.5em;
     }
     }
+
+/* Fix password section gap */
+.auth-page-background .password-wrapper input {
+    padding-right: 45px !important;
+}
+
+.auth-page-background .password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 1.2em;
+    user-select: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+        }
