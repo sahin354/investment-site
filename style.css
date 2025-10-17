@@ -63,7 +63,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-id { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
 .sidebar-vip { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
 .sidebar-actions { flex-grow: 1; padding-top: 15px; }
-.sidebar-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 15px 20px; background-color: transparent; border: nothing; text-align: left; font-size: 1em; color: #333; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; }
+.sidebar-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 15px 20px; background-color: transparent; border: none; text-align: left; font-size: 1em; color: #333; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; }
 .sidebar-btn:hover { background-color: var(--bg-light); color: var(--primary-color); }
 .sidebar-btn span { font-size: 1.4em; }
 .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
@@ -90,6 +90,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
 .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #dce4f0; border-radius: 8px; font-size: 1em; }
 .password-wrapper { position: relative; display: flex; align-items: center; }
+.password-wrapper input { padding-right: 40px; }
 .password-toggle-icon { position: absolute; right: 12px; cursor: pointer; user-select: none; font-size: 1.2em; color: #888; }
 .form-options { text-align: right; margin-bottom: 15px; }
 .form-options a { color: #555; font-size: 0.9em; text-decoration: none; }
@@ -301,277 +302,381 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     transition: width 0.3s ease;
 }
 
-/* === ENHANCED AUTH PAGES STYLES ONLY === */
-/* These styles only affect login and register pages with the new layout */
-body.auth-page-background {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+/* --- Modern Investment Plan Card Styles --- */
+
+.plan-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    margin: 15px 0;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card.vip {
+    border-left: 5px solid #9b59b6; /* A distinct color for VIP plans */
+}
+
+.plan-card-header {
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    position: relative; /* For VIP badge positioning */
+}
+
+.plan-card-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    color: #1a237e; /* Matches your admin panel theme */
+}
+
+.vip-badge {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    background-color: #9b59b6;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.plan-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Creates a clean 2x2 grid */
+    gap: 18px;
+    flex-grow: 1; /* Allows the body to take up available space */
+}
+
+.plan-detail {
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-label {
+    font-size: 0.8em;
+    color: #6c757d; /* Muted color for labels */
+    margin-bottom: 4px;
+}
+
+.plan-value {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.plan-card-footer {
+    margin-top: 20px;
+}
+
+.buy-button {
+    width: 100%;
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.buy-button:hover {
+    background: linear-gradient(135deg, #161d6a, #212b7a);
+    transform: scale(1.02);
+}
+
+/* --- Modern Auth Page Styles --- */
+.auth-page-background {
+    background-color: #f4f7f6;
+    font-family: 'Poppins', sans-serif; /* A modern font, add to your project if you like */
+}
+
+.auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    padding: 20px;
+}
+
+.auth-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-card h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #1a237e;
+    font-weight: 600;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #283593;
+    box-shadow: 0 0 0 3px rgba(40, 53, 147, 0.1);
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 18px;
+    cursor: pointer;
+    color: #888;
+    font-size: 1.2em;
+}
+
+.submit-btn {
+    width: 100%;
     padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a237e, #283593);
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(40, 53, 147, 0.3);
+}
+
+.submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.auth-footer-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.auth-footer-link a {
+    color: #1a237e;
+    text-decoration: none;
+    font-weight: 600;
+}
+/* --- NEW MODERN AUTH UI STYLES --- */
+
+.auth-page-background {
+    background-color: #F0F2F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .auth-container-wrapper {
     width: 100%;
-    max-width: 380px;
-    background: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 420px;
+    margin: 20px;
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
 .auth-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background-color: #6A7BFF; /* A nice modern blue/purple */
     color: white;
-    padding: 30px 25px;
+    padding: 40px 30px;
     text-align: center;
+    border-bottom-left-radius: 60px; /* The signature curve */
 }
 
-.company-name {
-    font-size: 2.8em;
-    font-weight: 800;
+.auth-header h1 {
     margin: 0 0 10px 0;
-    background: linear-gradient(45deg, #fff, #e3f2fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
-    letter-spacing: 1px;
+    font-size: 2.5em;
+    font-weight: 700;
 }
 
-.auth-header .welcome-text {
-    margin: 8px 0;
-    font-size: 1em;
+.auth-header p {
+    margin: 0;
+    font-size: 1.1em;
     opacity: 0.9;
 }
 
 .auth-header .header-link {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
     padding: 10px 25px;
     border: 2px solid white;
-    border-radius: 25px;
+    border-radius: 30px;
     color: white;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95em;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .auth-header .header-link:hover {
-    background: white;
-    color: var(--primary-color);
+    background-color: white;
+    color: #6A7BFF;
 }
 
 .auth-content {
-    padding: 25px;
+    padding: 40px 30px;
 }
 
 .auth-content h2 {
     text-align: center;
-    font-size: 1.6em;
+    font-size: 2em;
     color: #333;
+    margin-bottom: 30px;
+}
+
+.input-group {
     margin-bottom: 20px;
-    font-weight: 600;
 }
 
-/* Input styles specific to new auth pages */
-.auth-container-wrapper .input-group {
-    margin-bottom: 15px;
-}
-
-.auth-container-wrapper .input-group input {
+.input-group input {
     width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #e1e5ee;
-    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
     font-size: 1em;
-    background: #f8f9fa;
-    transition: all 0.3s ease;
+    background-color: #F9F9F9;
+    transition: all 0.3s;
 }
 
-.auth-container-wrapper .input-group input:focus {
+.input-group input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+    border-color: #6A7BFF;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 4px rgba(106, 123, 255, 0.1);
 }
 
-.auth-container-wrapper .input-group input::placeholder {
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
     color: #999;
 }
 
-.auth-container-wrapper .password-wrapper {
-    position: relative;
+.auth-options {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 25px;
 }
 
-.auth-container-wrapper .password-toggle-icon {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #888;
-    font-size: 1.2em;
-    user-select: none;
-}
-
-/* Fingerprint option */
-.auth-container-wrapper .fingerprint-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-    padding: 8px 0;
-}
-
-.auth-container-wrapper .fingerprint-option input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary-color);
-    cursor: pointer;
-}
-
-.auth-container-wrapper .fingerprint-option label {
-    color: #555;
+.auth-options .forgot-password {
+    color: #6A7BFF;
+    text-decoration: none;
+    font-size: 0.9em;
     font-weight: 500;
-    cursor: pointer;
-    margin: 0;
-    font-size: 0.95em;
 }
 
-/* Submit button for new auth pages */
-.auth-container-wrapper .submit-btn {
+.submit-btn {
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
+    padding: 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
+    background: #6A7BFF;
+    color: white;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
+    transition: all 0.3s;
 }
 
-.auth-container-wrapper .submit-btn:hover {
+.submit-btn:hover {
+    box-shadow: 0 5px 15px rgba(106, 123, 255, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
 }
 
-.auth-container-wrapper .submit-btn:disabled {
-    background: #cccccc;
+.submit-btn:disabled {
+    background: #B0B8E0;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
 }
 
-/* Divider */
-.auth-container-wrapper .divider {
+.social-login {
     text-align: center;
-    margin: 20px 0;
-    position: relative;
-    color: #777;
-    font-size: 0.9em;
+    margin-top: 30px;
 }
 
-.auth-container-wrapper .divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: #e1e5ee;
+.social-login p {
+    color: #AAA;
+    margin-bottom: 20px;
 }
 
-.auth-container-wrapper .divider span {
-    background: white;
-    padding: 0 15px;
-    position: relative;
-    z-index: 1;
-}
-
-/* Social login */
-.auth-container-wrapper .social-login {
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.auth-container-wrapper .social-icons {
+.social-icons {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 20px;
 }
 
-.auth-container-wrapper .social-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.social-icon {
     display: flex;
+    justify-content: center;
     align-items: center;
-    justify-content: center;
-    border: 2px solid #e1e5ee;
-    background: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid #E0E0E0;
+    text-decoration: none;
     color: #555;
-    font-size: 1em;
-    font-weight: bold;
-    text-decoration: none;
-    transition: all 0.3s ease;
+    font-size: 1.2em;
+    transition: all 0.3s;
 }
 
-.auth-container-wrapper .social-icon:hover {
-    transform: translateY(-2px);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+.social-icon:hover {
+    background-color: #F5F5F5;
+    color: #6A7BFF;
+    border-color: #6A7BFF;
 }
 
-/* Auth footer links */
-.auth-container-wrapper .auth-footer-link {
-    text-align: center;
-    color: #666;
-    font-size: 0.9em;
-}
-
-.auth-container-wrapper .auth-footer-link a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.auth-container-wrapper .auth-footer-link a:hover {
-    text-decoration: underline;
-}
-
-/* Hide old auth container styles when using new layout */
-.auth-container-wrapper ~ .auth-container,
-.auth-container-wrapper ~ .auth-card {
-    display: none;
-}
-
-/* Responsive Design for auth pages */
-@media (max-width: 480px) {
-    .auth-container-wrapper {
-        margin: 10px;
-        max-width: 350px;
-    }
-    
-    .auth-header {
-        padding: 25px 20px;
-    }
-    
-    .company-name {
-        font-size: 2.4em;
-    }
-    
-    .auth-content {
-        padding: 20px;
-    }
-    
-    .auth-content h2 {
-        font-size: 1.5em;
-    }
-}
+/* === ENHANCED AUTH PAGES STYLES ONLY === */
+/* These styles only affect login and register pages
