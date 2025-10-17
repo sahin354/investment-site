@@ -1,4 +1,4 @@
-// Enhanced Referral System with Earnings Tracking
+// Enhanced Referral System with Modern UI
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const redeemAmountEl = document.getElementById('redeemAmount');
     const successMessageEl = document.getElementById('successMessage');
 
+    // Friend List Elements
+    const friendListEl = document.getElementById('friend-list');
+    const tabs = document.querySelectorAll('.tab');
+
     let currentUserData = null;
     let userReferralCode = '';
 
@@ -46,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Load all data
                     fetchTeamData(db, userReferralCode);
                     calculateEarnings(user.uid);
+                    loadFriendList('all');
                     setupEventListeners();
                 }
             });
@@ -53,6 +58,50 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'login.html';
         }
     });
+
+    // Load friend list
+    function loadFriendList(filter) {
+        // This would typically come from your backend
+        // For now, using sample data
+        const sampleFriends = [
+            { name: "Hariram Manglaw", phone: "9980989304", status: "invited" },
+            { name: "Santu Dey", phone: "8985689809", status: "invited" },
+            { name: "Mauhet Verma", phone: "8943870809", status: "joined" }
+        ];
+
+        friendListEl.innerHTML = '';
+        
+        const filteredFriends = sampleFriends.filter(friend => {
+            if (filter === 'all') return true;
+            if (filter === 'joined') return friend.status === 'joined';
+            return false;
+        });
+
+        if (filteredFriends.length === 0) {
+            friendListEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No friends found</p>';
+            return;
+        }
+
+        filteredFriends.forEach(friend => {
+            const friendItem = document.createElement('div');
+            friendItem.className = 'friend-item';
+            
+            const initials = friend.name.split(' ').map(n => n[0]).join('');
+            
+            friendItem.innerHTML = `
+                <div class="friend-avatar">${initials}</div>
+                <div class="friend-info">
+                    <div class="friend-name">${friend.name}</div>
+                    <div class="friend-phone">${friend.phone}</div>
+                </div>
+                <button class="invite-btn">
+                    ${friend.status === 'joined' ? 'Joined' : 'Invite 💹'}
+                </button>
+            `;
+            
+            friendListEl.appendChild(friendItem);
+        });
+    }
 
     // Fetch team data for all levels
     async function fetchTeamData(db, userReferralCode) {
@@ -217,7 +266,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Setup event listeners
     function setupEventListeners() {
-        // Tab switching
+        // Tab switching for friends
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabType = this.getAttribute('data-tab');
+                loadFriendList(tabType);
+            });
+        });
+
+        // Tab switching for team
         document.querySelectorAll('.team-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
@@ -233,10 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('copyLinkBtn').addEventListener('click', function() {
             const referralLink = document.getElementById('referralLink').textContent;
             navigator.clipboard.writeText(referralLink).then(() => {
-                const originalText = this.querySelector('span').textContent;
-                this.querySelector('span').textContent = 'Copied!';
+                const originalText = this.textContent;
+                this.textContent = 'Copied!';
                 setTimeout(() => {
-                    this.querySelector('span').textContent = originalText;
+                    this.textContent = originalText;
                 }, 2000);
             });
         });
