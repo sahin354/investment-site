@@ -680,3 +680,31 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 
 /* === ENHANCED AUTH PAGES STYLES ONLY === */
 /* These styles only affect login and register pages
+
+/* Styling for grouped input fields */
+.input-field-group .input-group {
+    margin-bottom: 0; /* Removes the gap between fields */
+}
+
+/* Makes the borders collapse on top of each other */
+.input-field-group .input-group:not(:first-child) {
+    margin-top: -1px; 
+}
+
+/* Removes rounded corners from all inputs in the group initially */
+.input-field-group .input-group input {
+    border-radius: 0;
+}
+
+/* Applies rounded corners to the TOP of the FIRST input */
+.input-field-group .input-group:first-child input {
+    border-top-left-radius: 8px; /* You can adjust this value */
+    border-top-right-radius: 8px; /* You can adjust this value */
+}
+
+/* Applies rounded corners to the BOTTOM of the LAST input */
+.input-field-group .input-group:last-child input {
+    border-bottom-left-radius: 8px; /* You can adjust this value */
+    border-bottom-right-radius: 8px; /* You can adjust this value */
+        }
+        
