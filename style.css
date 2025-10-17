@@ -707,4 +707,196 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border-bottom-left-radius: 8px; /* You can adjust this value */
     border-bottom-right-radius: 8px; /* You can adjust this value */
         }
-        
+
+/* Enhanced Referral System Styles */
+
+/* Earnings Dashboard */
+.earnings-dashboard {
+    margin-bottom: 20px;
+}
+
+.earnings-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.earnings-box {
+    flex: 1;
+    text-align: center;
+    padding: 15px 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.earnings-label {
+    font-size: 0.8em;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.earnings-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #1e293b;
+}
+
+/* Bonus Info */
+.bonus-info {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.bonus-levels {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+
+.bonus-level {
+    text-align: center;
+}
+
+.bonus-percent {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.bonus-label {
+    font-size: 0.8em;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+/* My Earnings Button */
+.my-earnings-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+/* Modals */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--text-dark);
+}
+
+/* Earnings Stats */
+.earnings-stats {
+    margin-bottom: 20px;
+}
+
+.earning-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.earning-stat:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: #64748b;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+/* Modal Buttons */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-btn.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.modal-btn.secondary {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+/* Team Lists for All Levels */
+.team-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.team-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.team-list-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .earnings-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .bonus-levels {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-content {
+        margin: 20px;
+        padding: 20px;
+    }
+}
