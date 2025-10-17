@@ -1,20 +1,13 @@
-// Enhanced Referral System with Modern UI
+// Enhanced Referral System with Clean Layout
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
     
     // DOM Elements
-    const level1CountEl = document.getElementById('level1Count');
-    const level1ListEl = document.getElementById('level1List');
-    const level2CountEl = document.getElementById('level2Count');
-    const level2ListEl = document.getElementById('level2List');
-    const level3CountEl = document.getElementById('level3Count');
-    const level3ListEl = document.getElementById('level3List');
-    
-    // Earnings Elements
     const totalRewardEl = document.getElementById('total-reward');
     const availableRewardEl = document.getElementById('available-reward');
     const lockedRewardEl = document.getElementById('locked-reward');
+    const totalReferralsCountEl = document.getElementById('total-referrals-count');
     const redeemBtn = document.getElementById('redeem-btn');
     const myEarningsBtn = document.getElementById('myEarningsBtn');
     
@@ -31,10 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Friend List Elements
     const friendListEl = document.getElementById('friend-list');
-    const tabs = document.querySelectorAll('.tab');
+    const friendTabs = document.querySelectorAll('.friend-tab');
 
     let currentUserData = null;
     let userReferralCode = '';
+    let allFriends = [];
 
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -48,9 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     referralLinkEl.textContent = `${window.location.origin}?ref=${userReferralCode}`;
                     
                     // Load all data
-                    fetchTeamData(db, userReferralCode);
                     calculateEarnings(user.uid);
-                    loadFriendList('all');
+                    loadFriendData(userReferralCode);
                     setupEventListeners();
                 }
             });
@@ -59,19 +52,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Load friend list
-    function loadFriendList(filter) {
-        // This would typically come from your backend
-        // For now, using sample data
-        const sampleFriends = [
-            { name: "Hariram Manglaw", phone: "9980989304", status: "invited" },
-            { name: "Santu Dey", phone: "8985689809", status: "invited" },
-            { name: "Mauhet Verma", phone: "8943870809", status: "joined" }
-        ];
+    // Load friend data from referrals
+    async function loadFriendData(userReferralCode) {
+        try {
+            // Get level 1 referrals
+            const level1Query = await db.collection('users')
+                .where('referredBy', '==', userReferralCode)
+                .get();
 
+            allFriends = [];
+            
+            level1Query.forEach(doc => {
+                const friend = doc.data();
+                allFriends.push({
+                    name: friend.name || 'User',
+                    phone: friend.phone,
+                    status: friend.totalRechargeAmount > 0 ? 'joined' : 'invited',
+                    rechargeAmount: friend.totalRechargeAmount || 0
+                });
+            });
+
+            // Update total referrals count
+            totalReferralsCountEl.textContent = allFriends.length;
+            totalReferralsEl.textContent = allFriends.length;
+
+            // Load initial friend list
+            loadFriendList('all');
+
+        } catch (error) {
+            console.error('Error loading friend data:', error);
+        }
+    }
+
+    // Load friend list based on filter
+    function loadFriendList(filter) {
         friendListEl.innerHTML = '';
         
-        const filteredFriends = sampleFriends.filter(friend => {
+        const filteredFriends = allFriends.filter(friend => {
             if (filter === 'all') return true;
             if (filter === 'joined') return friend.status === 'joined';
             return false;
@@ -82,11 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        filteredFriends.forEach(friend => {
+        // Show only first few friends initially (like in screenshot)
+        const displayFriends = filteredFriends; // Remove slice to show all with scroll
+
+        displayFriends.forEach(friend => {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
             
-            const initials = friend.name.split(' ').map(n => n[0]).join('');
+            const initials = friend.name.split(' ').map(n => n[0]).join('').toUpperCase();
             
             friendItem.innerHTML = `
                 <div class="friend-avatar">${initials}</div>
@@ -94,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="friend-name">${friend.name}</div>
                     <div class="friend-phone">${friend.phone}</div>
                 </div>
-                <button class="invite-btn">
+                <button class="invite-btn ${friend.status === 'joined' ? 'joined' : ''}">
                     ${friend.status === 'joined' ? 'Joined' : 'Invite 💹'}
                 </button>
             `;
@@ -103,188 +123,109 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fetch team data for all levels
-    async function fetchTeamData(db, userReferralCode) {
-        // Level 1 - Direct referrals
-        const level1Query = db.collection('users').where('referredBy', '==', userReferralCode);
-        
-        level1Query.onSnapshot(snapshot => {
-            level1CountEl.textContent = snapshot.size;
-            level1ListEl.innerHTML = ''; 
-            
-            if (snapshot.empty) {
-                level1ListEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">You have no referrals yet.</p>';
-            } else {
-                snapshot.forEach(doc => {
-                    const referee = doc.data();
-                    displayTeamMember(level1ListEl, referee);
-                });
-            }
-        });
-
-        // Level 2 - Referrals of referrals
-        const level2Members = await getLevelMembers(userReferralCode, 2);
-        level2CountEl.textContent = level2Members.length;
-        displayTeamList(level2ListEl, level2Members);
-
-        // Level 3 - Third level referrals
-        const level3Members = await getLevelMembers(userReferralCode, 3);
-        level3CountEl.textContent = level3Members.length;
-        displayTeamList(level3ListEl, level3Members);
-    }
-
-    // Recursive function to get level members
-    async function getLevelMembers(referralCode, targetLevel, currentLevel = 1, collected = []) {
-        if (currentLevel >= targetLevel) return collected;
-
-        const directReferees = await db.collection('users')
-            .where('referredBy', '==', referralCode)
-            .get();
-
-        for (const doc of directReferees.docs) {
-            const referee = doc.data();
-            if (currentLevel === targetLevel - 1) {
-                collected.push(referee);
-            }
-            await getLevelMembers(referee.referralCode, targetLevel, currentLevel + 1, collected);
-        }
-        
-        return collected;
-    }
-
-    function displayTeamList(container, members) {
-        container.innerHTML = '';
-        
-        if (members.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No members at this level.</p>';
-            return;
-        }
-
-        members.forEach(member => {
-            displayTeamMember(container, member);
-        });
-    }
-
-    function displayTeamMember(container, member) {
-        let statusText = `<span class="recharge-status not-recharged">Not Recharged</span>`;
-        if (member.totalRechargeAmount > 0) {
-            statusText = `<span class="recharge-status recharged">₹${member.totalRechargeAmount}</span>`;
-        }
-        const listItem = `<div class="team-list-item"><span>${member.phone}</span>${statusText}</div>`;
-        container.innerHTML += listItem;
-    }
-
     // Calculate earnings based on team activity
     async function calculateEarnings(userId) {
-        const userDoc = db.collection('users').doc(userId);
-        const userData = (await userDoc.get()).data();
-        
-        // Get all team members across levels
-        const level1Members = await db.collection('users')
-            .where('referredBy', '==', userData.referralCode)
-            .get();
-        
-        let level2Members = [];
-        let level3Members = [];
-        
-        // Calculate level 2 and 3 members
-        for (const level1Doc of level1Members.docs) {
-            const level1Data = level1Doc.data();
-            const level2 = await db.collection('users')
-                .where('referredBy', '==', level1Data.referralCode)
-                .get();
-            level2Members.push(...level2.docs);
+        try {
+            const userDoc = db.collection('users').doc(userId);
+            const userData = (await userDoc.get()).data();
             
-            for (const level2Doc of level2.docs) {
-                const level2Data = level2Doc.data();
-                const level3 = await db.collection('users')
-                    .where('referredBy', '==', level2Data.referralCode)
+            // Get all team members across levels
+            const level1Members = await db.collection('users')
+                .where('referredBy', '==', userData.referralCode)
+                .get();
+            
+            let level2Members = [];
+            let level3Members = [];
+            
+            // Calculate level 2 and 3 members
+            for (const level1Doc of level1Members.docs) {
+                const level1Data = level1Doc.data();
+                const level2 = await db.collection('users')
+                    .where('referredBy', '==', level1Data.referralCode)
                     .get();
-                level3Members.push(...level3.docs);
+                level2Members.push(...level2.docs);
+                
+                for (const level2Doc of level2.docs) {
+                    const level2Data = level2Doc.data();
+                    const level3 = await db.collection('users')
+                        .where('referredBy', '==', level2Data.referralCode)
+                        .get();
+                    level3Members.push(...level3.docs);
+                }
             }
+
+            // Calculate earnings
+            let totalEarnings = 0;
+            let availableEarnings = 0;
+            let lockedEarnings = 0;
+
+            // Level 1: 20% commission
+            level1Members.forEach(doc => {
+                const member = doc.data();
+                if (member.totalRechargeAmount > 0) {
+                    const earnings = member.totalRechargeAmount * 0.20;
+                    totalEarnings += earnings;
+                    availableEarnings += earnings;
+                }
+            });
+
+            // Level 2: 8% commission
+            level2Members.forEach(doc => {
+                const member = doc.data();
+                if (member.totalRechargeAmount > 0) {
+                    const earnings = member.totalRechargeAmount * 0.08;
+                    totalEarnings += earnings;
+                    availableEarnings += earnings;
+                }
+            });
+
+            // Level 3: 1% commission
+            level3Members.forEach(doc => {
+                const member = doc.data();
+                if (member.totalRechargeAmount > 0) {
+                    const earnings = member.totalRechargeAmount * 0.01;
+                    totalEarnings += earnings;
+                    availableEarnings += earnings;
+                }
+            });
+
+            // Update UI
+            totalRewardEl.textContent = `₹${totalEarnings.toFixed(2)}`;
+            availableRewardEl.textContent = `₹${availableEarnings.toFixed(2)}`;
+            lockedRewardEl.textContent = `₹${lockedEarnings.toFixed(2)}`;
+
+            // Update earnings modal
+            totalEarningsEl.textContent = `₹${totalEarnings.toFixed(2)}`;
+            currentBonusEl.textContent = `₹${availableEarnings.toFixed(2)}`;
+            availableNowEl.textContent = `₹${availableEarnings.toFixed(2)}`;
+            redeemAmountEl.textContent = `₹${availableEarnings.toFixed(2)}`;
+
+            // Update user document with earnings
+            userDoc.update({
+                'referralEarnings.total': totalEarnings,
+                'referralEarnings.available': availableEarnings,
+                'referralEarnings.locked': lockedEarnings,
+                'referralEarnings.level1.count': level1Members.size,
+                'referralEarnings.level2.count': level2Members.length,
+                'referralEarnings.level3.count': level3Members.length
+            }).catch(error => {
+                console.log('Error updating earnings:', error);
+            });
+
+        } catch (error) {
+            console.error('Error calculating earnings:', error);
         }
-
-        // Calculate earnings
-        let totalEarnings = 0;
-        let availableEarnings = 0;
-        let lockedEarnings = 0;
-
-        // Level 1: 20% commission
-        level1Members.forEach(doc => {
-            const member = doc.data();
-            if (member.totalRechargeAmount > 0) {
-                const earnings = member.totalRechargeAmount * 0.20;
-                totalEarnings += earnings;
-                availableEarnings += earnings;
-            }
-        });
-
-        // Level 2: 8% commission
-        level2Members.forEach(doc => {
-            const member = doc.data();
-            if (member.totalRechargeAmount > 0) {
-                const earnings = member.totalRechargeAmount * 0.08;
-                totalEarnings += earnings;
-                availableEarnings += earnings;
-            }
-        });
-
-        // Level 3: 1% commission
-        level3Members.forEach(doc => {
-            const member = doc.data();
-            if (member.totalRechargeAmount > 0) {
-                const earnings = member.totalRechargeAmount * 0.01;
-                totalEarnings += earnings;
-                availableEarnings += earnings;
-            }
-        });
-
-        // Update UI
-        totalRewardEl.textContent = `₹${totalEarnings.toFixed(2)}`;
-        availableRewardEl.textContent = `₹${availableEarnings.toFixed(2)}`;
-        lockedRewardEl.textContent = `₹${lockedEarnings.toFixed(2)}`;
-
-        // Update earnings modal
-        totalReferralsEl.textContent = level1Members.size + level2Members.length + level3Members.length;
-        totalEarningsEl.textContent = `₹${totalEarnings.toFixed(2)}`;
-        currentBonusEl.textContent = `₹${availableEarnings.toFixed(2)}`;
-        availableNowEl.textContent = `₹${availableEarnings.toFixed(2)}`;
-        redeemAmountEl.textContent = `₹${availableEarnings.toFixed(2)}`;
-
-        // Update user document with earnings
-        userDoc.update({
-            'referralEarnings.total': totalEarnings,
-            'referralEarnings.available': availableEarnings,
-            'referralEarnings.locked': lockedEarnings,
-            'referralEarnings.level1.count': level1Members.size,
-            'referralEarnings.level2.count': level2Members.length,
-            'referralEarnings.level3.count': level3Members.length
-        }).catch(error => {
-            console.log('Error updating earnings:', error);
-        });
     }
 
     // Setup event listeners
     function setupEventListeners() {
-        // Tab switching for friends
-        tabs.forEach(tab => {
+        // Friend tab switching
+        friendTabs.forEach(tab => {
             tab.addEventListener('click', function() {
-                tabs.forEach(t => t.classList.remove('active'));
+                friendTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 const tabType = this.getAttribute('data-tab');
                 loadFriendList(tabType);
-            });
-        });
-
-        // Tab switching for team
-        document.querySelectorAll('.team-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.team-level-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                const level = this.getAttribute('data-level');
-                document.getElementById(`level${level}Content`).classList.add('active');
             });
         });
 
@@ -343,6 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update UI
                 availableRewardEl.textContent = '₹0.00';
                 totalRewardEl.textContent = `₹${(parseFloat(totalRewardEl.textContent.replace('₹', '')) - availableAmount).toFixed(2)}`;
+                availableNowEl.textContent = '₹0.00';
+                currentBonusEl.textContent = '₹0.00';
                 
                 redeemModal.style.display = 'none';
                 successMessageEl.textContent = `₹${availableAmount.toFixed(2)} has been added to your main balance!`;
@@ -365,6 +308,53 @@ document.addEventListener('DOMContentLoaded', () => {
                     modal.style.display = 'none';
                 }
             });
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const activeTab = document.querySelector('.friend-tab.active').getAttribute('data-tab');
+            
+            const filteredFriends = allFriends.filter(friend => {
+                const matchesSearch = friend.name.toLowerCase().includes(searchTerm) || 
+                                    friend.phone.includes(searchTerm);
+                const matchesTab = activeTab === 'all' || 
+                                 (activeTab === 'joined' && friend.status === 'joined');
+                
+                return matchesSearch && matchesTab;
+            });
+
+            displayFilteredFriends(filteredFriends);
+        });
+    }
+
+    function displayFilteredFriends(friends) {
+        friendListEl.innerHTML = '';
+        
+        if (friends.length === 0) {
+            friendListEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No friends found</p>';
+            return;
+        }
+
+        friends.forEach(friend => {
+            const friendItem = document.createElement('div');
+            friendItem.className = 'friend-item';
+            
+            const initials = friend.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            
+            friendItem.innerHTML = `
+                <div class="friend-avatar">${initials}</div>
+                <div class="friend-info">
+                    <div class="friend-name">${friend.name}</div>
+                    <div class="friend-phone">${friend.phone}</div>
+                </div>
+                <button class="invite-btn ${friend.status === 'joined' ? 'joined' : ''}">
+                    ${friend.status === 'joined' ? 'Joined' : 'Invite 💹'}
+                </button>
+            `;
+            
+            friendListEl.appendChild(friendItem);
         });
     }
 });
