@@ -1,4 +1,4 @@
-// Enhanced Referral System with Clean Layout
+// Tabbed Referral System - Exactly like screenshot
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
@@ -9,16 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockedRewardEl = document.getElementById('locked-reward');
     const totalReferralsCountEl = document.getElementById('total-referrals-count');
     const redeemBtn = document.getElementById('redeem-btn');
-    const myEarningsBtn = document.getElementById('myEarningsBtn');
     
     // Modal Elements
-    const earningsModal = document.getElementById('earningsModal');
     const redeemModal = document.getElementById('redeemModal');
     const successModal = document.getElementById('successModal');
-    const totalReferralsEl = document.getElementById('totalReferrals');
-    const totalEarningsEl = document.getElementById('totalEarnings');
-    const currentBonusEl = document.getElementById('currentBonus');
-    const availableNowEl = document.getElementById('availableNow');
     const redeemAmountEl = document.getElementById('redeemAmount');
     const successMessageEl = document.getElementById('successMessage');
 
@@ -26,9 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const friendListEl = document.getElementById('friend-list');
     const friendTabs = document.querySelectorAll('.friend-tab');
 
+    // Tab Elements
+    const mainTabs = document.querySelectorAll('.main-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
     let currentUserData = null;
     let userReferralCode = '';
     let allFriends = [];
+
+    // Update time
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+    }
 
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -42,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     referralLinkEl.textContent = `${window.location.origin}?ref=${userReferralCode}`;
                     
                     // Load all data
+                    updateTime();
+                    setInterval(updateTime, 60000);
                     calculateEarnings(user.uid);
                     loadFriendData(userReferralCode);
                     setupEventListeners();
@@ -74,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update total referrals count
             totalReferralsCountEl.textContent = allFriends.length;
-            totalReferralsEl.textContent = allFriends.length;
 
             // Load initial friend list
             loadFriendList('all');
@@ -99,10 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Show only first few friends initially (like in screenshot)
-        const displayFriends = filteredFriends; // Remove slice to show all with scroll
-
-        displayFriends.forEach(friend => {
+        filteredFriends.forEach(friend => {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
             
@@ -193,11 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
             totalRewardEl.textContent = `₹${totalEarnings.toFixed(2)}`;
             availableRewardEl.textContent = `₹${availableEarnings.toFixed(2)}`;
             lockedRewardEl.textContent = `₹${lockedEarnings.toFixed(2)}`;
-
-            // Update earnings modal
-            totalEarningsEl.textContent = `₹${totalEarnings.toFixed(2)}`;
-            currentBonusEl.textContent = `₹${availableEarnings.toFixed(2)}`;
-            availableNowEl.textContent = `₹${availableEarnings.toFixed(2)}`;
             redeemAmountEl.textContent = `₹${availableEarnings.toFixed(2)}`;
 
             // Update user document with earnings
@@ -219,12 +218,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Setup event listeners
     function setupEventListeners() {
+        // Main tab switching
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update tabs
+                mainTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}Tab`).classList.add('active');
+            });
+        });
+
         // Friend tab switching
         friendTabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 friendTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                const tabType = this.getAttribute('data-tab');
+                const tabType = this.getAttribute('data-friend-tab');
                 loadFriendList(tabType);
             });
         });
@@ -239,15 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.textContent = originalText;
                 }, 2000);
             });
-        });
-
-        // My Earnings modal
-        myEarningsBtn.addEventListener('click', () => {
-            earningsModal.style.display = 'flex';
-        });
-
-        document.getElementById('closeEarningsModal').addEventListener('click', () => {
-            earningsModal.style.display = 'none';
         });
 
         // Redeem functionality
@@ -284,8 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update UI
                 availableRewardEl.textContent = '₹0.00';
                 totalRewardEl.textContent = `₹${(parseFloat(totalRewardEl.textContent.replace('₹', '')) - availableAmount).toFixed(2)}`;
-                availableNowEl.textContent = '₹0.00';
-                currentBonusEl.textContent = '₹0.00';
                 
                 redeemModal.style.display = 'none';
                 successMessageEl.textContent = `₹${availableAmount.toFixed(2)} has been added to your main balance!`;
@@ -302,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Close modals when clicking outside
-        [earningsModal, redeemModal, successModal].forEach(modal => {
+        [redeemModal, successModal].forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.style.display = 'none';
@@ -314,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.querySelector('.search-input');
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const activeTab = document.querySelector('.friend-tab.active').getAttribute('data-tab');
+            const activeTab = document.querySelector('.friend-tab.active').getAttribute('data-friend-tab');
             
             const filteredFriends = allFriends.filter(friend => {
                 const matchesSearch = friend.name.toLowerCase().includes(searchTerm) || 
