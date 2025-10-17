@@ -20,8 +20,29 @@
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Refer & Earn
+    <div class="my-earnings-btn" id="myEarningsBtn">My Earnings</div>
   </header>
   <main class="refer-page-container">
+    <!-- Earnings Dashboard -->
+    <div class="card earnings-dashboard">
+      <div class="earnings-container">
+        <div class="earnings-box">
+          <div class="earnings-label">Total Reward</div>
+          <div class="earnings-value" id="total-reward">₹0.00</div>
+        </div>
+        <div class="earnings-box">
+          <div class="earnings-label">Available to Redeem</div>
+          <div class="earnings-value" id="available-reward">₹0.00</div>
+        </div>
+        <div class="earnings-box">
+          <div class="earnings-label">Locked Reward</div>
+          <div class="earnings-value" id="locked-reward">₹0.00</div>
+        </div>
+      </div>
+      <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
+    </div>
+
+    <!-- Referral Link Card -->
     <div class="card refer-main-card">
       <h2>Invite Friends, Earn Rewards!</h2>
       <p>Share your unique link with friends to earn commission rewards.</p>
@@ -29,15 +50,36 @@
         <span id="referralLink">Loading your link...</span>
         <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
       </div>
+      <div class="bonus-info">
+        <p><strong>Referral Bonus Structure</strong></p>
+        <div class="bonus-levels">
+          <div class="bonus-level">
+            <div class="bonus-percent">20%</div>
+            <div class="bonus-label">1st Level</div>
+          </div>
+          <div class="bonus-level">
+            <div class="bonus-percent">8%</div>
+            <div class="bonus-label">2nd Level</div>
+          </div>
+          <div class="bonus-level">
+            <div class="bonus-percent">1%</div>
+            <div class="bonus-label">3rd Level</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Commission Levels -->
     <div class="card commission-card">
         <h3>Commission Levels</h3>
         <div class="levels-container">
-            <div class="level-display"><span class="level-title">Level 1</span><span class="level-percent">21%</span></div>
-            <div class="level-display"><span class="level-title">Level 2</span><span class="level-percent">3%</span></div>
+            <div class="level-display"><span class="level-title">Level 1</span><span class="level-percent">20%</span></div>
+            <div class="level-display"><span class="level-title">Level 2</span><span class="level-percent">8%</span></div>
             <div class="level-display"><span class="level-title">Level 3</span><span class="level-percent">1%</span></div>
         </div>
     </div>
+
+    <!-- My Team -->
     <div class="card team-card">
         <h3>My Team</h3>
         <div class="team-tabs">
@@ -54,11 +96,63 @@
                 </div>
                 <div class="team-list-container" id="level1List"></div>
             </div>
-            <div class="team-level-content" id="level2Content"><p>Total Members: <strong id="level2Count">0</strong></p></div>
-            <div class="team-level-content" id="level3Content"><p>Total Members: <strong id="level3Count">0</strong></p></div>
+            <div class="team-level-content" id="level2Content">
+                <p>Total Members: <strong id="level2Count">0</strong></p>
+                <div class="team-list-container" id="level2List"></div>
+            </div>
+            <div class="team-level-content" id="level3Content">
+                <p>Total Members: <strong id="level3Count">0</strong></p>
+                <div class="team-list-container" id="level3List"></div>
+            </div>
         </div>
     </div>
   </main>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="earningsModal">
+    <div class="modal-content">
+      <h3>My Earnings</h3>
+      <div class="earnings-stats">
+        <div class="earning-stat">
+          <span class="stat-label">Total Referrals:</span>
+          <span class="stat-value" id="totalReferrals">0</span>
+        </div>
+        <div class="earning-stat">
+          <span class="stat-label">Total Earnings:</span>
+          <span class="stat-value" id="totalEarnings">₹0.00</span>
+        </div>
+        <div class="earning-stat">
+          <span class="stat-label">Current Bonus:</span>
+          <span class="stat-value" id="currentBonus">₹0.00</span>
+        </div>
+        <div class="earning-stat">
+          <span class="stat-label">Available Now:</span>
+          <span class="stat-value" id="availableNow">₹0.00</span>
+        </div>
+      </div>
+      <button class="submit-btn" id="closeEarningsModal">Close</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="redeemModal">
+    <div class="modal-content">
+      <h3>Redeem Reward</h3>
+      <p>Are you sure you want to redeem <strong id="redeemAmount">₹0.00</strong> to your main balance?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn secondary" id="cancelRedeem">Cancel</button>
+        <button class="modal-btn primary" id="confirmRedeem">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+      <h3>Success!</h3>
+      <p id="successMessage">Your reward has been successfully redeemed!</p>
+      <button class="submit-btn" id="closeSuccessModal">OK</button>
+    </div>
+  </div>
+
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html" class="active">Refer</a><a href="mine.html">Mine</a>
@@ -70,4 +164,4 @@
   <script src="common.js"></script>
   <script src="script-refer.js"></script>
 </body>
-</html>
+        </html>
