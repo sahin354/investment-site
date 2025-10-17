@@ -481,6 +481,192 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
-  <script src="script-refer.js"></script>
-</body>
-                                                     </html>
+  <script>
+    // Tabbed Referral System - Fixed with proper tab functionality
+    document.addEventListener('DOMContentLoaded', () => {
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        // DOM Elements
+        const totalRewardEl = document.getElementById('total-reward');
+        const availableRewardEl = document.getElementById('available-reward');
+        const lockedRewardEl = document.getElementById('locked-reward');
+        const totalReferralsCountEl = document.getElementById('total-referrals-count');
+        const redeemBtn = document.getElementById('redeem-btn');
+        
+        // Modal Elements
+        const redeemModal = document.getElementById('redeemModal');
+        const successModal = document.getElementById('successModal');
+        const redeemAmountEl = document.getElementById('redeemAmount');
+        const successMessageEl = document.getElementById('successMessage');
+
+        // Friend List Elements
+        const friendListEl = document.getElementById('friend-list');
+
+        // Tab Elements
+        const mainTabs = document.querySelectorAll('.main-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const friendTabs = document.querySelectorAll('.friend-tab');
+
+        let currentUserData = null;
+        let userReferralCode = '';
+        let allFriends = [];
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+
+        // Tab switching function
+        function switchTab(tabName) {
+            // Update tabs
+            mainTabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabName + 'Tab') {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    if (doc.exists) {
+                        currentUserData = doc.data();
+                        userReferralCode = currentUserData.referralCode;
+                        
+                        // Initialize referral link
+                        const referralLinkEl = document.getElementById('referralLink');
+                        referralLinkEl.textContent = `${window.location.origin}?ref=${userReferralCode}`;
+                        
+                        // Load all data
+                        updateTime();
+                        setInterval(updateTime, 60000);
+                        calculateEarnings(user.uid);
+                        loadFriendData(userReferralCode);
+                        setupEventListeners();
+                    }
+                });
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load friend data from referrals
+        async function loadFriendData(userReferralCode) {
+            try {
+                // Get level 1 referrals
+                const level1Query = await db.collection('users')
+                    .where('referredBy', '==', userReferralCode)
+                    .get();
+
+                allFriends = [];
+                
+                level1Query.forEach(doc => {
+                    const friend = doc.data();
+                    allFriends.push({
+                        name: friend.name || 'User',
+                        phone: friend.phone,
+                        status: friend.totalRechargeAmount > 0 ? 'joined' : 'invited',
+                        rechargeAmount: friend.totalRechargeAmount || 0
+                    });
+                });
+
+                // Update total referrals count
+                totalReferralsCountEl.textContent = allFriends.length;
+
+                // Load initial friend list
+                loadFriendList('all');
+
+            } catch (error) {
+                console.error('Error loading friend data:', error);
+            }
+        }
+
+        // Load friend list based on filter
+        function loadFriendList(filter) {
+            friendListEl.innerHTML = '';
+            
+            const filteredFriends = allFriends.filter(friend => {
+                if (filter === 'all') return true;
+                if (filter === 'joined') return friend.status === 'joined';
+                return false;
+            });
+
+            if (filteredFriends.length === 0) {
+                friendListEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No friends found</p>';
+                return;
+            }
+
+            filteredFriends.forEach(friend => {
+                const friendItem = document.createElement('div');
+                friendItem.className = 'friend-item';
+                
+                const initials = friend.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                
+                friendItem.innerHTML = `
+                    <div class="friend-avatar">${initials}</div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}</div>
+                        <div class="friend-phone">${friend.phone}</div>
+                    </div>
+                    <button class="invite-btn ${friend.status === 'joined' ? 'joined' : ''}">
+                        ${friend.status === 'joined' ? 'Joined' : 'Invite 💹'}
+                    </button>
+                `;
+                
+                friendListEl.appendChild(friendItem);
+            });
+        }
+
+        // Calculate earnings based on team activity
+        async function calculateEarnings(userId) {
+            try {
+                const userDoc = db.collection('users').doc(userId);
+                const userData = (await userDoc.get()).data();
+                
+                // Get all team members across levels
+                const level1Members = await db.collection('users')
+                    .where('referredBy', '==', userData.referralCode)
+                    .get();
+                
+                let level2Members = [];
+                let level3Members = [];
+                
+                // Calculate level 2 and 3 members
+                for (const level1Doc of level1Members.docs) {
+                    const level1Data = level1Doc.data();
+                    const level2 = await db.collection('users')
+                        .where('referredBy', '==', level1Data.referralCode)
+                        .get();
+                    level2Members.push(...level2.docs);
+                    
+                    for (const level2Doc of level2.docs) {
+                        const level2Data = level2Doc.data();
+                        const level3 = await db.collection('users')
+                            .where('referredBy', '==', level2Data.referralCode)
+                            .get();
+                        level3Members.push(...level3.docs);
+                    }
+                }
+
+                // Calculate earnings
+                let totalEarnings = 0;
+                let availableEarnings = 0;
+                let lockedEarnings = 0;
+
+                // Level 1: 20% commission
+                level1Members.forEach(doc => {
+                    const member = doc.data();
+ 
