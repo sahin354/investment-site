@@ -678,225 +678,168 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     border-color: #6A7BFF;
 }
 
-/* === ENHANCED AUTH PAGES STYLES ONLY === */
-/* These styles only affect login and register pages
+/* Add to your existing style.css */
 
-/* Styling for grouped input fields */
-.input-field-group .input-group {
-    margin-bottom: 0; /* Removes the gap between fields */
+.refer-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    font-family: Arial, sans-serif;
 }
 
-/* Makes the borders collapse on top of each other */
-.input-field-group .input-group:not(:first-child) {
-    margin-top: -1px; 
-}
-
-/* Removes rounded corners from all inputs in the group initially */
-.input-field-group .input-group input {
-    border-radius: 0;
-}
-
-/* Applies rounded corners to the TOP of the FIRST input */
-.input-field-group .input-group:first-child input {
-    border-top-left-radius: 8px; /* You can adjust this value */
-    border-top-right-radius: 8px; /* You can adjust this value */
-}
-
-/* Applies rounded corners to the BOTTOM of the LAST input */
-.input-field-group .input-group:last-child input {
-    border-bottom-left-radius: 8px; /* You can adjust this value */
-    border-bottom-right-radius: 8px; /* You can adjust this value */
-        }
-
-/* Enhanced Referral System Styles */
-
-/* Earnings Dashboard */
-.earnings-dashboard {
-    margin-bottom: 20px;
-}
-
-.earnings-container {
+/* Tab Navigation */
+.tabs {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.earnings-box {
-    flex: 1;
-    text-align: center;
-    padding: 15px 10px;
-    background: #f8fafc;
+    background: #f1f1f1;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    overflow: hidden;
 }
-
-.earnings-label {
-    font-size: 0.8em;
-    color: #64748b;
-    margin-bottom: 5px;
-}
-
-.earnings-value {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #1e293b;
-}
-
-/* Bonus Info */
-.bonus-info {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.bonus-levels {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 15px;
-}
-
-.bonus-level {
-    text-align: center;
-}
-
-.bonus-percent {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-.bonus-label {
-    font-size: 0.8em;
-    color: #64748b;
-    margin-top: 5px;
-}
-
-/* My Earnings Button */
-.my-earnings-btn {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.2);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-/* Modals */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-align: center;
-    color: var(--text-dark);
-}
-
-/* Earnings Stats */
-.earnings-stats {
-    margin-bottom: 20px;
-}
-
-.earning-stat {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.earning-stat:last-child {
-    border-bottom: none;
-}
-
-.stat-label {
-    color: #64748b;
-}
-
-.stat-value {
-    font-weight: bold;
-    color: var(--text-dark);
-}
-
-/* Modal Buttons */
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.modal-btn {
+.tab-link {
     flex: 1;
     padding: 12px;
+    text-align: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+}
+.tab-link.active {
+    background: #fff;
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tab-content {
+    padding-top: 20px;
+}
+
+/* Reward Boxes */
+.reward-boxes {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.box {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.box span {
+    font-size: 14px;
+    color: #666;
+    display: block;
+    margin-bottom: 8px;
+}
+.box strong {
+    font-size: 24px;
+    color: #333;
+}
+.locked-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+.locked-box span {
+    font-size: 14px;
+    color: #666;
+    margin-right: 10px;
+}
+.locked-box strong {
+    font-size: 24px;
+    color: #333;
+}
+
+.redeem-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #6a5af9; /* A nice purple, like the image */
+    color: white;
     border: none;
     border-radius: 8px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.redeem-button:disabled {
+    background-color: #c0c0c0;
+    cursor: not-allowed;
+}
+
+
+/* Invite Box */
+.invite-box {
+    background: #f9f9f9;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.referral-code-box {
+    display: flex;
+    margin-top: 15px;
+}
+.referral-code-box input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px 0 0 8px;
+    background: #fff;
+    font-size: 14px;
+}
+.referral-code-box button {
+    padding: 10px 15px;
+    border: none;
+    background: #6a5af9;
+    color: white;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
 }
 
-.modal-btn.primary {
-    background: var(--primary-color);
-    color: white;
+/* Friends List */
+.friends-tabs {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
 }
-
-.modal-btn.secondary {
-    background: #e2e8f0;
-    color: #64748b;
+.friend-tab {
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #555;
 }
-
-/* Team Lists for All Levels */
-.team-list-container {
-    max-height: 300px;
-    overflow-y: auto;
+.friend-tab.active {
+    color: #6a5af9;
+    border-bottom: 2px solid #6a5af9;
 }
-
-.team-list-item {
+#friends-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#friends-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 10px;
+    padding: 15px;
     border-bottom: 1px solid #f0f0f0;
 }
-
-.team-list-item:last-child {
+#friends-list li:last-child {
     border-bottom: none;
 }
-
-/* Responsive Design */
-@media (max-width: 480px) {
-    .earnings-container {
-        flex-direction: column;
-        gap: 8px;
+#friends-list li span {
+    font-weight: 600;
+    color: #28a745; /* Green for "Joined" */
+    font-size: 14px;
     }
-    
-    .bonus-levels {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .modal-content {
-        margin: 20px;
-        padding: 20px;
-    }
-}
+        
