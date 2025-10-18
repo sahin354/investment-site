@@ -1,63 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refer & Earn</title>
-    <link rel="stylesheet" href="style.css">
-    </head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adani Corporation - Refer & Earn</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside id="sideMenu" class="side-menu">
+      <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+      <div class="sidebar-actions">
+        <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+        <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+        <button class="sidebar-btn"><span>⚙️</span> Settings</button>
+      </div>
+      <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+  
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    Refer & Earn
+    </header>
+  
+  <main class="refer-page-container">
+    
+    <nav class="tabs main-refer-tabs">
+      <button class="tab-button" data-tab="invite">Invite</button>
+      <button class="tab-button active" data-tab="earnings">My Earnings</button>
+    </nav>
 
-    <div class="refer-container">
-        <div class="tabs">
-            <button class="tab-link active" onclick="openTab('invite')">Invite</button>
-            <button class="tab-link" onclick="openTab('earnings')">My Earnings</button>
+    <section id="invite" class="tab-content">
+        <div class="card refer-main-card">
+          <h2>Invite Friends, Earn Rewards!</h2>
+          <p>Share your unique link with friends to earn commission rewards.</p>
+          <div class="refer-link-box">
+            <span id="referralLink">Loading your link...</span>
+            <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
+          </div>
+          <div class="bonus-info">
+            <p><strong>Referral Bonus Structure</strong></p>
+            <div class="bonus-levels">
+              <div class="bonus-level">
+                <div class="bonus-percent">20%</div>
+                <div class="bonus-label">1st Level</div>
+              </div>
+              <div class="bonus-level">
+                <div class="bonus-percent">8%</div>
+                <div class="bonus-label">2nd Level</div>
+              </div>
+              <div class="bonus-level">
+                <div class="bonus-percent">1%</div>
+                <div class="bonus-label">3rd Level</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card commission-card">
+            <h3>Commission Levels</h3>
+            <div class="levels-container">
+                <div class="level-display"><span class="level-title">Level 1</span><span class="level-percent">20%</span></div>
+                <div class="level-display"><span class="level-title">Level 2</span><span class="level-percent">8%</span></div>
+                <div class="level-display"><span class="level-title">Level 3</span><span class="level-percent">1%</span></div>
+            </div>
         </div>
 
-        <div id="earnings" class="tab-content" style="display: none;">
-            <div class="reward-boxes">
-                <div class="box">
-                    <span>Total Reward</span>
-                    <strong id="total-reward">₹0.00</strong>
-                </div>
-                <div class="box">
-                    <span>Available to Redeem</span>
-                    <strong id="available-reward">₹0.00</strong>
-                </div>
-            </div>
-            <div class="locked-box">
-                <span>Locked Reward</span>
-                <strong id="locked-reward">₹0.00</strong>
-            </div>
-            <button class="redeem-button" id="redeem-btn">Redeem Reward</button>
-        </div>
-
-        <div id="invite" class="tab-content">
-            <div class="invite-box">
-                <h3>Refer your friends and earn!</h3>
-                <p>Copy your code and share it with your friends.</p>
-                <div class="referral-code-box">
-                    <input type="text" id="referral-link" readonly>
-                    <button id="copy-btn">Copy</button>
-                </div>
+        <div class="card friends-card">
+            <h3>Friends</h3>
+            
+            <div class="search-bar-container">
+                <span>🔍</span>
+                <input type="text" placeholder="Search friends">
             </div>
 
-            <h3>Your Referrals</h3>
-            <div class="friends-list-container">
-                <div class="friends-tabs">
-                    <button class="friend-tab active">Joined</button>
-                </div>
-                <ul id="friends-list">
-                    </ul>
+            <div class="team-tabs" id="friends-tabs">
+                <button class="team-tab active" data-friend-tab="all">All</button>
+                <button class="team-tab" data-friend-tab="joined">Joined</button>
             </div>
+
+            <div id="all" class="friend-tab-content active">
+                <div class="friend-list">
+                    <div class="friend-item">
+                        <div class="friend-avatar">HM</div>
+                        <div class="friend-info">
+                            <div class="friend-name">Hariram Manglaw</div>
+                            <div class="friend-phone">9980989304</div>
+                        </div>
+                        <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                    </div>
+                    <div class="friend-item">
+                        <div class="friend-avatar">SD</div>
+                        <div class="friend-info">
+                            <div class="friend-name">Santu Dey</div>
+                            <div class="friend-phone">8985689809</div>
+                        </div>
+                        <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                    </div>
+                    <div class="friend-item">
+                        <div class="friend-avatar">MV</div>
+                        <div class="friend-info">
+                            <div class="friend-name">Mauhet Verma</div>
+                            <div class="friend-phone">8943870809</div>
+                        </div>
+                        <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="joined" class="friend-tab-content">
+                <div class="team-tabs">
+                    <button class="team-tab active" data-level="1">Level 1</button>
+                    <button class="team-tab" data-level="2">Level 2</button>
+                    <button class="team-tab" data-level="3">Level 3</button>
+                </div>
+                <div class="team-content">
+                    <div class="team-level-content active" id="level1Content">
+                        <p>Total Members: <strong id="level1Count">0</strong></p>
+                        <div class="team-list-header">
+                            <span>Phone Number</span>
+                            <span>Recharge Status</span>
+                        </div>
+                        <div class="team-list-container" id="level1List"></div>
+                    </div>
+                    <div class="team-level-content" id="level2Content">
+                        <p>Total Members: <strong id="level2Count">0</strong></p>
+                        <div class="team-list-container" id="level2List"></div>
+                    </div>
+                    <div class="team-level-content" id="level3Content">
+                        <p>Total Members: <strong id="level3Count">0</strong></p>
+                        <div class="team-list-container" id="level3List"></div>
+                    </div>
+                </div>
+                </div>
         </div>
+    </section>
+
+    <section id="earnings" class="tab-content active">
+        <div class="card earnings-dashboard">
+          <div class="earnings-container">
+            <div class="earnings-box">
+              <div class="earnings-label">Total Reward</div>
+              <div class="earnings-value" id="total-reward">₹0.00</div>
+            </div>
+            <div class="earnings-box">
+              <div class="earnings-label">Available to Redeem</div>
+              <div class="earnings-value" id="available-reward">₹0.00</div>
+            </div>
+            <div class="earnings-box">
+              <div class="earnings-label">Locked Reward</div>
+              <div class="earnings-value" id="locked-reward">₹0.00</div>
+            </div>
+          </div>
+          <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
+        </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="earningsModal">
+    <div class="modal-content">
+      <h3>My Earnings</h3>
+      <button class="submit-btn" id="closeEarningsModal">Close</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="redeemModal">
+    </div>
+  <div class="modal-overlay" id="successModal">
     </div>
 
-    <script src="https'www.gstatic.com/firebasejs/9.0.0/firebase-app.js" type="module"></script>
-    <script src="https'www.gstatic.com/firebasejs/9.0.0/firebase-auth.js" type="module"></script>
-    <script src="https'www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js" type="module"></script>
+  <div class="bottom-nav-spacer"></div>
+  <footer class="bottom-nav">
+    <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html" class="active">Refer</a><a href="mine.html">Mine</a>
+  </footer>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="common.js"></script>
+  <script src="script-refer.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Main "Invite" / "My Earnings" Tab logic
+        const mainTabs = document.querySelectorAll('.main-refer-tabs .tab-button');
+        const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
 
-    <script src="firebaseConfig.js" type="module"></script>
-    <script src="script-refer.js" type="module"></script>
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mainTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                mainContents.forEach(c => c.classList.remove('active'));
+                const targetContent = document.getElementById(tab.dataset.tab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+
+        // "All" / "Joined" (Friends) Tab logic
+        const friendTabs = document.querySelectorAll('#friends-tabs .team-tab');
+        const friendContents = document.querySelectorAll('.friend-tab-content');
+
+        friendTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                friendTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                friendContents.forEach(c => c.classList.remove('active'));
+                const targetContent = document.getElementById(tab.dataset.friendTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    });
+  </script>
 </body>
-</html>
+                </html>
+    
