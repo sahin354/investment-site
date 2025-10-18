@@ -1004,158 +1004,100 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     gap: 10px;
 }
 
-/* This is the new rule for the scrollable list */
-.friend-list.scrollable {
-    max-height: 220px; /* Shows about 3-4 items */
-    overflow-y: auto;
-    padding-right: 5px; /* Prevents scrollbar from overlapping content */
+/* --- NEW REFER PAGE STYLES (v3 - FINAL FIX) --- */
+
+/* This makes the "Invite" / "My Earnings" tabs use your
+   original white-background-and-underline style from index.html */
+.main-refer-tabs {
+    margin: 0;
+    /* It will inherit the rest of the .tabs styles */
 }
 
-.friend-item {
+/* This styles the new grid layout in the "Invite" card */
+.invite-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 columns for levels */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Makes the link box span all 3 columns */
+.invite-content-grid .refer-link-box {
+    grid-column: 1 / -1; /* Span all columns */
     display: flex;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.friend-item:last-child {
-    border-bottom: none;
-}
-
-.friend-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    justify-content: space-between;
     background-color: var(--bg-light);
-    color: var(--primary-color);
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-right: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 15px;
 }
 
-.friend-info {
-    flex-grow: 1;
-}
-
-.friend-name {
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-.friend-phone {
+.invite-content-grid .refer-link-box #referralLink {
+    font-family: monospace;
     font-size: 0.9em;
-    color: var(--text-light);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-
-.invite-btn {
+ 
+.invite-content-grid .refer-link-box #copyLinkBtn {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 20px;
-    padding: 8px 15px;
-    font-size: 0.9em;
+    border-radius: 6px;
+    padding: 8px 12px;
     font-weight: bold;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    flex-shrink: 0; /* Prevents button from shrinking */
 }
 
-.invite-btn span {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-}
-
-.invite-btn img {
-    width: 100%;
-    height: 100%;
-    vertical-align: middle;
-}
-
-/* --- NEW STYLES FOR REFER PAGE (TO MATCH SCREENSHOT) --- */
-
-/* 1. Main "Invite" / "My Earnings" Toggles */
-.main-refer-tabs {
-    background-color: #f1f3f6; /* Light grey bg for the toggle container */
-    border-radius: 10px;
-    padding: 5px;
-    display: flex;
-    margin: 15px;
+/* This styles the "Level 1/2/3" boxes from your old CSS */
+.invite-content-grid .level-display {
+    background-color: var(--bg-light);
     border: 1px solid var(--border-color);
-}
-.main-refer-tabs .tab-button {
-    flex: 1;
-    padding: 10px;
     border-radius: 8px;
-    border: none;
-    background: transparent; /* Default state is transparent */
-    font-size: 1em;
-    font-weight: 600;
-    color: var(--text-light);
-    cursor: pointer;
+    padding: 15px 10px;
+    width: 100%; /* Make it fill the grid column */
+    display: flex;
+    flex-direction: column;
     text-align: center;
-    border-bottom: none; /* Override existing .tab-button style */
-}
-.main-refer-tabs .tab-button.active {
-    background-color: #ffffff; /* White active state */
-    color: var(--primary-color);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-bottom: none; /* Override existing .tab-button style */
-}
-/* Ensure only the active main tab content is shown */
-main.refer-page-container > .tab-content {
-    display: none;
-    padding: 0; /* Remove padding from tab-content wrapper */
-}
-main.refer-page-container > .tab-content.active {
-    display: block;
 }
 
-/* 2. "My Earnings" Card Styling */
-.earnings-dashboard .earnings-container {
-    display: grid;
-    /* This grid layout matches the screenshot */
-    grid-template-areas: 
-        "total available"
-        "locked locked";
-    gap: 15px;
-    margin-bottom: 20px;
+.invite-content-grid .level-display .level-title {
+    font-size: 0.8em;
+    color: var(--text-light);
+}
+.invite-content-grid .level-display .level-percent {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 5px;
+}
+
+/* --- STYLES FOR OTHER SECTIONS (Kept from screenshot) --- */
+
+/* "My Earnings" Card Styles */
+.earnings-dashboard .earnings-container { 
+    display: grid; 
+    grid-template-areas: "total available" "locked locked"; 
+    gap: 15px; 
+    margin-bottom: 20px; 
 }
 #total-reward-box    { grid-area: total; }
 #available-reward-box { grid-area: available; }
 #locked-reward-box  { grid-area: locked; }
+.earnings-dashboard .earnings-label { font-size: 0.9em; color: var(--text-light); margin-bottom: 5px; }
+.earnings-dashboard .earnings-value { font-size: 1.5em; font-weight: 700; color: var(--text-dark); }
+.earnings-dashboard .submit-btn { background-color: #aebcff; color: #ffffff; font-weight: bold; }
+.earnings-dashboard .submit-btn:hover { background-color: #98a9f8; }
 
-.earnings-dashboard .earnings-label {
-    font-size: 0.9em;
-    color: var(--text-light);
-    margin-bottom: 5px;
-}
-.earnings-dashboard .earnings-value {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--text-dark);
-}
-/* Style for the "Redeem Reward" button from screenshot */
-.earnings-dashboard .submit-btn {
-    background-color: #aebcff; /* Light purple/blue from screenshot */
-    color: #ffffff;
-    font-weight: bold;
-}
-.earnings-dashboard .submit-btn:hover {
-    background-color: #98a9f8;
-}
-
-/* 3. "Friends" Card Styling */
+/* "Friends" Card Styles */
 .friends-card h3 {
     font-size: 1.3em;
     color: var(--text-dark);
     margin-bottom: 15px;
 }
-
 .search-bar-container {
     display: flex;
     align-items: center;
@@ -1165,25 +1107,9 @@ main.refer-page-container > .tab-content.active {
     padding: 10px 15px;
     margin-bottom: 20px;
 }
-.search-bar-container span {
-    font-size: 1.1em;
-    color: var(--text-light);
-    margin-right: 10px;
-}
-.search-bar-container input {
-    border: none;
-    background: transparent;
-    outline: none;
-    width: 100%;
-    font-size: 1em;
-    color: var(--text-dark);
-}
-.search-bar-container input::placeholder {
-    color: var(--text-light);
-}
+.search-bar-container span { margin-right: 10px; }
+.search-bar-container input { border: none; background: transparent; outline: none; width: 100%; }
 
-/* 4. "All" / "Joined" Toggles */
-/* This ID selector is strong enough to override the default .team-tabs */
 #friends-tabs {
     background-color: #f1f3f6;
     border-radius: 8px;
@@ -1191,98 +1117,36 @@ main.refer-page-container > .tab-content.active {
     display: flex;
     border: 1px solid var(--border-color);
     justify-content: center;
-    border-bottom: none; /* Override existing .team-tabs style */
+    border-bottom: none; 
 }
 #friends-tabs .team-tab {
     flex: 1;
-    max-width: 120px; /* Gives it the centered look */
+    max-width: 120px;
     padding: 8px;
     border-radius: 6px;
     border: none;
     background: transparent;
     font-weight: 500;
     color: var(--text-light);
-    border-bottom: none; /* Override existing .team-tab style */
+    border-bottom: none;
 }
 #friends-tabs .team-tab.active {
     background-color: #ffffff;
     color: var(--primary-color);
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    border-bottom: none; /* Override existing .team-tab style */
-}
-.friend-tab-content {
-    display: none;
-    margin-top: 15px;
-}
-.friend-tab-content.active {
-    display: block;
-}
-
-/* 5. Friend List Styling */
-.friend-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.friend-list.scrollable {
-    /* This creates the scrolling list for ~3 items */
-    max-height: 220px; 
-    overflow-y: auto;
-    padding-right: 5px;
-}
-.friend-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-.friend-item:last-child {
     border-bottom: none;
 }
-.friend-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e2e8f0;
-    color: var(--primary-color);
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-right: 12px;
-}
-.friend-info {
-    flex-grow: 1;
-}
-.friend-name {
-    font-weight: 600;
-    color: var(--text-dark);
-}
-.friend-phone {
-    font-size: 0.9em;
-    color: var(--text-light);
-}
-.invite-btn {
-    background-color: #6c8cff; /* Blue from screenshot */
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 15px;
-    font-size: 0.9em;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.invite-btn span {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-}
-.invite-btn img {
-    width: 100%;
-    height: 100%;
-    vertical-align: middle;
-}
+.friend-tab-content { display: none; margin-top: 15px; }
+.friend-tab-content.active { display: block; }
+
+.friend-list { display: flex; flex-direction: column; gap: 10px; }
+.friend-list.scrollable { max-height: 220px; overflow-y: auto; padding-right: 5px; }
+.friend-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+.friend-item:last-child { border-bottom: none; }
+.friend-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #e2e8f0; color: var(--primary-color); font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 12px; }
+.friend-info { flex-grow: 1; }
+.friend-name { font-weight: 600; }
+.friend-phone { font-size: 0.9em; color: var(--text-light); }
+.invite-btn { background-color: #6c8cff; color: white; border: none; border-radius: 20px; padding: 8px 15px; font-size: 0.9em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.invite-btn span { display: inline-block; width: 16px; height: 16px; }
+.invite-btn img { width: 100%; height: 100%; }
