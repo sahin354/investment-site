@@ -11,7 +11,7 @@
   <aside id="sideMenu" class="side-menu">
       <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
       <div class="sidebar-actions">
-        <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+        <button class="sidebar-btn"><span>🧑<U+200D>💼</span> Customer Support</button>
         <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
         <button class="sidebar-btn"><span>⚙️</span> Settings</button>
       </div>
@@ -26,11 +26,11 @@
   <main class="refer-page-container">
     
     <nav class="tabs main-refer-tabs">
-      <button class="tab-button active" data-tab="invite">Invite</button>
-      <button class="tab-button" data-tab="earnings">My Earnings</button>
+      <button class="tab-button" data-tab="invite">Invite</button>
+      <button class="tab-button active" data-tab="earnings">My Earnings</button>
     </nav>
 
-    <section id="invite" class="tab-content active">
+    <section id="invite" class="tab-content">
         <div class="card refer-main-card">
           <h2>Invite Friends, Earn Rewards!</h2>
           <p>Share your unique link with friends to earn commission rewards.</p>
@@ -50,20 +50,20 @@
         </div>
     </section>
 
-    <section id="earnings" class="tab-content">
+    <section id="earnings" class="tab-content active">
         <div class="card earnings-dashboard">
           <div class="earnings-container">
-            <div class="earnings-box">
+            <div class="earnings-box" id="total-reward-box">
               <div class="earnings-label">Total Reward</div>
               <div class="earnings-value" id="total-reward">₹0.00</div>
             </div>
-            <div class="earnings-box">
+            <div class="earnings-box" id="available-reward-box">
               <div class="earnings-label">Available to Redeem</div>
               <div class="earnings-value" id="available-reward">₹0.00</div>
             </div>
-            <div class="earnings-box">
+            <div class="earnings-box" id="locked-reward-box">
               <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-value" id="locked-reward">₹0.00</div>
+              <div class="earnings-value"id="locked-reward">₹0.00</div>
             </div>
           </div>
           <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
@@ -155,9 +155,22 @@
     </div>
   </div>
   <div class="modal-overlay" id="redeemModal">
+     <div class="modal-content">
+      <h3>Redeem Reward</h3>
+      <p>Are you sure you want to redeem <strong id="redeemAmount">₹0.00</strong> to your main balance?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn secondary" id="cancelRedeem">Cancel</button>
+        <button class="modal-btn primary" id="confirmRedeem">Confirm</button>
+      </div>
     </div>
+  </div>
   <div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+      <h3>Success!</h3>
+      <p id="successMessage">Your reward has been successfully redeemed!</p>
+      <button class="submit-btn" id="closeSuccessModal">OK</button>
     </div>
+  </div>
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html" class="active">Refer</a><a href="mine.html">Mine</a>
@@ -206,11 +219,8 @@
                 }
             });
         });
-
-        // --- Your existing L1/L2/L3 tab logic will be handled by script-refer.js ---
-        // This new script will not conflict with it.
     });
   </script>
 </body>
-          </html>
-                
+              </html>
+  
