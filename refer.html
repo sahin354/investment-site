@@ -11,7 +11,7 @@
   <aside id="sideMenu" class="side-menu">
       <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
       <div class="sidebar-actions">
-        <button class="sidebar-btn"><span>🧑<U+200D></span> Customer Support</button>
+        <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
         <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
         <button class="sidebar-btn"><span>⚙️</span> Settings</button>
       </div>
@@ -26,26 +26,38 @@
   <main class="refer-page-container">
     
     <nav class="tabs main-refer-tabs">
-      
-      <button class="tab-button" data-tab="invite">Invite</button>
-      <button class="tab-button active" data-tab="earnings">My Earnings</button>
+      <button class="tab-button active" data-tab="invite">Invite</button>
+      <button class="tab-button" data-tab="earnings">My Earnings</button>
     </nav>
 
-    <section id="invite" class="tab-content">
+    <section id="invite" class="tab-content active">
         <div class="card refer-main-card">
-          <h2>Invite Friends, Earn Rewards!</h2>
-          <div class="refer-link-box">
-            <span id="referralLink">Loading your link...</span>
-            <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
-            <div class="levels-container">
-                <div class="level-display"><span class="level-title">Level 1</span><span class="level-percent">20%</span></div>
-                <div class="level-display"><span class="level-title">Level 2</span><span class="level-percent">8%</span></div>
-                <div class="level-display"><span class="level-title">Level 3</span><span class="level-percent">1%</span></div>
+            <h2>Invite Friends, Earn Rewards!</h2>
+            
+            <div class="invite-content-grid">
+                
+                <div class="refer-link-box">
+                    <span id="referralLink">Loading your link...</span>
+                    <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
+                </div>
+
+                <div class="level-display">
+                    <span class="level-title">Level 1</span>
+                    <span class="level-percent">20%</span>
+                </div>
+                <div class="level-display">
+                    <span class="level-title">Level 2</span>
+                    <span class="level-percent">8%</span>
+                </div>
+                <div class="level-display">
+                    <span class="level-title">Level 3</span>
+                    <span class="level-percent">1%</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="earnings" class="tab-content active">
+    <section id="earnings" class="tab-content">
         <div class="card earnings-dashboard">
           <div class="earnings-container">
             <div class="earnings-box" id="total-reward-box">
@@ -139,9 +151,10 @@
                     <div class="team-list-container" id="level3List"></div>
                 </div>
             </div>
-            </div>
-    
-  </div>
+        </div>
+    </div>
+  </main>
+
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html">Home</a><a href="recharge.html">Recharge</a><a href="refer.html" class="active">Refer</a><a href="mine.html">Mine</a>
@@ -152,7 +165,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
-  <script src="script-refer.js"></script> <script>
+  <script src="script-refer.js"></script> 
+  
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const mainTabs = document.querySelectorAll('.main-refer-tabs .tab-button');
@@ -177,7 +192,6 @@
 
         friendTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
-                // Stop the click from bubbling up to the L1/L2/L3 tab handler
                 e.stopPropagation(); 
                 
                 friendTabs.forEach(t => t.classList.remove('active'));
@@ -193,5 +207,4 @@
     });
   </script>
 </body>
-              </html>
-  
+</html>
