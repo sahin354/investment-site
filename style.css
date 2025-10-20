@@ -1150,3 +1150,149 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .invite-btn { background-color: #6c8cff; color: white; border: none; border-radius: 20px; padding: 8px 15px; font-size: 0.9em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 .invite-btn span { display: inline-block; width: 16px; height: 16px; }
 .invite-btn img { width: 100%; height: 100%; }
+
+/* --- FINAL FIXES FOR REFER PAGE (v4) --- */
+
+/* 1. Fix for "Invite/Earnings" tabs not showing */
+/* This forces the styles to apply and look like the index.html tabs */
+nav.tabs.main-refer-tabs {
+    display: flex;
+    background-color: white; /* Use white background */
+    margin: 0; /* Flush to container edges */
+    padding: 0;
+    border-bottom: 1px solid var(--border-color); /* Separator line */
+}
+nav.tabs.main-refer-tabs .tab-button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: none;
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent; /* Default underline */
+    cursor: pointer;
+    border-radius: 0;
+    box-shadow: none;
+}
+nav.tabs.main-refer-tabs .tab-button.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color); /* Active underline */
+    background: none;
+}
+
+/* 2. Fix for "slightly down" layout */
+/* Remove padding from the main page container */
+.refer-page-container {
+    padding: 0; 
+}
+/* Remove extra padding from the tab-content wrapper */
+.refer-page-container .tab-content {
+    padding: 0;
+    display: none; /* Make sure this is set */
+}
+.refer-page-container .tab-content.active {
+    display: block;
+}
+/* All cards on refer page get 15px margin on all sides */
+/* This creates the 15px spacing from screen edge */
+.refer-page-container .card {
+    margin: 15px;
+}
+/* The first card (Invite/Earnings) should have 15px top margin */
+.refer-page-container .tab-content > .card:first-child {
+    margin-top: 15px;
+}
+/* The Friends card should also have 15px top margin */
+.refer-page-container .friends-card {
+    margin-top: 15px;
+}
+
+/* 3. Styles for Invite Card (from screenshot) */
+.invite-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 10px;
+    margin-top: 20px;
+}
+.invite-content-grid .refer-link-box {
+    grid-column: 1 / -1; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f1f3f6; /* Use light grey from screenshot */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 15px;
+}
+.invite-content-grid .refer-link-box #referralLink {
+    font-family: monospace;
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.invite-content-grid .refer-link-box #copyLinkBtn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.invite-content-grid .level-display {
+    background-color: #f1f3f6; /* Use light grey from screenshot */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px 10px;
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.invite-content-grid .level-display .level-title {
+    font-size: 0.8em;
+    color: var(--text-light);
+}
+.invite-content-grid .level-display .level-percent {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 5px;
+}
+
+/* 4. STYLES FOR OTHER SECTIONS (Unchanged) */
+.earnings-dashboard .earnings-container { display: grid; grid-template-areas: "total available" "locked locked"; gap: 15px; margin-bottom: 20px; }
+#total-reward-box    { grid-area: total; }
+#available-reward-box { grid-area: available; }
+#locked-reward-box  { grid-area: locked; }
+.earnings-dashboard .earnings-label { font-size: 0.9em; color: var(--text-light); margin-bottom: 5px; }
+.earnings-dashboard .earnings-value { font-size: 1.5em; font-weight: 700; color: var(--text-dark); }
+.earnings-dashboard .submit-btn { background-color: #aebcff; color: #ffffff; font-weight: bold; }
+.earnings-dashboard .submit-btn:hover { background-color: #98a9f8; }
+
+.friends-card h3 { font-size: 1.3em; color: var(--text-dark); margin-bottom: 15px; }
+.search-bar-container { display: flex; align-items: center; background-color: #f1f3f6; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 15px; margin-bottom: 20px; }
+.search-bar-container span { margin-right: 10px; }
+.search-bar-container input { border: none; background: transparent; outline: none; width: 100%; }
+
+#friends-tabs { background-color: #f1f3f6; border-radius: 8px; padding: 4px; display: flex; border: 1px solid var(--border-color); justify-content: center; border-bottom: none; }
+#friends-tabs .team-tab { flex: 1; max-width: 120px; padding: 8px; border-radius: 6px; border: none; background: transparent; font-weight: 500; color: var(--text-light); border-bottom: none; }
+#friends-tabs .team-tab.active { background-color: #ffffff; color: var(--primary-color); box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: none; }
+.friend-tab-content { display: none; margin-top: 15px; }
+.friend-tab-content.active { display: block; }
+
+.friend-list { display: flex; flex-direction: column; gap: 10px; }
+.friend-list.scrollable { max-height: 220px; overflow-y: auto; padding-right: 5px; }
+.friend-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+.friend-item:last-child { border-bottom: none; }
+.friend-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #e2e8f0; color: var(--primary-color); font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 12px; }
+.friend-info { flex-grow: 1; }
+.friend-name { font-weight: 600; }
+.friend-phone { font-size: 0.9em; color: var(--text-light); }
+.invite-btn { background-color: #6c8cff; color: white; border: none; border-radius: 20px; padding: 8px 15px; font-size: 0.9em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.invite-btn span { display: inline-block; width: 16px; height: 16px; }
+.invite-btn img { width: 100%; height: 100%; }
+                         
