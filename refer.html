@@ -23,14 +23,14 @@
     Refer & Earn
   </header>
   
-  <main class="refer-page-container page-container">
+  <main class="page-container">
     
     <nav class="tabs main-refer-tabs">
       <button class="tab-button active" data-tab="invite">Invite</button>
       <button class="tab-button" data-tab="earnings">My Earnings</button>
     </nav>
     <section id="invite" class="tab-content active">
-        <div class="card refer-main-card">
+        <div class="card refer-main-card" style="margin: 0;">
             <h2>Invite Friends, Earn Rewards!</h2>
             <div class="invite-content-grid">
                 <div class="refer-link-box">
@@ -54,7 +54,7 @@
     </section>
 
     <section id="earnings" class="tab-content">
-        <div class="card earnings-dashboard">
+        <div class="card earnings-dashboard" style="margin: 0;">
           <div class="earnings-container">
             <div class="earnings-box" id="total-reward-box">
               <div class="earnings-label">Total Reward</div>
@@ -159,10 +159,9 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        
-        // FIX: Reverted to the original ".tab-button" selector
+        // Using the original ".tab-button" selector which is correct
         const mainTabs = document.querySelectorAll('.main-refer-tabs .tab-button');
-        const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
+        const mainContents = document.querySelectorAll('main.page-container > .tab-content'); // Updated main selector
 
         mainTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -198,5 +197,4 @@
     });
   </script>
 </body>
-          </html>
-                      
+</html>
