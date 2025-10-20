@@ -5,6 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="style.css" />
+  
+  <style>
+    .pill-tab-container {
+      display: flex;
+      background-color: #f0f2f5; /* Light gray background */
+      border-radius: 30px; /* Fully rounded pill shape */
+      padding: 5px;
+      margin: 15px; /* Use the page's 15px margin */
+    }
+    .pill-tab-button {
+      flex: 1; /* Make buttons share space equally */
+      padding: 10px 15px;
+      border: none;
+      border-radius: 25px; /* Rounded shape for the button itself */
+      background-color: transparent; /* Inactive state is transparent */
+      color: #555; /* Dark text for inactive state */
+      font-weight: 600;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .pill-tab-button.active {
+      background-color: #ffffff; /* Active state is white */
+      color: #1a202c;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Shadow for active state */
+    }
+    
+    /* Make the cards inside the tabs have no top margin */
+    .tab-content .card {
+      margin-top: 0;
+    }
+  </style>
 </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -23,14 +55,15 @@
     Refer & Earn
   </header>
   
-  <main class="page-container">
+  <main class="refer-page-container">
     
-    <nav class="tabs main-refer-tabs">
-      <button class="tab-button active" data-tab="invite">Invite</button>
-      <button class="tab-button" data-tab="earnings">My Earnings</button>
+    <nav class="pill-tab-container main-refer-tabs">
+      <button class="pill-tab-button" data-tab="invite">Invite</button>
+      <button class="pill-tab-button active" data-tab="earnings">My Earnings</button>
     </nav>
-    <section id="invite" class="tab-content active">
-        <div class="card refer-main-card" style="margin: 0;">
+
+    <section id="invite" class="tab-content">
+        <div class="card refer-main-card">
             <h2>Invite Friends, Earn Rewards!</h2>
             <div class="invite-content-grid">
                 <div class="refer-link-box">
@@ -53,8 +86,8 @@
         </div>
     </section>
 
-    <section id="earnings" class="tab-content">
-        <div class="card earnings-dashboard" style="margin: 0;">
+    <section id="earnings" class="tab-content active">
+        <div class="card earnings-dashboard">
           <div class="earnings-container">
             <div class="earnings-box" id="total-reward-box">
               <div class="earnings-label">Total Reward</div>
@@ -159,9 +192,11 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        // Using the original ".tab-button" selector which is correct
-        const mainTabs = document.querySelectorAll('.main-refer-tabs .tab-button');
-        const mainContents = document.querySelectorAll('main.page-container > .tab-content'); // Updated main selector
+        
+        // FIX 3: UPDATED JAVASCRIPT
+        // This now looks for the new ".pill-tab-button" class
+        const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
+        const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
 
         mainTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -176,7 +211,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic ---
+        // --- "All" / "Joined" (Friends) Tab logic (This was already correct) ---
         const friendTabs = document.querySelectorAll('#friends-tabs .team-tab');
         const friendContents = document.querySelectorAll('.friend-tab-content');
 
@@ -197,4 +232,5 @@
     });
   </script>
 </body>
-</html>
+                                                    </html>
+    
