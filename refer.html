@@ -23,15 +23,14 @@
     Refer & Earn
   </header>
   
-  <main class="refer-page-container">
+  <main class="refer-page-container page-container">
     
-    <nav class="team-tabs main-refer-tabs" style="margin: 15px 15px 0 15px; background: white; border-radius: 12px 12px 0 0;">
-      <button class="team-tab active" data-tab="invite">Invite</button>
-      <button class="team-tab" data-tab="earnings">My Earnings</button>
+    <nav class="tabs main-refer-tabs">
+      <button class="tab-button active" data-tab="invite">Invite</button>
+      <button class="tab-button" data-tab="earnings">My Earnings</button>
     </nav>
-
-    <section id="invite" class="tab-content active" style="margin: 0 15px; border-radius: 0 0 12px 12px;">
-        <div class="card refer-main-card" style="margin: 0; box-shadow: none; border: none;">
+    <section id="invite" class="tab-content active">
+        <div class="card refer-main-card">
             <h2>Invite Friends, Earn Rewards!</h2>
             <div class="invite-content-grid">
                 <div class="refer-link-box">
@@ -54,8 +53,8 @@
         </div>
     </section>
 
-    <section id="earnings" class="tab-content" style="margin: 0 15px; border-radius: 0 0 12px 12px;">
-        <div class="card earnings-dashboard" style="margin: 0; box-shadow: none; border: none;">
+    <section id="earnings" class="tab-content">
+        <div class="card earnings-dashboard">
           <div class="earnings-container">
             <div class="earnings-box" id="total-reward-box">
               <div class="earnings-label">Total Reward</div>
@@ -160,7 +159,9 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        const mainTabs = document.querySelectorAll('.main-refer-tabs .team-tab');
+        
+        // FIX: Reverted to the original ".tab-button" selector
+        const mainTabs = document.querySelectorAll('.main-refer-tabs .tab-button');
         const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
 
         mainTabs.forEach(tab => {
@@ -197,4 +198,5 @@
     });
   </script>
 </body>
-</html>
+          </html>
+                      
