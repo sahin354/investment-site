@@ -29,18 +29,14 @@
       <button class="tab-button active" data-tab="invite">Invite</button>
       <button class="tab-button" data-tab="earnings">My Earnings</button>
     </nav>
-
     <section id="invite" class="tab-content active">
         <div class="card refer-main-card">
             <h2>Invite Friends, Earn Rewards!</h2>
-            
             <div class="invite-content-grid">
-                
                 <div class="refer-link-box">
                     <span id="referralLink">Loading your link...</span>
                     <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
                 </div>
-
                 <div class="level-display">
                     <span class="level-title">Level 1</span>
                     <span class="level-percent">20%</span>
@@ -79,17 +75,14 @@
 
     <div class="card friends-card">
         <h3>Friends</h3>
-        
         <div class="search-bar-container">
             <span>🔍</span>
             <input type="text" placeholder="Search friends">
         </div>
-
         <div class="team-tabs" id="friends-tabs">
             <button class="team-tab active" data-friend-tab="all">All</button>
             <button class="team-tab" data-friend-tab="joined">Joined</button>
         </div>
-
         <div id="all" class="friend-tab-content active">
             <div class="friend-list scrollable">
                 <div class="friend-item">
@@ -126,7 +119,6 @@
                 </div>
             </div>
         </div>
-
         <div id="joined" class="friend-tab-content">
             <div class="team-tabs">
                 <button class="team-tab active" data-level="1">Level 1</button>
@@ -136,10 +128,7 @@
             <div class="team-content">
                 <div class="team-level-content active" id="level1Content">
                     <p>Total Members: <strong id="level1Count">0</strong></p>
-                    <div class="team-list-header">
-                        <span>Phone Number</span>
-                        <span>Recharge Status</span>
-                    </div>
+                    <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
                     <div class="team-list-container" id="level1List"></div>
                 </div>
                 <div class="team-level-content" id="level2Content">
@@ -207,4 +196,5 @@
     });
   </script>
 </body>
-</html>
+  </html>
+  
