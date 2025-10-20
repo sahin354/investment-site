@@ -8,28 +8,30 @@
   
   <style>
     .pill-tab-container {
-      display: flex;
-      background-color: #f0f2f5; /* Light gray background */
-      border-radius: 30px; /* Fully rounded pill shape */
-      padding: 5px;
+      display: flex !important;
+      background-color: #f0f2f5 !important; /* Light gray background */
+      border-radius: 30px !important; /* Fully rounded pill shape */
+      padding: 5px !important;
       margin: 15px; /* Use the page's 15px margin */
     }
     .pill-tab-button {
-      flex: 1; /* Make buttons share space equally */
-      padding: 10px 15px;
-      border: none;
-      border-radius: 25px; /* Rounded shape for the button itself */
-      background-color: transparent; /* Inactive state is transparent */
-      color: #555; /* Dark text for inactive state */
-      font-weight: 600;
-      font-size: 0.9em;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      flex: 1 !important; /* Make buttons share space equally */
+      padding: 10px 15px !important;
+      border: none !important;
+      border-radius: 25px !important; /* Rounded shape for the button itself */
+      background-color: transparent !important; /* Inactive state is transparent */
+      color: #555 !important; /* Dark text for inactive state */
+      font-weight: 600 !important;
+      font-size: 0.9em !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      text-decoration: none !important; /* Added for 'a' tag */
+      text-align: center !important; /* Added for 'a' tag */
     }
     .pill-tab-button.active {
-      background-color: #ffffff; /* Active state is white */
-      color: #1a202c;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* Shadow for active state */
+      background-color: #ffffff !important; /* Active state is white */
+      color: #1a202c !important;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important; /* This is the shadow you see */
     }
     
     /* Make the cards inside the tabs have no top margin */
@@ -57,10 +59,10 @@
   
   <main class="refer-page-container">
     
-    <nav class="pill-tab-container main-refer-tabs">
-      <button class="pill-tab-button" data-tab="invite">Invite</button>
-      <button class="pill-tab-button active" data-tab="earnings">My Earnings</button>
-    </nav>
+    <div class="pill-tab-container main-refer-tabs">
+      <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
+      <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
+    </div>
 
     <section id="invite" class="tab-content">
         <div class="card refer-main-card">
@@ -199,7 +201,10 @@
         const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
 
         mainTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+            // Added 'e' to the function to catch the click event
+            tab.addEventListener('click', (e) => { 
+                e.preventDefault(); // This stops the 'a' tag from navigating
+                
                 mainTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
@@ -232,5 +237,5 @@
     });
   </script>
 </body>
-                                                    </html>
-    
+  </html>
+  
