@@ -7,36 +7,69 @@
   <link rel="stylesheet" href="style.css" />
   
   <style>
+    /* This new class adds the 15px padding that was missing */
+    .refer-page-wrapper {
+      padding: 15px;
+    }
+
     .pill-tab-container {
       display: flex !important;
-      background-color: #f0f2f5 !important; /* Light gray background */
-      border-radius: 30px !important; /* Fully rounded pill shape */
+      background-color: #f0f2f5 !important;
+      border-radius: 30px !important;
       padding: 5px !important;
-      margin: 15px; /* Use the page's 15px margin */
+      margin-bottom: 15px; /* Add space below the tabs */
     }
     .pill-tab-button {
-      flex: 1 !important; /* Make buttons share space equally */
+      flex: 1 !important;
       padding: 10px 15px !important;
       border: none !important;
-      border-radius: 25px !important; /* Rounded shape for the button itself */
-      background-color: transparent !important; /* Inactive state is transparent */
-      color: #555 !important; /* Dark text for inactive state */
+      border-radius: 25px !important;
+      background-color: transparent !important;
+      color: #555 !important;
       font-weight: 600 !important;
       font-size: 0.9em !important;
       cursor: pointer !important;
       transition: all 0.3s ease !important;
-      text-decoration: none !important; /* Added for 'a' tag */
-      text-align: center !important; /* Added for 'a' tag */
+      text-decoration: none !important;
+      text-align: center !important;
     }
     .pill-tab-button.active {
-      background-color: #ffffff !important; /* Active state is white */
+      background-color: #ffffff !important;
       color: #1a202c !important;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important; /* This is the shadow you see */
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
     }
     
-    /* Make the cards inside the tabs have no top margin */
     .tab-content .card {
       margin-top: 0;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
+    /* FIX 2: FIX FOR BROKEN "Invite" BUTTON
+      This style targets the broken button in your friends list
+      and makes it look correct again.
+    */
+    .friend-item .invite-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center;
+      gap: 6px !important;
+      background-color: var(--primary-color) !important;
+      color: white !important;
+      border: none !important;
+      padding: 8px 12px !important;
+      border-radius: 20px !important;
+      font-weight: 600 !important;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    .friend-item .invite-btn span {
+      display: inline-flex !important;
+      align-items: center !important;
+    }
+    .friend-item .invite-btn img {
+      width: 16px !important;
+      height: 16px !important;
     }
   </style>
 </head>
@@ -57,127 +90,129 @@
     Refer & Earn
   </header>
   
-  <main class="refer-page-container">
+  <main>
+    <div class="refer-page-wrapper">
     
-    <div class="pill-tab-container main-refer-tabs">
-      <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
-      <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
-    </div>
+      <div class="pill-tab-container main-refer-tabs">
+        <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
+        <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
+      </div>
 
-    <section id="invite" class="tab-content">
-        <div class="card refer-main-card">
-            <h2>Invite Friends, Earn Rewards!</h2>
-            <div class="invite-content-grid">
-                <div class="refer-link-box">
-                    <span id="referralLink">Loading your link...</span>
-                    <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
-                </div>
-                <div class="level-display">
-                    <span class="level-title">Level 1</span>
-                    <span class="level-percent">20%</span>
-                </div>
-                <div class="level-display">
-                    <span class="level-title">Level 2</span>
-                    <span class="level-percent">8%</span>
-                </div>
-                <div class="level-display">
-                    <span class="level-title">Level 3</span>
-                    <span class="level-percent">1%</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="earnings" class="tab-content active">
-        <div class="card earnings-dashboard">
-          <div class="earnings-container">
-            <div class="earnings-box" id="total-reward-box">
-              <div class="earnings-label">Total Reward</div>
-              <div class="earnings-value" id="total-reward">₹0.00</div>
-            </div>
-            <div class="earnings-box" id="available-reward-box">
-              <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-value" id="available-reward">₹0.00</div>
-            </div>
-            <div class="earnings-box" id="locked-reward-box">
-              <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-value"id="locked-reward">₹0.00</div>
-            </div>
+      <section id="invite" class="tab-content">
+          <div class="card refer-main-card">
+              <h2>Invite Friends, Earn Rewards!</h2>
+              <div class="invite-content-grid">
+                  <div class="refer-link-box">
+                      <span id="referralLink">Loading your link...</span>
+                      <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
+                  </div>
+                  <div class="level-display">
+                      <span class="level-title">Level 1</span>
+                      <span class="level-percent">20%</span>
+                  </div>
+                  <div class="level-display">
+                      <span class="level-title">Level 2</span>
+                      <span class="level-percent">8%</span>
+                  </div>
+                  <div class="level-display">
+                      <span class="level-title">Level 3</span>
+                      <span class="level-percent">1%</span>
+                  </div>
+              </div>
           </div>
-          <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
-        </div>
-    </section>
+      </section>
 
-    <div class="card friends-card">
-        <h3>Friends</h3>
-        <div class="search-bar-container">
-            <span>🔍</span>
-            <input type="text" placeholder="Search friends">
-        </div>
-        <div class="team-tabs" id="friends-tabs">
-            <button class="team-tab active" data-friend-tab="all">All</button>
-            <button class="team-tab" data-friend-tab="joined">Joined</button>
-        </div>
-        <div id="all" class="friend-tab-content active">
-            <div class="friend-list scrollable">
-                <div class="friend-item">
-                    <div class="friend-avatar">HM</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Hariram Manglaw</div>
-                        <div class="friend-phone">9980989304</div>
-                    </div>
-                    <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
-                </div>
-                <div class="friend-item">
-                    <div class="friend-avatar">SD</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Santu Dey</div>
-                        <div class="friend-phone">8985689809</div>
-                    </div>
-                    <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
-                </div>
-                <div class="friend-item">
-                    <div class="friend-avatar">MV</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Mauhet Verma</div>
-                        <div class="friend-phone">8943870809</div>
-                    </div>
-                    <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
-                </div>
-                <div class="friend-item">
-                    <div class="friend-avatar">RA</div>
-                    <div class="friend-info">
-                        <div class="friend-name">Rajesh Kumar</div>
-                        <div class="friend-phone">9876543210</div>
-                    </div>
-                    <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
-                </div>
+      <section id="earnings" class="tab-content active">
+          <div class="card earnings-dashboard">
+            <div class="earnings-container">
+              <div class="earnings-box" id="total-reward-box">
+                <div class="earnings-label">Total Reward</div>
+                <div class="earnings-value" id="total-reward">₹0.00</div>
+              </div>
+              <div class="earnings-box" id="available-reward-box">
+                <div class="earnings-label">Available to Redeem</div>
+                <div class="earnings-value" id="available-reward">₹0.00</div>
+              </div>
+              <div class="earnings-box" id="locked-reward-box">
+                <div class="earnings-label">Locked Reward</div>
+                <div class="earnings-value"id="locked-reward">₹0.00</div>
+              </div>
             </div>
-        </div>
-        <div id="joined" class="friend-tab-content">
-            <div class="team-tabs">
-                <button class="team-tab active" data-level="1">Level 1</button>
-                <button class="team-tab" data-level="2">Level 2</button>
-                <button class="team-tab" data-level="3">Level 3</button>
-            </div>
-            <div class="team-content">
-                <div class="team-level-content active" id="level1Content">
-                    <p>Total Members: <strong id="level1Count">0</strong></p>
-                    <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
-                    <div class="team-list-container" id="level1List"></div>
-                </div>
-                <div class="team-level-content" id="level2Content">
-                    <p>Total Members: <strong id="level2Count">0</strong></p>
-                    <div class="team-list-container" id="level2List"></div>
-                </div>
-                <div class="team-level-content" id="level3Content">
-                    <p>Total Members: <strong id="level3Count">0</strong></p>
-                    <div class="team-list-container" id="level3List"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-  </main>
+            <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
+          </div>
+      </section>
+
+      <div class="card friends-card">
+          <h3>Friends</h3>
+          <div class="search-bar-container">
+              <span>🔍</span>
+              <input type="text" placeholder="Search friends">
+          </div>
+          <div class="team-tabs" id="friends-tabs">
+              <button class="team-tab active" data-friend-tab="all">All</button>
+              <button class="team-tab" data-friend-tab="joined">Joined</button>
+          </div>
+          <div id="all" class="friend-tab-content active">
+              <div class="friend-list scrollable">
+                  <div class="friend-item">
+                      <div class="friend-avatar">HM</div>
+                      <div class="friend-info">
+                          <div class="friend-name">Hariram Manglaw</div>
+                          <div class="friend-phone">9980989304</div>
+                      </div>
+                      <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                  </div>
+                  <div class="friend-item">
+                      <div class="friend-avatar">SD</div>
+                      <div class="friend-info">
+                          <div class="friend-name">Santu Dey</div>
+                          <div class="friend-phone">8985689809</div>
+                      </div>
+                      <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                  </div>
+                  <div class="friend-item">
+                      <div class="friend-avatar">MV</div>
+                      <div class="friend-info">
+                          <div class="friend-name">Mauhet Verma</div>
+                          <div class="friend-phone">8943870809</div>
+                      </div>
+                      <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                  </div>
+                  <div class="friend-item">
+                      <div class="friend-avatar">RA</div>
+                      <div class="friend-info">
+                          <div class="friend-name">Rajesh Kumar</div>
+                          <div class="friend-phone">9876543210</div>
+                      </div>
+                      <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+                  </div>
+              </div>
+          </div>
+          <div id="joined" class="friend-tab-content">
+              <div class="team-tabs">
+                  <button class="team-tab active" data-level="1">Level 1</button>
+                  <button class="team-tab" data-level="2">Level 2</button>
+                  <button class="team-tab" data-level="3">Level 3</button>
+              </div>
+              <div class="team-content">
+                  <div class="team-level-content active" id="level1Content">
+                      <p>Total Members: <strong id="level1Count">0</strong></p>
+                      <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
+                      <div class="team-list-container" id="level1List"></div>
+                  </div>
+                  <div class="team-level-content" id="level2Content">
+                      <p>Total Members: <strong id="level2Count">0</strong></p>
+                      <div class="team-list-container" id="level2List"></div>
+                  </div>
+                  <div class="team-level-content" id="level3Content">
+                      <p>Total Members: <strong id="level3Count">0</strong></p>
+                      <div class="team-list-container" id="level3List"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+    </div></main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
@@ -194,16 +229,14 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        
-        // FIX 3: UPDATED JAVASCRIPT
-        // This now looks for the new ".pill-tab-button" class
         const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
-        const mainContents = document.querySelectorAll('main.refer-page-container > .tab-content');
+        
+        // Updated to search within the new wrapper
+        const mainContents = document.querySelectorAll('.refer-page-wrapper > .tab-content');
 
         mainTabs.forEach(tab => {
-            // Added 'e' to the function to catch the click event
             tab.addEventListener('click', (e) => { 
-                e.preventDefault(); // This stops the 'a' tag from navigating
+                e.preventDefault();
                 
                 mainTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
@@ -216,7 +249,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic (This was already correct) ---
+        // --- "All" / "Joined" (Friends) Tab logic (No changes needed) ---
         const friendTabs = document.querySelectorAll('#friends-tabs .team-tab');
         const friendContents = document.querySelectorAll('.friend-tab-content');
 
@@ -237,5 +270,5 @@
     });
   </script>
 </body>
-</html>
+  </html>
   
