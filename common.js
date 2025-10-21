@@ -23,7 +23,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 
                 // Redirect to login if not on auth pages
                 if (!authPages.includes(currentPage)) {
-                    window.location.href = 'login.html';
+                    window.location.href = 'login.html'
                 }
             }
         });
@@ -120,3 +120,117 @@ function loadUserData(userId) {
         console.error('Error loading user data:', error);
     });
                     }
+
+// --- START: Inactivity Auto-Logout ---
+// This code should be added to your common.js file
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if Firebase is loaded
+    if (typeof firebase === 'undefined' || !firebase.auth) {
+        console.warn("Firebase Auth not found, auto-logout feature is disabled.");
+        return;
+    }
+
+    // Set the inactivity timeout duration (30 minutes in milliseconds)
+    const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+
+    // Variable to hold the timer ID
+    let inactivityTimer;
+
+    /**
+     * Function to log the user out via Firebase and redirect.
+     */
+    function autoLogout() {
+        console.log("Inactivity detected. Logging out...");
+        
+        firebase.auth().signOut()
+            .then(() => {
+                // Sign-out successful.
+                alert("You have been logged out due to inactivity.");
+                
+                // --- IMPORTANT ---
+                // Change 'login.html' to the correct path of your login page if it's different.
+                window.location.href = 'login.html'; 
+            })
+            .catch((error) => {
+                // An error happened.
+                console.error("Error during auto-logout:", error);
+                
+                // Still redirect even if sign-out fails, as session might be bad
+                alert("Your session has expired.");
+                window.location.href = 'login.html';
+            });
+    }
+
+    /**
+     * Resets the inactivity timer.
+     * This function is called whenever user activity is detected.
+     */
+    function resetInactivityTimer() {
+        // Clear the existing timer
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+        }
+        
+        // Start a new timer
+        inactivityTimer = setTimeout(autoLogout, INACTIVITY_TIMEOUT_MS);
+        // console.log("Timer reset. New timeout in 30 minutes."); // Uncomment for testing
+    }
+
+    /**
+     * Stops the inactivity timer.
+     * Used when the user logs out manually or is not logged in.
+     */
+    function stopInactivityTimer() {
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            console.log("Inactivity timer stopped.");
+        }
+    }
+
+    /**
+     * Attaches event listeners to the document to detect activity.
+     */
+    function setupActivityListeners() {
+        // Events that count as user activity
+        const activityEvents = [
+            'mousemove', 
+            'mousedown', 
+            'keydown', 
+            'touchstart', 
+            'scroll',
+            'click'
+        ];
+
+        // Add event listeners for all activity events
+        // We use 'document' to listen globally
+        activityEvents.forEach(eventName => {
+            document.addEventListener(eventName, resetInactivityTimer, true);
+        });
+
+        console.log("Activity listeners attached.");
+    }
+
+    // --- Main Logic ---
+    // Use onAuthStateChanged to check if a user is logged in.
+    // We only want the timer to run for logged-in users.
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // User is signed in.
+            console.log("User is logged in. Starting inactivity timer.");
+            setupActivityListeners(); // Start listening for activity
+            resetInactivityTimer(); // Start the timer for the first time
+        } else {
+            // User is signed out (or was never logged in).
+            console.log("User is not logged in. Stopping inactivity timer.");
+            stopInactivityTimer(); // Stop any existing timer
+            
+            // Optional: Remove listeners if you want to be extra clean,
+            // but it's generally fine to leave them.
+        }
+    });
+
+});
+
+// --- END: Inactivity Auto-Logout ---
+
