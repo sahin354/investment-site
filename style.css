@@ -75,24 +75,12 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .tab-button.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
 .tab-content { display: none; padding: 15px; }
 .tab-content.active { display: block; }
-
-/* NOTE: .plan-card is styled twice later on.
-  This version is used by your index.html page.
-*/
-.plan-card { 
-    display: flex; 
-    background-color: white; 
-    border-radius: 8px; 
-    box-shadow: var(--card-shadow); 
-    margin-bottom: 15px; 
-    overflow: hidden; 
-}
+.plan-card { display: flex; background-color: white; border-radius: 8px; box-shadow: var(--card-shadow); margin-bottom: 15px; overflow: hidden; }
 .plan-card img { width: 100px; height: 100px; object-fit: cover; }
 .plan-details { flex-grow: 1; padding: 10px 15px; }
 .plan-details h4 { margin: 0 0 5px 0; }
 .plan-details p { margin: 5px 0; font-size: 0.9em; color: var(--text-light); }
 .buy-btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; align-self: center; margin-right: 15px; border-radius: 6px; }
-
 /* --- Auth Pages (login.html, register.html) --- */
 .auth-page-background { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 .auth-container { width: 100%; max-width: 400px; padding: 20px; }
@@ -108,19 +96,18 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .form-options a { color: #555; font-size: 0.9em; text-decoration: none; }
 .auth-switch { text-align: center; margin-top: 20px; font-size: 0.9em; color: #555; }
 .auth-switch a { color: var(--primary-color); font-weight: bold; text-decoration: none; }
-
 /* --- Refer Page (refer.html) --- */
-.refer-page-container {
-  padding: 15px;
-  padding-top: 0; /* The 'main' tag handles top padding */
-}
-.refer-main-card h2 { margin-top: 0; }
-.refer-link-box { display: flex; align-items: center; justify-content: space-between; background-color: var(--bg-light); border: 1px solid #dce4f0; border-radius: 8px; padding: 8px 12px; margin-top: 20px; }
-#referralLink { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; }
-#copyLinkBtn { background-color: #eef2f7; color: #3c4858; border: none; border-radius: 6px; padding: 8px 12px; font-weight: bold; cursor: pointer; }
-.level-display { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 10px; width: 30%; display: flex; flex-direction: column; }
-.level-title { font-size: 0.9em; color: var(--text-light); }
-.level-percent { font-size: 1.5em; font-weight: bold; color: var(--primary-color); margin-top: 5px; }
+/* These are your OLD styles for the refer page */
+.refer-page-container { padding: 15px; }
+/* .refer-main-card h2 { margin-top: 0; } */ /* Commented out as new style exists */
+/* .refer-link-box { display: flex; align-items: center; justify-content: space-between; background-color: var(--bg-light); border: 1px solid #dce4f0; border-radius: 8px; padding: 8px 12px; margin-top: 20px; } */ /* Commented out */
+/* #referralLink { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: monospace; } */ /* Commented out */
+/* #copyLinkBtn { background-color: #eef2f7; color: #3c4858; border: none; border-radius: 6px; padding: 8px 12px; font-weight: bold; cursor: pointer; } */ /* Commented out */
+.commission-card h3, .team-card h3 { text-align: center; margin: 0 0 20px 0; }
+.levels-container { display: flex; justify-content: space-around; text-align: center; }
+/* .level-display { background-color: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 10px; width: 30%; display: flex; flex-direction: column; } */ /* Commented out */
+/* .level-title { font-size: 0.9em; color: var(--text-light); } */ /* Commented out */
+/* .level-percent { font-size: 1.5em; font-weight: bold; color: var(--primary-color); margin-top: 5px; } */ /* Commented out */
 .team-tabs { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); }
 .team-tab { padding: 10px 20px; border: none; background: none; font-size: 1em; font-weight: 500; color: var(--text-light); cursor: pointer; border-bottom: 3px solid transparent; }
 .team-tab.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
@@ -131,70 +118,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .team-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; }
 .recharge-status.recharged { color: #15803d; font-weight: bold; background-color: #dcfce7; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
 .recharge-status.not-recharged { color: #9ca3af; background-color: #f3f4f6; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
-
-/* === NEW STYLES FOR REFER PAGE PILL TABS === */
-.pill-tab-container {
-  display: flex;
-  background-color: #f0f2f5;
-  border-radius: 30px;
-  padding: 5px;
-  margin-bottom: 15px; /* Add space below the tabs */
-  margin-top: 15px; /* Add space above the tabs */
-}
-.pill-tab-button {
-  flex: 1;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 25px;
-  background-color: transparent;
-  color: #555;
-  font-weight: 600;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  text-align: center;
-}
-.pill-tab-button.active {
-  background-color: #ffffff;
-  color: #1a202c;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-/* This makes the card inside the tab content full-width */
-.refer-page-container > .tab-content .card {
-  margin-top: 0;
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* === FIX FOR BROKEN "Invite" BUTTON === */
-.friend-item {
-    /* This makes sure the button doesn't get pushed down */
-    align-items: center;
-}
-.friend-item .invite-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.9em;
-  white-space: nowrap;
-}
-.friend-item .invite-btn span {
-  display: inline-flex;
-  align-items: center;
-}
-.friend-item .invite-btn img {
-  width: 16px;
-  height: 16px;
-}
-
 
 /* ===== MINE PAGE SPECIFIC STYLES ===== */
 .mine-page .profile-header-card {
@@ -328,17 +251,66 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
 .quick-amount-btn.active, .quick-amount-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
+/* Investment Plan Cards */
+/* This is a conflicting definition of .plan-card, but it is overridden by the more modern styles below */
+.plan-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.buy-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.buy-btn:hover {
+    background: var(--secondary-color);
+}
+
+/* VIP Plan Styling */
+.plan-card:has(h4:contains('VIP')) {
+    border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #fffaf0, #fff5e6);
+}
+
+/* Progress Bars */
+.progress-bar {
+    background: #f0f0f0;
+    border-radius: 10px;
+    height: 8px;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
 /* --- Modern Investment Plan Card Styles --- */
-/*
-  This is the second .plan-card style. 
-  It has different properties and will override the one from index.html
-  on pages where these more modern styles are used.
-*/
+/* This is the new .plan-card style that is used */
 .plan-card {
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-    margin: 15px 0; /* Note: 15px 0, not 15px auto */
+    margin: 15px 0;
     padding: 20px;
     border: 1px solid #e9ecef;
     display: flex;
@@ -432,7 +404,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     font-family: 'Poppins', sans-serif; /* A modern font, add to your project if you like */
 }
 
-/* This .auth-container is different from the .auth-container-wrapper */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -678,4 +649,17 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     margin-top: 30px;
 }
 
-.social-log
+.social-login p {
+    color: #AAA;
+    margin-bottom: 20px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-icon {
+    display: flex;
+    justify-content: center;
