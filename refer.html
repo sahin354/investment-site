@@ -5,73 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="style.css" />
-  
-  <style>
-    /* This new class adds the 15px padding that was missing */
-    .refer-page-wrapper {
-      padding: 15px;
-    }
-
-    .pill-tab-container {
-      display: flex !important;
-      background-color: #f0f2f5 !important;
-      border-radius: 30px !important;
-      padding: 5px !important;
-      margin-bottom: 15px; /* Add space below the tabs */
-    }
-    .pill-tab-button {
-      flex: 1 !important;
-      padding: 10px 15px !important;
-      border: none !important;
-      border-radius: 25px !important;
-      background-color: transparent !important;
-      color: #555 !important;
-      font-weight: 600 !important;
-      font-size: 0.9em !important;
-      cursor: pointer !important;
-      transition: all 0.3s ease !important;
-      text-decoration: none !important;
-      text-align: center !important;
-    }
-    .pill-tab-button.active {
-      background-color: #ffffff !important;
-      color: #1a202c !important;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    .tab-content .card {
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
-    }
-    
-    /* FIX 2: FIX FOR BROKEN "Invite" BUTTON
-      This style targets the broken button in your friends list
-      and makes it look correct again.
-    */
-    .friend-item .invite-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center;
-      gap: 6px !important;
-      background-color: var(--primary-color) !important;
-      color: white !important;
-      border: none !important;
-      padding: 8px 12px !important;
-      border-radius: 20px !important;
-      font-weight: 600 !important;
-      font-size: 0.9em;
-      white-space: nowrap;
-    }
-    .friend-item .invite-btn span {
-      display: inline-flex !important;
-      align-items: center !important;
-    }
-    .friend-item .invite-btn img {
-      width: 16px !important;
-      height: 16px !important;
-    }
-  </style>
 </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -90,8 +23,7 @@
     Refer & Earn
   </header>
   
-  <main>
-    <div class="refer-page-wrapper">
+  <main class="refer-page-container">
     
       <div class="pill-tab-container main-refer-tabs">
         <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
@@ -212,7 +144,7 @@
           </div>
       </div>
       
-    </div></main>
+  </main>
 
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
@@ -230,9 +162,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
-        
-        // Updated to search within the new wrapper
-        const mainContents = document.querySelectorAll('.refer-page-wrapper > .tab-content');
+        const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
 
         mainTabs.forEach(tab => {
             tab.addEventListener('click', (e) => { 
@@ -242,7 +172,10 @@
                 tab.classList.add('active');
 
                 mainContents.forEach(c => c.classList.remove('active'));
-                const targetContent = document.getElementById(tab.dataset.tab);
+                
+                // JAVASCRIPT FIX: Removed extra '..' before 'tab'
+                const targetContent = document.getElementById(tab.dataset.tab); 
+                
                 if (targetContent) {
                     targetContent.classList.add('active');
                 }
@@ -270,5 +203,5 @@
     });
   </script>
 </body>
-  </html>
-  
+                            </html>
+                            
