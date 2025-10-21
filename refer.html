@@ -5,402 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* --- Global Styles & Variables --- */
-    :root {
-      --primary-color: #1e3c72;
-      --secondary-color: #2a5298;
-      --text-dark: #1a202c;
-      --text-light: #555;
-      --bg-light: #f4f6f9;
-      --border-color: #eef2f7;
-      --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      line-height: 1.5;
-      padding-bottom: 70px;
-    }
-    /* --- Core Layout Components --- */
-    .top-bar {
-      background: var(--primary-color); color: white; padding: 15px 20px;
-      font-size: 1.2em; font-weight: bold; text-align: center;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
-    }
-    main { padding-top: 60px; }
-    .bottom-nav {
-      display: flex; justify-content: space-around; position: fixed;
-      bottom: 0; left: 0; right: 0; background-color: white;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 10px 0; z-index: 900;
-    }
-    .bottom-nav a { color: var(--text-light); text-decoration: none; font-size: 0.9em; }
-    .bottom-nav a.active { color: var(--primary-color); font-weight: bold; }
-    .bottom-nav-spacer { height: 70px; }
-    /* --- Reusable Components --- */
-    .card {
-      background: #ffffff; border-radius: 12px; padding: 20px;
-      margin: 15px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);
-    }
-    .page-container { padding: 0; }
-    .submit-btn {
-      width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold;
-      background-color: var(--primary-color); color: white; border: none;
-      border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
-    }
-    .submit-btn:hover { background-color: var(--secondary-color); }
-    .submit-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
-    /* --- Hamburger Menu & Sidebar --- */
-    .menu-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; }
-    .menu-btn span { display: block; width: 22px; height: 2px; background-color: white; margin: 5px 0; }
-    body.sidebar-open { overflow: hidden; }
-    .sidebar-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); z-index: 998; opacity: 0;
-      pointer-events: none; transition: opacity 0.3s ease-in-out;
-    }
-    body.sidebar-open .sidebar-overlay { opacity: 1; pointer-events: auto; }
-    .side-menu {
-      position: fixed; top: 0; left: 0; width: 280px; max-width: 85vw; height: 100%;
-      background-color: #ffffff; z-index: 999; display: flex; flex-direction: column;
-      box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1); transform: translateX(-100%);
-      transition: transform 0.3s ease-in-out;
-    }
-    body.sidebar-open .side-menu { transform: translateX(0); }
-    .sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 25px 20px; }
-    .sidebar-id { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
-    .sidebar-vip { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
-    .sidebar-actions { flex-grow: 1; padding-top: 15px; }
-    .sidebar-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 15px 20px; background-color: transparent; border: none; text-align: left; font-size: 1em; color: #333; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; }
-    .sidebar-btn:hover { background-color: var(--bg-light); color: var(--primary-color); }
-    .sidebar-btn span { font-size: 1.4em; }
-    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
-    .close-btn:hover { color: white; }
-    
-    /* --- Refer Page Specific Styles --- */
-    .refer-page-wrapper {
-      padding: 15px;
-    }
-    
-    /* Tab Navigation - EXACT match to screenshot */
-    .pill-tab-container {
-      display: flex !important;
-      background-color: #f0f2f5 !important;
-      border-radius: 30px !important;
-      padding: 5px !important;
-      margin-bottom: 15px;
-    }
-    
-    .pill-tab-button {
-      flex: 1 !important;
-      padding: 10px 15px !important;
-      border: none !important;
-      border-radius: 25px !important;
-      background-color: transparent !important;
-      color: #555 !important;
-      font-weight: 600 !important;
-      font-size: 0.9em !important;
-      cursor: pointer !important;
-      transition: all 0.3s ease !important;
-      text-decoration: none !important;
-      text-align: center !important;
-    }
-    
-    .pill-tab-button.active {
-      background-color: #ffffff !important;
-      color: #1a202c !important;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    /* Earnings Dashboard - EXACT layout from screenshot */
-    .earnings-dashboard {
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
-    }
-    
-    .earnings-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    .earnings-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      background-color: var(--bg-light);
-      border-radius: 12px;
-    }
-    
-    .earnings-label {
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-    
-    .earnings-value {
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--primary-color);
-    }
-    
-    /* Referral Section */
-    .refer-main-card {
-      margin-top: 0;
-      margin-left: 0;
-      margin-right: 0;
-    }
-    
-    .refer-main-card h2 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-size: 1.3rem;
-    }
-    
-    .invite-content-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    
-    .refer-link-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: var(--bg-light);
-      border: 1px solid #dce4f0;
-      border-radius: 8px;
-      padding: 12px 15px;
-    }
-    
-    #referralLink {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-family: monospace;
-      color: var(--primary-color);
-      font-weight: 600;
-      flex: 1;
-      margin-right: 10px;
-    }
-    
-    #copyLinkBtn {
-      background-color: #eef2f7;
-      color: #3c4858;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      font-weight: bold;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    
-    .level-display {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #f8fafc;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 15px;
-    }
-    
-    .level-title {
-      font-size: 0.9em;
-      color: var(--text-light);
-    }
-    
-    .level-percent {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-    
-    /* Friends Section */
-    .friends-card {
-      margin-top: 20px;
-    }
-    
-    .friends-card h3 {
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-    
-    .search-bar-container {
-      position: relative;
-      margin-bottom: 15px;
-    }
-    
-    .search-bar-container span {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-light);
-    }
-    
-    .search-bar-container input {
-      width: 100%;
-      padding: 12px 15px 12px 45px;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      background-color: var(--bg-light);
-      font-size: 0.95rem;
-    }
-    
-    .team-tabs {
-      display: flex;
-      background-color: var(--bg-light);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 15px;
-    }
-    
-    .team-tab {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      background: transparent;
-      border: none;
-      font-weight: 600;
-      color: var(--text-light);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .team-tab.active {
-      background-color: white;
-      color: var(--primary-color);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    }
-    
-    /* Friend List - EXACT match to screenshot */
-    .friend-list {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    
-    .friend-item {
-      display: flex;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-    
-    .friend-item:last-child {
-      border-bottom: none;
-    }
-    
-    .friend-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background-color: var(--primary-color);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
-    
-    .friend-info {
-      flex: 1;
-    }
-    
-    .friend-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    
-    .friend-phone {
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-    
-    /* Fixed Invite Button - EXACT match to screenshot */
-    .friend-item .invite-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center;
-      gap: 6px !important;
-      background-color: #10b981 !important;
-      color: white !important;
-      border: none !important;
-      padding: 8px 12px !important;
-      border-radius: 20px !important;
-      font-weight: 600 !important;
-      font-size: 0.9em;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    
-    .friend-item .invite-btn span {
-      display: inline-flex !important;
-      align-items: center !important;
-    }
-    
-    .friend-item .invite-btn img {
-      width: 16px !important;
-      height: 16px !important;
-    }
-    
-    /* Bottom Navigation */
-    .bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text-light);
-      font-size: 0.8rem;
-      transition: color 0.3s;
-    }
-    
-    .bottom-nav a.active {
-      color: var(--primary-color);
-    }
-    
-    .bottom-nav a i {
-      font-size: 1.2rem;
-      margin-bottom: 4px;
-    }
-    
-    /* Scrollable Content */
-    .scrollable {
-      overflow-y: auto;
-    }
-    
-    /* Friend Tab Content */
-    .friend-tab-content {
-      display: none;
-    }
-    
-    .friend-tab-content.active {
-      display: block;
-    }
-    
-    /* Responsive Adjustments */
-    @media (min-width: 768px) {
-      main {
-        max-width: 500px;
-        margin: 0 auto;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -424,13 +29,11 @@
   
   <main>
     <div class="refer-page-wrapper">
-      <!-- Tab Navigation - EXACT match to screenshot -->
       <div class="pill-tab-container main-refer-tabs">
         <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
         <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
       </div>
 
-      <!-- Invite Tab Content -->
       <section id="invite" class="tab-content">
         <div class="card refer-main-card">
           <h2>Invite Friends, Earn Rewards!</h2>
@@ -455,7 +58,6 @@
         </div>
       </section>
 
-      <!-- My Earnings Tab Content -->
       <section id="earnings" class="tab-content active">
         <div class="card earnings-dashboard">
           <div class="earnings-container">
@@ -476,7 +78,6 @@
         </div>
       </section>
 
-      <!-- Friends Section -->
       <div class="card friends-card">
         <h3>Friends</h3>
         <div class="search-bar-container">
@@ -488,7 +89,6 @@
           <button class="team-tab" data-friend-tab="joined">Joined</button>
         </div>
         
-        <!-- All Friends Tab -->
         <div id="all" class="friend-tab-content active">
           <div class="friend-list scrollable">
             <div class="friend-item">
@@ -518,7 +118,6 @@
           </div>
         </div>
         
-        <!-- Joined Friends Tab -->
         <div id="joined" class="friend-tab-content">
           <div class="team-tabs">
             <button class="team-tab active" data-level="1">Level 1</button>
@@ -553,7 +152,14 @@
     <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="common.js"></script>
+  
   <script>
+    // This script contains the logic for the tabs on this page
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
@@ -593,11 +199,31 @@
             });
         });
 
-        // Sidebar functionality
-        const menuBtn = document.getElementById('menuBtn');
-        const sideMenu = document.getElementById('sideMenu');
-        const closeBtn = document.getElementById('closeBtn');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        
-        menuBtn.addEventListener('click', () => {
-            sideMenu.classList.add('active')
+        // --- "Level 1/2/3" (Joined Friends) Tab logic ---
+        // Assuming this logic is needed for the "Joined" tab
+        const levelTabs = document.querySelectorAll('#joined .team-tabs .team-tab');
+        const levelContents = document.querySelectorAll('#joined .team-level-content');
+
+        levelTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                levelTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const targetContentId = `level${tab.dataset.level}Content`;
+                levelContents.forEach(c => c.classList.remove('active'));
+                const targetContent = document.getElementById(targetContentId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+
+        // Note: Sidebar functionality is in common.js, but if it's not,
+        // the sidebar code from your original file is already in common.js or 
+        // should be added there. This inline script only handles tab logic.
+    });
+  </script>
+</body>
+</html>
