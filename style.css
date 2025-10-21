@@ -228,95 +228,113 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .input-field-group .input-group:first-child input { border-top-left-radius: 8px; border-top-right-radius: 8px; }
 .input-field-group .input-group:last-child input { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
 
-/* === REVISED STYLES FOR refer.html (from LATEST screenshot) === */
+/* === REVISED STYLES FOR refer.html === */
 
 .refer-page-container {
-  padding: 0; /* Ensures content stretches to edges if needed, internal margins handle spacing */
+  padding: 0;
 }
 
-/* Top Tabs: Invite / My Earnings */
-.refer-top-tabs {
+/* Ensure refer-main-tabs styling doesn't interfere with original index.html tabs */
+.refer-main-tabs {
+    /* These inherit from .tabs now, only use if specific overrides are needed for refer page main tabs */
+    margin-bottom: 15px; /* Space below the tab buttons */
+}
+
+/* Friends Sub-Tabs: All / Joined */
+.friends-sub-tabs {
   display: flex;
-  background-color: white; /* Matches white background of top bar/body */
-  padding: 0 15px; /* Horizontal padding for alignment with cards */
-  margin-bottom: 15px; /* Space between tabs and the earnings card */
-  border-bottom: 1px solid #ddd; /* Thin separator line */
+  border-bottom: 1px solid #eee; /* Light separator line */
+  margin-bottom: 15px;
 }
 
-.refer-top-tabs .refer-top-tab-button {
+.friends-sub-tabs .friends-sub-tab-button {
   flex: 1;
-  padding: 15px 0; /* Vertical padding */
+  padding: 12px 0;
   border: none;
   background: none;
   font-size: 1em;
   font-weight: 500;
-  color: #888; /* Muted color for inactive tabs */
+  color: #888;
   cursor: pointer;
-  text-decoration: none; /* Remove default underline */
+  text-decoration: none;
   text-align: center;
   transition: color 0.2s;
   position: relative; /* For the active bottom line */
 }
 
-.refer-top-tabs .refer-top-tab-button.active {
-  color: var(--primary-color); /* Active tab color */
+.friends-sub-tabs .friends-sub-tab-button.active {
+  color: var(--primary-color);
   font-weight: bold;
 }
 
-.refer-top-tabs .refer-top-tab-button.active::after {
+.friends-sub-tabs .friends-sub-tab-button.active::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 60%; /* Adjust width of the underline */
-    height: 3px; /* Thickness of the underline */
+    height: 2px; /* Thickness of the underline */
     background-color: var(--primary-color);
-    border-radius: 2px;
+    border-radius: 1px;
 }
 
-/* Earnings Card */
-.earnings-card {
-  margin-top: 0; /* Remove top margin if it's the first card after tabs */
-  margin-bottom: 15px; /* Space before next card */
-  /* Margin already set by .card selector, keep it at 15px all around for consistency */
+/* Friend List Items */
+.friend-list {
+  /* No explicit max-height, let it grow naturally or be handled by outer scroll */
 }
 
-.earnings-summary-item {
+.friend-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px; /* Spacing between reward lines */
+  justify-content: space-between; /* Space out details and button */
+  padding: 12px 0;
+  border-bottom: 1px solid #eee; /* Separator between friends */
 }
 
-.earnings-summary-item:last-of-type {
-  margin-bottom: 20px; /* More space before the button */
+.friend-item:last-child {
+  border-bottom: none;
+  margin-bottom: 15px; /* Space before level buttons */
 }
 
-.earnings-summary-item span:first-child {
+.friend-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allow details to take up space */
+}
+
+.friend-name {
+  font-weight: 500; /* Medium bold for name */
   font-size: 1em;
-  color: #333; /* Darker text for label as in screenshot */
+  color: #333;
 }
 
-.earnings-summary-item span:last-child {
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #1a202c; /* Stronger color for amount */
+.friend-phone {
+  font-size: 0.9em;
+  color: #777;
+  margin-top: 3px;
 }
 
-.redeem-btn {
-  background-color: #6A7BFF; /* Matches blue button in screenshot */
-  font-weight: normal; /* Less bold than global submit-btn */
-  border-radius: 5px; /* Slightly less rounded */
-}
-.redeem-btn:hover {
-  background-color: #576bff;
+.invite-btn-simple {
+  background-color: white; /* White background */
+  color: #6A7BFF; /* Blue text */
+  border: 1px solid #6A7BFF; /* Blue border */
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-weight: normal;
+  font-size: 0.9em;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 15px; /* Space between details and button */
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
-/* Friends Card */
-.friends-card {
-  margin-top: 0; /* No extra top margin, follows earnings card */
-  /* Margin already set by .card selector */
+.invite-btn-simple:hover {
+  background-color: #6A7BFF;
+  color: white;
 }
 
-.friends-card 
+/* Level Buttons (at bottom of All tab) */
+.level-buttons-container {
+  display: flex;
+  g
