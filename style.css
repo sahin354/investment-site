@@ -68,10 +68,48 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-btn span { font-size: 1.4em; }
 .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
 .close-btn:hover { color: white; }
-/* --- Home Page (index.html) --- */
+
+/* --- Home Page (index.html) - Restored original tab styles --- */
 .banner-img { width: 100%; display: block; }
+
+/* Tabs for index.html (Primary, VIP, Purchased) */
+.tabs { /* Assuming your main index.html uses a container with this class */
+    display: flex;
+    justify-content: space-around;
+    background-color: white; /* Or match your banner background */
+    padding: 10px 0;
+    margin-top: -5px; /* Adjust if needed to sit under banner */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Optional subtle shadow */
+}
+
+/* Specific tab button style for index.html */
+.tabs .tab-button {
+    flex: 1; /* Distribute space evenly */
+    padding: 10px 15px;
+    border: 1px solid #dce4f0; /* Light border */
+    border-radius: 20px; /* Pill shape */
+    background-color: #f8fafc; /* Light background for inactive */
+    color: var(--text-light);
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    margin: 0 5px; /* Space between buttons */
+    transition: all 0.2s ease;
+    text-decoration: none; /* Ensure no underline */
+}
+
+/* Active state for index.html tab buttons */
+.tabs .tab-button.active {
+    background-color: var(--primary-color); /* Primary color background */
+    color: white;
+    border-color: var(--primary-color); /* Primary color border */
+    box-shadow: 0 2px 8px rgba(30, 60, 114, 0.2); /* Subtle shadow for active */
+}
+
 .tab-content { display: none; padding: 15px; }
 .tab-content.active { display: block; }
+
 .plan-card { display: flex; background-color: white; border-radius: 8px; box-shadow: var(--card-shadow); margin-bottom: 15px; overflow: hidden; }
 .plan-card img { width: 100px; height: 100px; object-fit: cover; }
 .plan-details { flex-grow: 1; padding: 10px 15px; }
@@ -281,58 +319,4 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   /* Margin already set by .card selector */
 }
 
-.friends-card h3 {
-  font-size: 1.2em;
-  margin-top: 0;
-  margin-bottom: 15px;
-  text-align: left; /* Align to left */
-}
-
-/* Search Input Wrapper */
-.search-input-wrapper {
-  position: relative;
-  margin-bottom: 15px; /* Space below search bar */
-}
-
-.search-input-wrapper i {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999; /* Muted icon color */
-  font-size: 1.1em;
-}
-
-.search-input-wrapper input {
-  width: calc(100% - 30px); /* Adjust width for padding and icon */
-  padding: 12px 15px 12px 45px; /* Left padding for icon */
-  border: 1px solid #ccc; /* Visible border */
-  border-radius: 5px; /* Slightly rounded corners */
-  font-size: 1em;
-  background-color: white; /* Ensure white background */
-  outline: none; /* Remove focus outline */
-}
-.search-input-wrapper input::placeholder {
-    color: #bbb;
-}
-
-/* Friends Sub-Tabs: All / Joined */
-.friends-sub-tabs {
-  display: flex;
-  border-bottom: 1px solid #eee; /* Light separator line */
-  margin-bottom: 15px;
-}
-
-.friends-sub-tabs .friends-sub-tab-button {
-  flex: 1;
-  padding: 12px 0;
-  border: none;
-  background: none;
-  font-size: 1em;
-  font-weight: 500;
-  color: #888;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: color 0.2s;
-  position: relative; /* For the active bottom lin
+.friends-card 
