@@ -28,113 +28,103 @@
   </header>
   
   <main>
-    <div class="refer-page-wrapper">
-      <div class="top-page-tabs">
-        <a href="#" class="tab-button" data-tab="invite">Invite</a>
-        <a href="#" class="tab-button active" data-tab="earnings">My Earnings</a>
+    <div class="refer-page-container">
+      <div class="refer-top-tabs">
+        <a href="#" class="refer-top-tab-button" data-tab="invite">Invite</a>
+        <a href="#" class="refer-top-tab-button active" data-tab="earnings">My Earnings</a>
       </div>
 
-      <section id="invite" class="tab-content">
-        <div class="card refer-main-card">
-          <h2>Invite Friends, Earn Rewards!</h2>
-          <div class="invite-content-grid">
-            <div class="refer-link-box">
-              <span id="referralLink">https://adani.com/ref/UZ123456</span>
-              <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
-            </div>
-            <div class="level-display">
-              <span class="level-title">Level 1</span>
-              <span class="level-percent">20%</span>
-            </div>
-            <div class="level-display">
-              <span class="level-title">Level 2</span>
-              <span class="level-percent">8%</span>
-            </div>
-            <div class="level-display">
-              <span class="level-title">Level 3</span>
-              <span class="level-percent">1%</span>
-            </div>
+      <section id="earnings" class="tab-content active">
+        <div class="card earnings-card">
+          <div class="earnings-summary-item">
+            <span>Total Reward</span>
+            <span>₹0.00</span>
           </div>
+          <div class="earnings-summary-item">
+            <span>Available to Redeem</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="earnings-summary-item">
+            <span>Locked Reward</span>
+            <span>₹0.00</span>
+          </div>
+          <button class="submit-btn redeem-btn">Redeem Reward</button>
         </div>
       </section>
 
-      <section id="earnings" class="tab-content active">
-        <div class="card earnings-dashboard">
-          <div class="earnings-summary-item">
-            <span class="earnings-label">Total Reward</span>
-            <span class="earnings-value" id="total-reward">₹0.00</span>
+      <section id="invite" class="tab-content">
+        <div class="card invite-card">
+          <h2 style="margin-top:0;">Invite friends to earn rewards!</h2>
+          <p>Your referral link: <span id="referralLink">https://adani.com/ref/UZ123456</span> <button class="copy-link-btn">Copy</button></p>
+          <div class="commission-levels">
+            <p>Level 1: 20%</p>
+            <p>Level 2: 8%</p>
+            <p>Level 3: 1%</p>
           </div>
-          <div class="earnings-summary-item">
-            <span class="earnings-label">Available to Redeem</span>
-            <span class="earnings-value" id="available-reward">₹0.00</span>
-          </div>
-          <div class="earnings-summary-item">
-            <span class="earnings-label">Locked Reward</span>
-            <span class="earnings-value" id="locked-reward">₹0.00</span>
-          </div>
-          <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
         </div>
       </section>
 
       <div class="card friends-card">
         <h3>Friends</h3>
-        <div class="search-bar-container">
-          <span>🔍</span>
+        <div class="search-input-wrapper">
+          <i class="fas fa-search"></i>
           <input type="text" placeholder="Search friends">
         </div>
-        <div class="bottom-tab-buttons" id="friends-tabs">
-          <button class="tab-button active" data-friend-tab="all">All</button>
-          <button class="tab-button" data-friend-tab="joined">Joined</button>
+
+        <div class="friends-sub-tabs">
+          <a href="#" class="friends-sub-tab-button active" data-friend-tab="all">All</a>
+          <a href="#" class="friends-sub-tab-button" data-friend-tab="joined">Joined</a>
         </div>
         
-        <div id="all" class="friend-tab-content active">
-          <div class="friend-list scrollable">
+        <div id="all" class="friends-tab-content active">
+          <div class="friend-list">
             <div class="friend-item">
-              <div class="friend-avatar">HM</div>
-              <div class="friend-info">
-                <div class="friend-name">Hariram Manglaw</div>
+              <div class="friend-details">
+                <div class="friend-name">HM Hariram Manglaw</div>
                 <div class="friend-phone">9980989304</div>
               </div>
-              <button class="invite-friend-btn">Invite</button> </div>
-            <div class="friend-item">
-              <div class="friend-avatar">SD</div>
-              <div class="friend-info">
-                <div class="friend-name">Santu Dey</div>
-                <div class="friend-phone">8985689809</div>
-              </div>
-              <button class="invite-friend-btn">Invite</button>
+              <button class="invite-btn-simple">Invite</button>
             </div>
             <div class="friend-item">
-              <div class="friend-avatar">MV</div>
-              <div class="friend-info">
-                <div class="friend-name">Mauhet Verma</div>
+              <div class="friend-details">
+                <div class="friend-name">SD Santu Dey</div>
+                <div class="friend-phone">8985689809</div>
+              </div>
+              <button class="invite-btn-simple">Invite</button>
+            </div>
+            <div class="friend-item">
+              <div class="friend-details">
+                <div class="friend-name">MV Mauhet Verma</div>
                 <div class="friend-phone">8943870809</div>
               </div>
-              <button class="invite-friend-btn">Invite</button>
+              <button class="invite-btn-simple">Invite</button>
+            </div>
+            <div class="level-buttons-container">
+              <button class="level-button active" data-level="1">Level 1</button>
+              <button class="level-button" data-level="2">Level 2</button>
+              <button class="level-button" data-level="3">Level 3</button>
             </div>
           </div>
         </div>
         
-        <div id="joined" class="friend-tab-content">
-          <div class="team-tabs">
-            <button class="team-tab active" data-level="1">Level 1</button>
-            <button class="team-tab" data-level="2">Level 2</button>
-            <button class="team-tab" data-level="3">Level 3</button>
+        <div id="joined" class="friends-tab-content">
+          <div class="joined-team-levels">
+            <button class="level-button active" data-level="1">Level 1</button>
+            <button class="level-button" data-level="2">Level 2</button>
+            <button class="level-button" data-level="3">Level 3</button>
           </div>
-          <div class="team-content">
-            <div class="team-level-content active" id="level1Content">
-              <p>Total Members: <strong id="level1Count">0</strong></p>
-              <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
-              <div class="team-list-container" id="level1List"></div>
-            </div>
-            <div class="team-level-content" id="level2Content">
-              <p>Total Members: <strong id="level2Count">0</strong></p>
-              <div class="team-list-container" id="level2List"></div>
-            </div>
-            <div class="team-level-content" id="level3Content">
-              <p>Total Members: <strong id="level3Count">0</strong></p>
-              <div class="team-list-container" id="level3List"></div>
-            </div>
+          <div class="team-level-content active" id="level1Content">
+            <p>Total Members: <strong id="level1Count">0</strong></p>
+            <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
+            <div class="team-list-container" id="level1List"></div>
+          </div>
+          <div class="team-level-content" id="level2Content">
+            <p>Total Members: <strong id="level2Count">0</strong></p>
+            <div class="team-list-container" id="level2List"></div>
+          </div>
+          <div class="team-level-content" id="level3Content">
+            <p>Total Members: <strong id="level3Count">0</strong></p>
+            <div class="team-list-container" id="level3List"></div>
           </div>
         </div>
       </div>
@@ -154,18 +144,18 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
-  
-  <script>
+  <script src="refer.js"></script> <script>
+    // This script contains basic tab switching logic if refer.js doesn't handle it
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Main "Invite" / "My Earnings" Tab logic (using .tab-button) ---
-        const mainTabs = document.querySelectorAll('.top-page-tabs .tab-button');
-        const mainContents = document.querySelectorAll('.refer-page-wrapper > .tab-content');
+        // --- Main "Invite" / "My Earnings" Tab logic ---
+        const referTopTabs = document.querySelectorAll('.refer-top-tab-button');
+        const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
 
-        mainTabs.forEach(tab => {
+        referTopTabs.forEach(tab => {
             tab.addEventListener('click', (e) => { 
                 e.preventDefault();
                 
-                mainTabs.forEach(t => t.classList.remove('active'));
+                referTopTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
                 mainContents.forEach(c => c.classList.remove('active'));
@@ -176,18 +166,18 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic (using .tab-button) ---
-        const friendTabs = document.querySelectorAll('#friends-tabs .tab-button'); // Corrected selector
-        const friendContents = document.querySelectorAll('.friend-tab-content');
+        // --- "All" / "Joined" (Friends) Tab logic ---
+        const friendsSubTabs = document.querySelectorAll('.friends-sub-tabs .friends-sub-tab-button');
+        const friendsTabContents = document.querySelectorAll('.friends-tab-content');
 
-        friendTabs.forEach(tab => {
+        friendsSubTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
-                e.stopPropagation(); 
+                e.preventDefault(); 
                 
-                friendTabs.forEach(t => t.classList.remove('active'));
+                friendsSubTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
-                friendContents.forEach(c => c.classList.remove('active'));
+                friendsTabContents.forEach(c => c.classList.remove('active'));
                 const targetContent = document.getElementById(tab.dataset.friendTab);
                 if (targetContent) {
                     targetContent.classList.add('active');
@@ -195,27 +185,53 @@
             });
         });
 
-        // --- "Level 1/2/3" (Joined Friends) Tab logic ---
-        const levelTabs = document.querySelectorAll('#joined .team-tabs .team-tab');
-        const levelContents = document.querySelectorAll('#joined .team-level-content');
+        // --- "Level 1/2/3" (within Friends sections) Tab logic ---
+        // For "All" tab levels
+        const allLevelButtons = document.querySelectorAll('#all .level-button');
+        allLevelButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                allLevelButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // You would typically filter the friend list here based on the level.
+                // For this example, it just highlights the button.
+            });
+        });
 
-        levelTabs.forEach(tab => {
+        // For "Joined" tab levels (if applicable, this structure might be different)
+        const joinedLevelButtons = document.querySelectorAll('#joined .level-button');
+        const teamLevelContents = document.querySelectorAll('.team-level-content');
+
+        joinedLevelButtons.forEach(tab => {
             tab.addEventListener('click', (e) => {
-                e.stopPropagation();
+                e.preventDefault();
 
-                levelTabs.forEach(t => t.classList.remove('active'));
+                joinedLevelButtons.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
                 const targetContentId = `level${tab.dataset.level}Content`;
-                levelContents.forEach(c => c.classList.remove('active'));
+                teamLevelContents.forEach(c => c.classList.remove('active'));
                 const targetContent = document.getElementById(targetContentId);
                 if (targetContent) {
                     targetContent.classList.add('active');
                 }
             });
         });
+
+        // Copy referral link functionality
+        const copyLinkBtn = document.querySelector('.copy-link-btn');
+        if (copyLinkBtn) {
+            copyLinkBtn.addEventListener('click', () => {
+                const referralLink = document.getElementById('referralLink').textContent;
+                navigator.clipboard.writeText(referralLink).then(() => {
+                    alert('Referral link copied!');
+                }).catch(err => {
+                    console.error('Failed to copy link: ', err);
+                });
+            });
+        }
     });
   </script>
 </body>
   </html>
-          
+  
