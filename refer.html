@@ -29,9 +29,9 @@
   
   <main>
     <div class="refer-page-wrapper">
-      <div class="pill-tab-container main-refer-tabs">
-        <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
-        <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
+      <div class="top-page-tabs">
+        <a href="#" class="tab-button" data-tab="invite">Invite</a>
+        <a href="#" class="tab-button active" data-tab="earnings">My Earnings</a>
       </div>
 
       <section id="invite" class="tab-content">
@@ -60,19 +60,17 @@
 
       <section id="earnings" class="tab-content active">
         <div class="card earnings-dashboard">
-          <div class="earnings-container">
-            <div class="earnings-box" id="total-reward-box">
-              <div class="earnings-label">Total Reward</div>
-              <div class="earnings-value" id="total-reward">₹0.00</div>
-            </div>
-            <div class="earnings-box" id="available-reward-box">
-              <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-value" id="available-reward">₹0.00</div>
-            </div>
-            <div class="earnings-box" id="locked-reward-box">
-              <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-value" id="locked-reward">₹0.00</div>
-            </div>
+          <div class="earnings-summary-item">
+            <span class="earnings-label">Total Reward</span>
+            <span class="earnings-value" id="total-reward">₹0.00</span>
+          </div>
+          <div class="earnings-summary-item">
+            <span class="earnings-label">Available to Redeem</span>
+            <span class="earnings-value" id="available-reward">₹0.00</span>
+          </div>
+          <div class="earnings-summary-item">
+            <span class="earnings-label">Locked Reward</span>
+            <span class="earnings-value" id="locked-reward">₹0.00</span>
           </div>
           <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
         </div>
@@ -84,9 +82,9 @@
           <span>🔍</span>
           <input type="text" placeholder="Search friends">
         </div>
-        <div class="team-tabs" id="friends-tabs">
-          <button class="team-tab active" data-friend-tab="all">All</button>
-          <button class="team-tab" data-friend-tab="joined">Joined</button>
+        <div class="bottom-tab-buttons" id="friends-tabs">
+          <button class="tab-button active" data-friend-tab="all">All</button>
+          <button class="tab-button" data-friend-tab="joined">Joined</button>
         </div>
         
         <div id="all" class="friend-tab-content active">
@@ -97,15 +95,14 @@
                 <div class="friend-name">Hariram Manglaw</div>
                 <div class="friend-phone">9980989304</div>
               </div>
-              <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
-            </div>
+              <button class="invite-friend-btn">Invite</button> </div>
             <div class="friend-item">
               <div class="friend-avatar">SD</div>
               <div class="friend-info">
                 <div class="friend-name">Santu Dey</div>
                 <div class="friend-phone">8985689809</div>
               </div>
-              <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+              <button class="invite-friend-btn">Invite</button>
             </div>
             <div class="friend-item">
               <div class="friend-avatar">MV</div>
@@ -113,7 +110,7 @@
                 <div class="friend-name">Mauhet Verma</div>
                 <div class="friend-phone">8943870809</div>
               </div>
-              <button class="invite-btn">Invite <span><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"></span></button>
+              <button class="invite-friend-btn">Invite</button>
             </div>
           </div>
         </div>
@@ -159,10 +156,9 @@
   <script src="common.js"></script>
   
   <script>
-    // This script contains the logic for the tabs on this page
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Main "Invite" / "My Earnings" Tab logic ---
-        const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
+        // --- Main "Invite" / "My Earnings" Tab logic (using .tab-button) ---
+        const mainTabs = document.querySelectorAll('.top-page-tabs .tab-button');
         const mainContents = document.querySelectorAll('.refer-page-wrapper > .tab-content');
 
         mainTabs.forEach(tab => {
@@ -180,8 +176,8 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic ---
-        const friendTabs = document.querySelectorAll('#friends-tabs .team-tab');
+        // --- "All" / "Joined" (Friends) Tab logic (using .tab-button) ---
+        const friendTabs = document.querySelectorAll('#friends-tabs .tab-button'); // Corrected selector
         const friendContents = document.querySelectorAll('.friend-tab-content');
 
         friendTabs.forEach(tab => {
@@ -200,7 +196,6 @@
         });
 
         // --- "Level 1/2/3" (Joined Friends) Tab logic ---
-        // Assuming this logic is needed for the "Joined" tab
         const levelTabs = document.querySelectorAll('#joined .team-tabs .team-tab');
         const levelContents = document.querySelectorAll('#joined .team-level-content');
 
@@ -219,11 +214,8 @@
                 }
             });
         });
-
-        // Note: Sidebar functionality is in common.js, but if it's not,
-        // the sidebar code from your original file is already in common.js or 
-        // should be added there. This inline script only handles tab logic.
     });
   </script>
 </body>
-</html>
+  </html>
+          
