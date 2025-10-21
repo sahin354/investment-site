@@ -36,17 +36,19 @@
 
       <section id="earnings" class="tab-content active">
         <div class="card earnings-card">
-          <div class="earnings-summary-item">
-            <span>Total Reward</span>
-            <span>₹0.00</span>
-          </div>
-          <div class="earnings-summary-item">
-            <span>Available to Redeem</span>
-            <span>₹0.00</span>
-          </div>
-          <div class="earnings-summary-item">
-            <span>Locked Reward</span>
-            <span>₹0.00</span>
+          <div class="earnings-grid">
+            <div class="earnings-item">
+              <div class="earnings-label">Total Reward</div>
+              <div class="earnings-amount">₹0.00</div>
+            </div>
+            <div class="earnings-item">
+              <div class="earnings-label">Available to Redeem</div>
+              <div class="earnings-amount">₹0.00</div>
+            </div>
+            <div class="earnings-item full-width">
+              <div class="earnings-label">Locked Reward</div>
+              <div class="earnings-amount">₹0.00</div>
+            </div>
           </div>
           <button class="submit-btn redeem-btn">Redeem Reward</button>
         </div>
@@ -148,7 +150,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        // Changed selector to target the new structure
         const referMainTabs = document.querySelectorAll('.refer-main-tabs .tab-button');
         const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
 
@@ -234,4 +235,5 @@
     });
   </script>
 </body>
-</html>
+  </html>
+  
