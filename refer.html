@@ -84,32 +84,34 @@
       padding: 15px;
     }
     
-    /* Tab Navigation - Fixed to match screenshot */
-    .tab-navigation {
-      display: flex;
-      background-color: #f0f2f5;
-      border-radius: 30px;
-      padding: 5px;
-      margin-bottom: 20px;
+    /* Tab Navigation - EXACT match to screenshot */
+    .pill-tab-container {
+      display: flex !important;
+      background-color: #f0f2f5 !important;
+      border-radius: 30px !important;
+      padding: 5px !important;
+      margin-bottom: 15px;
     }
     
-    .tab-button {
-      flex: 1;
-      padding: 12px 15px;
-      text-align: center;
-      background: transparent;
-      border: none;
-      font-weight: 600;
-      color: #555;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .pill-tab-button {
+      flex: 1 !important;
+      padding: 10px 15px !important;
+      border: none !important;
+      border-radius: 25px !important;
+      background-color: transparent !important;
+      color: #555 !important;
+      font-weight: 600 !important;
+      font-size: 0.9em !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      text-decoration: none !important;
+      text-align: center !important;
     }
     
-    .tab-button.active {
-      background-color: white;
-      color: var(--primary-color);
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    .pill-tab-button.active {
+      background-color: #ffffff !important;
+      color: #1a202c !important;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
     }
     
     .tab-content {
@@ -120,7 +122,13 @@
       display: block;
     }
     
-    /* Earnings Dashboard - Fixed layout */
+    /* Earnings Dashboard - EXACT layout from screenshot */
+    .earnings-dashboard {
+      margin-top: 0;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    
     .earnings-container {
       display: flex;
       flex-direction: column;
@@ -149,66 +157,82 @@
     }
     
     /* Referral Section */
-    .referral-code {
-      background-color: var(--bg-light);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .refer-main-card {
+      margin-top: 0;
+      margin-left: 0;
+      margin-right: 0;
     }
     
-    .referral-code span {
-      font-weight: 600;
-      color: var(--primary-color);
+    .refer-main-card h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+    
+    .invite-content-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .refer-link-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--bg-light);
+      border: 1px solid #dce4f0;
+      border-radius: 8px;
+      padding: 12px 15px;
+    }
+    
+    #referralLink {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-family: monospace;
+      color: var(--primary-color);
+      font-weight: 600;
+      flex: 1;
       margin-right: 10px;
     }
     
-    .copy-btn {
-      background-color: var(--primary-color);
-      color: white;
+    #copyLinkBtn {
+      background-color: #eef2f7;
+      color: #3c4858;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 8px 12px;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
       white-space: nowrap;
     }
     
-    .level-container {
+    .level-display {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    
-    .level-box {
-      flex: 1;
-      text-align: center;
-      padding: 15px 10px;
-      background-color: var(--bg-light);
-      border-radius: 12px;
-      margin: 0 5px;
+      align-items: center;
+      background-color: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
     }
     
     .level-title {
-      display: block;
-      font-size: 0.9rem;
+      font-size: 0.9em;
       color: var(--text-light);
-      margin-bottom: 5px;
     }
     
     .level-percent {
-      display: block;
-      font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.5em;
+      font-weight: bold;
       color: var(--primary-color);
     }
     
     /* Friends Section */
+    .friends-card {
+      margin-top: 20px;
+    }
+    
     .friends-card h3 {
       margin-bottom: 15px;
       font-size: 1.1rem;
@@ -236,7 +260,7 @@
       font-size: 0.95rem;
     }
     
-    .friend-tabs {
+    .team-tabs {
       display: flex;
       background-color: var(--bg-light);
       border-radius: 12px;
@@ -244,7 +268,7 @@
       margin-bottom: 15px;
     }
     
-    .friend-tab {
+    .team-tab {
       flex: 1;
       padding: 10px;
       text-align: center;
@@ -257,13 +281,13 @@
       transition: all 0.3s ease;
     }
     
-    .friend-tab.active {
+    .team-tab.active {
       background-color: white;
       color: var(--primary-color);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     }
     
-    /* Friend List - Fixed to match screenshot */
+    /* Friend List - EXACT match to screenshot */
     .friend-list {
       max-height: 400px;
       overflow-y: auto;
@@ -308,12 +332,12 @@
       font-size: 0.9rem;
     }
     
-    /* Fixed Invite Button - Working properly */
-    .invite-btn {
-      display: inline-flex;
-      align-items: center;
+    /* Fixed Invite Button - EXACT match to screenshot */
+    .friend-item .invite-btn {
+      display: inline-flex !important;
+      align-items: center !important;
       justify-content: center;
-      gap: 6px;
+      gap: 6px !important;
       background-color: #10b981 !important;
       color: white !important;
       border: none !important;
@@ -325,12 +349,12 @@
       cursor: pointer;
     }
     
-    .invite-btn span {
+    .friend-item .invite-btn span {
       display: inline-flex !important;
       align-items: center !important;
     }
     
-    .invite-btn img {
+    .friend-item .invite-btn img {
       width: 16px !important;
       height: 16px !important;
     }
@@ -360,19 +384,21 @@
       overflow-y: auto;
     }
     
+    /* Friend Tab Content */
+    .friend-tab-content {
+      display: none;
+    }
+    
+    .friend-tab-content.active {
+      display: block;
+    }
+    
     /* Responsive Adjustments */
     @media (min-width: 768px) {
       main {
         max-width: 500px;
         margin: 0 auto;
       }
-    }
-    
-    /* Divider like in screenshot */
-    .divider {
-      height: 1px;
-      background-color: var(--border-color);
-      margin: 20px 0;
     }
   </style>
 </head>
@@ -398,30 +424,30 @@
   
   <main>
     <div class="refer-page-wrapper">
-      <!-- Tab Navigation -->
-      <div class="tab-navigation">
-        <button class="tab-button" data-tab="invite">Invite</button>
-        <button class="tab-button active" data-tab="earnings">My Earnings</button>
+      <!-- Tab Navigation - EXACT match to screenshot -->
+      <div class="pill-tab-container main-refer-tabs">
+        <a href="#" class="pill-tab-button" data-tab="invite">Invite</a>
+        <a href="#" class="pill-tab-button active" data-tab="earnings">My Earnings</a>
       </div>
 
       <!-- Invite Tab Content -->
       <section id="invite" class="tab-content">
-        <div class="card">
+        <div class="card refer-main-card">
           <h2>Invite Friends, Earn Rewards!</h2>
-          <div class="referral-code">
-            <span id="referralLink">https://adani.com/ref/UZ123456</span>
-            <button id="copyLinkBtn" class="copy-btn">Copy</button>
-          </div>
-          <div class="level-container">
-            <div class="level-box">
+          <div class="invite-content-grid">
+            <div class="refer-link-box">
+              <span id="referralLink">https://adani.com/ref/UZ123456</span>
+              <button id="copyLinkBtn" title="Copy to clipboard"><span>Copy</span></button>
+            </div>
+            <div class="level-display">
               <span class="level-title">Level 1</span>
               <span class="level-percent">20%</span>
             </div>
-            <div class="level-box">
+            <div class="level-display">
               <span class="level-title">Level 2</span>
               <span class="level-percent">8%</span>
             </div>
-            <div class="level-box">
+            <div class="level-display">
               <span class="level-title">Level 3</span>
               <span class="level-percent">1%</span>
             </div>
@@ -431,37 +457,35 @@
 
       <!-- My Earnings Tab Content -->
       <section id="earnings" class="tab-content active">
-        <div class="card">
+        <div class="card earnings-dashboard">
           <div class="earnings-container">
-            <div class="earnings-box">
+            <div class="earnings-box" id="total-reward-box">
               <div class="earnings-label">Total Reward</div>
               <div class="earnings-value" id="total-reward">₹0.00</div>
             </div>
-            <div class="earnings-box">
+            <div class="earnings-box" id="available-reward-box">
               <div class="earnings-label">Available to Redeem</div>
               <div class="earnings-value" id="available-reward">₹0.00</div>
             </div>
-            <div class="earnings-box">
+            <div class="earnings-box" id="locked-reward-box">
               <div class="earnings-label">Locked Reward</div>
               <div class="earnings-value" id="locked-reward">₹0.00</div>
             </div>
           </div>
-          <!-- Divider like in screenshot -->
-          <div class="divider"></div>
           <button class="submit-btn" id="redeem-btn">Redeem Reward</button>
         </div>
       </section>
 
       <!-- Friends Section -->
-      <div class="card">
+      <div class="card friends-card">
         <h3>Friends</h3>
         <div class="search-bar-container">
-          <i class="fas fa-search"></i>
+          <span>🔍</span>
           <input type="text" placeholder="Search friends">
         </div>
-        <div class="friend-tabs">
-          <button class="friend-tab active" data-friend-tab="all">All</button>
-          <button class="friend-tab" data-friend-tab="joined">Joined</button>
+        <div class="team-tabs" id="friends-tabs">
+          <button class="team-tab active" data-friend-tab="all">All</button>
+          <button class="team-tab" data-friend-tab="joined">Joined</button>
         </div>
         
         <!-- All Friends Tab -->
@@ -496,10 +520,10 @@
         
         <!-- Joined Friends Tab -->
         <div id="joined" class="friend-tab-content">
-          <div class="friend-tabs">
-            <button class="friend-tab active" data-level="1">Level 1</button>
-            <button class="friend-tab" data-level="2">Level 2</button>
-            <button class="friend-tab" data-level="3">Level 3</button>
+          <div class="team-tabs">
+            <button class="team-tab active" data-level="1">Level 1</button>
+            <button class="team-tab" data-level="2">Level 2</button>
+            <button class="team-tab" data-level="3">Level 3</button>
           </div>
           <div class="team-content">
             <div class="team-level-content active" id="level1Content">
@@ -530,76 +554,50 @@
   </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Tab functionality
-      const tabButtons = document.querySelectorAll('.tab-button');
-      const tabContents = document.querySelectorAll('.tab-content');
-      
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const tabId = button.getAttribute('data-tab');
-          
-          // Update active tab button
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
-          
-          // Show active tab content
-          tabContents.forEach(content => content.classList.remove('active'));
-          document.getElementById(tabId).classList.add('active');
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Main "Invite" / "My Earnings" Tab logic ---
+        const mainTabs = document.querySelectorAll('.main-refer-tabs .pill-tab-button');
+        const mainContents = document.querySelectorAll('.refer-page-wrapper > .tab-content');
+
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => { 
+                e.preventDefault();
+                
+                mainTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                mainContents.forEach(c => c.classList.remove('active'));
+                const targetContent = document.getElementById(tab.dataset.tab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
         });
-      });
-      
-      // Friend tabs functionality
-      const friendTabs = document.querySelectorAll('.friend-tab');
-      const friendContents = document.querySelectorAll('.friend-tab-content');
-      
-      friendTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const tabId = tab.getAttribute('data-friend-tab');
-          
-          // Update active friend tab
-          friendTabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          
-          // Show active friend content
-          friendContents.forEach(content => content.classList.remove('active'));
-          document.getElementById(tabId).classList.add('active');
+
+        // --- "All" / "Joined" (Friends) Tab logic ---
+        const friendTabs = document.querySelectorAll('#friends-tabs .team-tab');
+        const friendContents = document.querySelectorAll('.friend-tab-content');
+
+        friendTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                
+                friendTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                friendContents.forEach(c => c.classList.remove('active'));
+                const targetContent = document.getElementById(tab.dataset.friendTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
         });
-      });
-      
-      // Sidebar functionality
-      const menuBtn = document.getElementById('menuBtn');
-      const sideMenu = document.getElementById('sideMenu');
-      const closeBtn = document.getElementById('closeBtn');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      
-      menuBtn.addEventListener('click', () => {
-        sideMenu.classList.add('active');
-        sidebarOverlay.style.display = 'block';
-        document.body.classList.add('sidebar-open');
-      });
-      
-      closeBtn.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        sidebarOverlay.style.display = 'none';
-        document.body.classList.remove('sidebar-open');
-      });
-      
-      sidebarOverlay.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        sidebarOverlay.style.display = 'none';
-        document.body.classList.remove('sidebar-open');
-      });
-      
-      // Copy referral link functionality
-      const copyLinkBtn = document.getElementById('copyLinkBtn');
-      const referralLink = document.getElementById('referralLink');
-      
-      copyLinkBtn.addEventListener('click', () => {
-        const textArea = document.createElement('textarea');
-        textArea.value = referralLink.textContent;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
+
+        // Sidebar functionality
+        const menuBtn = document.getElementById('menuBtn');
+        const sideMenu = document.getElementById('sideMenu');
+        const closeBtn = document.getElementById('closeBtn');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         
+        menuBtn.addEventListener('click', () => {
+            sideMenu.classList.add('active')
