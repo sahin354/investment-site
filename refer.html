@@ -29,9 +29,9 @@
   
   <main>
     <div class="refer-page-container">
-      <div class="refer-top-tabs">
-        <a href="#" class="refer-top-tab-button" data-tab="invite">Invite</a>
-        <a href="#" class="refer-top-tab-button active" data-tab="earnings">My Earnings</a>
+      <div class="tabs refer-main-tabs">
+        <a href="#" class="tab-button" data-tab="invite">Invite</a>
+        <a href="#" class="tab-button active" data-tab="earnings">My Earnings</a>
       </div>
 
       <section id="earnings" class="tab-content active">
@@ -88,7 +88,7 @@
             <div class="friend-item">
               <div class="friend-details">
                 <div class="friend-name">SD Santu Dey</div>
-                <div class="friend-phone">8985689809</div>
+                <div class="friend-phone">8985688909</div>
               </div>
               <button class="invite-btn-simple">Invite</button>
             </div>
@@ -144,18 +144,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
-  <script src="refer.js"></script> <script>
-    // This script contains basic tab switching logic if refer.js doesn't handle it
+  <script src="refer.js"></script> 
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
-        const referTopTabs = document.querySelectorAll('.refer-top-tab-button');
+        // Changed selector to target the new structure
+        const referMainTabs = document.querySelectorAll('.refer-main-tabs .tab-button');
         const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
 
-        referTopTabs.forEach(tab => {
+        referMainTabs.forEach(tab => {
             tab.addEventListener('click', (e) => { 
                 e.preventDefault();
                 
-                referTopTabs.forEach(t => t.classList.remove('active'));
+                referMainTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
 
                 mainContents.forEach(c => c.classList.remove('active'));
@@ -166,7 +167,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic ---
+        // --- "All" / "Joined" (Friends) Tab logic (remains the same) ---
         const friendsSubTabs = document.querySelectorAll('.friends-sub-tabs .friends-sub-tab-button');
         const friendsTabContents = document.querySelectorAll('.friends-tab-content');
 
@@ -185,7 +186,7 @@
             });
         });
 
-        // --- "Level 1/2/3" (within Friends sections) Tab logic ---
+        // --- "Level 1/2/3" (within Friends sections) Tab logic (remains the same) ---
         // For "All" tab levels
         const allLevelButtons = document.querySelectorAll('#all .level-button');
         allLevelButtons.forEach(btn => {
@@ -233,5 +234,4 @@
     });
   </script>
 </body>
-  </html>
-  
+</html>
