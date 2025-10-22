@@ -34,14 +34,15 @@
       font-weight: 600;
       color: var(--text-dark, #1a202c);
     }
+    /* UPDATED: Redeem Button uses your primary color */
     .redeem-btn {
-      background-color: #a0aFFF;
+      background-color: var(--primary-color, #1e3c72);
       font-size: 1.1em;
       padding: 15px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(160, 175, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
     }
-    .redeem-btn:hover { background-color: #8a9bff; }
+    .redeem-btn:hover { background-color: var(--secondary-color, #2a5298); }
 
     /* --- Pill-Style Main Tabs (Invite / My Earnings) --- */
     .refer-main-tabs {
@@ -67,12 +68,13 @@
       text-decoration: none;
       margin: 0;
     }
+    /* UPDATED: Active tab uses your primary color */
     .refer-main-tabs .tab-button.active {
-      background-color: #ffffff;
-      color: var(--text-dark, #1a202c);
+      background-color: var(--primary-color, #1e3c72);
+      color: #ffffff;
       font-weight: 600;
       border: none;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
     }
 
     /* --- Pill-Style Friends Sub-Tabs (All / Joined) --- */
@@ -99,19 +101,20 @@
       transition: all 0.2s ease;
       position: relative; 
     }
+    /* UPDATED: Active tab uses your primary color */
     .friends-sub-tabs .friends-sub-tab-button.active {
-      background-color: #ffffff;
-      color: var(--text-dark, #1a202c);
+      background-color: var(--primary-color, #1e3c72);
+      color: #ffffff;
       font-weight: 600;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
     }
     .friends-sub-tabs .friends-sub-tab-button.active::after {
       content: none; 
     }
 
-    /* --- Invite Button Style (with icon) --- */
+    /* UPDATED: Invite Button uses your primary color */
     .invite-btn-simple {
-      background-color: #6A7BFF;
+      background-color: var(--primary-color, #1e3c72);
       color: white;
       border: none;
       padding: 8px 15px;
@@ -123,9 +126,9 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 2px 8px rgba(106, 123, 255, 0.3);
+      box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
     }
-    .invite-btn-simple:hover { background-color: #5a6bf0; }
+    .invite-btn-simple:hover { background-color: var(--secondary-color, #2a5298); }
     .invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
 
     /* --- Search Bar Polish --- */
@@ -151,13 +154,11 @@
     }
     .search-input-wrapper input:focus {
       outline: none;
-      border-color: #6A7BFF;
+      border-color: var(--primary-color);
       background: white;
     }
 
-    /* === NEW STYLES FOR INVITE SECTION & SCROLL === */
-    
-    /* New Invite Card */
+    /* --- New Invite Card (from previous step) --- */
     .invite-header-card {
       background: #ffffff;
       border-radius: 12px;
@@ -173,8 +174,6 @@
       font-weight: 700;
       color: var(--text-dark, #1a202c);
     }
-
-    /* New Referral Link Box */
     .referral-link-box {
       display: flex;
       align-items: center;
@@ -192,6 +191,7 @@
       text-overflow: ellipsis;
       padding-right: 10px;
     }
+    /* UPDATED: Copy button uses your primary color */
     .copy-btn-inset {
       background-color: var(--primary-color, #1e3c72);
       color: white;
@@ -200,10 +200,8 @@
       padding: 10px 18px;
       font-weight: bold;
       cursor: pointer;
-      flex-shrink: 0; /* Prevents button from shrinking */
+      flex-shrink: 0;
     }
-
-    /* New Commission Level Cards */
     .commission-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -222,20 +220,19 @@
       color: #666;
       margin-bottom: 5px;
     }
+    /* UPDATED: Percent text uses your primary color */
     .commission-card .level-percent {
       font-size: 1.6em;
       font-weight: 700;
       color: var(--primary-color, #1e3c72);
     }
 
-    /* New Scrollable Friends List */
+    /* --- Scrollable Friends List (from previous step) --- */
     .scrollable-friend-list {
-      max-height: 210px; /* Approx 3.5 items, adjust as needed */
+      max-height: 210px; /* Approx 3.5 items */
       overflow-y: auto;
-      /* Add some padding to the right for the scrollbar */
       padding-right: 5px; 
     }
-    /* Style for the "empty" message */
     .scrollable-friend-list .empty-list-message {
       text-align: center;
       color: #888;
@@ -294,12 +291,10 @@
       <section id="invite" class="tab-content">
         <div class="invite-header-card">
           <h2>Invite Friends, Earn Rewards!</h2>
-          
           <div class="referral-link-box">
             <span id="referralLinkText">Loading your link...</span>
             <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
           </div>
-
           <div class="commission-grid">
             <div class="commission-card">
               <div class="level-label">Level 1</div>
@@ -359,13 +354,6 @@
               </div>
               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
             </div>
-            <div class="friend-item">
-              <div class="friend-details">
-                <div class="friend-name">Test Friend 5</div>
-                <div class="friend-phone">1234567890</div>
-              </div>
-              <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-            </div>
           </div>
         </div>
         
@@ -395,6 +383,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+        
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const referMainTabs = document.querySelectorAll('.refer-main-tabs .tab-button');
         const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
@@ -410,7 +399,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic ---
+        // --- "All" / "Joined" (Friends) Tab logic (FIXED) ---
         const friendsSubTabs = document.querySelectorAll('.friends-sub-tabs .friends-sub-tab-button');
         const friendsTabContents = document.querySelectorAll('.friends-tab-content');
 
@@ -425,7 +414,7 @@
             });
         });
         
-        // --- NEW: Copy referral link functionality ---
+        // --- Copy referral link functionality ---
         const copyLinkBtn = document.getElementById('copyReferralBtn');
         if (copyLinkBtn) {
             copyLinkBtn.addEventListener('click', () => {
@@ -445,43 +434,37 @@
         }
         
         /**
-         * NEW: Function to load your unique referral link
-         * Add your Firebase logic here (in refer.js or common.js)
+         * Function to load your unique referral link
          */
         function loadReferralData() {
-            // 1. Get the currently logged-in user
-            const user = firebase.auth().currentUser;
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    // Create the unique referral link
+                    const uniqueLink = `https://sahin354.github.io/inv/register.html?ref=${user.uid}`;
+                    
+                    // Update the text on the page
+                    const linkElement = document.getElementById('referralLinkText');
+                    if (linkElement) {
+                        linkElement.textContent = uniqueLink;
+                    }
+                    
+                    // You can also load your friend lists here
+                    // loadAllFriends(user.uid);
+                    // loadJoinedFriends(user.uid);
 
-            if (user) {
-                // 2. Create the unique referral link
-                const uniqueLink = `https://your-website.com/register.html?ref=${user.uid}`;
-                
-                // 3. Update the text on the page
-                const linkElement = document.getElementById('referralLinkText');
-                if (linkElement) {
-                    linkElement.textContent = uniqueLink;
+                } else {
+                    // User is not logged in
+                    const linkElement = document.getElementById('referralLinkText');
+                    if (linkElement) {
+                        linkElement.textContent = 'Error: Not logged in.';
+                    }
                 }
-            } else {
-                // User is not logged in, wait for common.js to redirect
-                const linkElement = document.getElementById('referralLinkText');
-                if (linkElement) {
-                    linkElement.textContent = 'Error: Not logged in.';
-                }
-            }
+            });
         }
         
-        // Load the referral link as soon as the page is ready
-        // We wait for Firebase to be ready first
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                loadReferralData();
-                // You can also load your friend lists here
-                // loadAllFriends(user.uid);
-                // loadJoinedFriends(user.uid);
-            }
-        });
+        // Load the referral link
+        loadReferralData();
     });
   </script>
 </body>
-                                     </html>
-                                                         
+</html>
