@@ -79,7 +79,7 @@
         </div>
         
         <div id="all" class="friends-tab-content active">
-          <div class="friend-list">
+          <div class="friend-list" id="allFriendList">
             <div class="friend-item">
               <div class="friend-details">
                 <div class="friend-name">HM Hariram Manglaw</div>
@@ -101,32 +101,12 @@
               </div>
               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
             </div>
-            <div class="level-buttons-container">
-              <button class="level-button active" data-level="1">Level 1</button>
-              <button class="level-button" data-level="2">Level 2</button>
-              <button class="level-button" data-level="3">Level 3</button>
             </div>
-          </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
-          <div class="joined-team-levels">
-            <button class="level-button active" data-level="1">Level 1</button>
-            <button class="level-button" data-level="2">Level 2</button>
-            <button class="level-button" data-level="3">Level 3</button>
-          </div>
-          <div class="team-level-content active" id="level1Content">
-            <p>Total Members: <strong id="level1Count">0</strong></p>
-            <div class="team-list-header"><span>Phone Number</span><span>Recharge Status</span></div>
-            <div class="team-list-container" id="level1List"></div>
-          </div>
-          <div class="team-level-content" id="level2Content">
-            <p>Total Members: <strong id="level2Count">0</strong></p>
-            <div class="team-list-container" id="level2List"></div>
-          </div>
-          <div class="team-level-content" id="level3Content">
-            <p>Total Members: <strong id="level3Count">0</strong></p>
-            <div class="team-list-container" id="level3List"></div>
+          <div class="friend-list" id="joinedFriendList">
+            <p style="text-align: center; color: #888; padding: 20px 0;">No friends have purchased a plan yet.</p>
           </div>
         </div>
       </div>
@@ -168,7 +148,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic (remains the same) ---
+        // --- "All" / "Joined" (Friends) Tab logic ---
         const friendsSubTabs = document.querySelectorAll('.friends-sub-tabs .friends-sub-tab-button');
         const friendsTabContents = document.querySelectorAll('.friends-tab-content');
 
@@ -186,41 +166,8 @@
                 }
             });
         });
-
-        // --- "Level 1/2/3" (within Friends sections) Tab logic (remains the same) ---
-        // For "All" tab levels
-        const allLevelButtons = document.querySelectorAll('#all .level-button');
-        allLevelButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                allLevelButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                // You would typically filter the friend list here based on the level.
-                // For this example, it just highlights the button.
-            });
-        });
-
-        // For "Joined" tab levels (if applicable, this structure might be different)
-        const joinedLevelButtons = document.querySelectorAll('#joined .level-button');
-        const teamLevelContents = document.querySelectorAll('.team-level-content');
-
-        joinedLevelButtons.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                joinedLevelButtons.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                const targetContentId = `level${tab.dataset.level}Content`;
-                teamLevelContents.forEach(c => c.classList.remove('active'));
-                const targetContent = document.getElementById(targetContentId);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-            });
-        });
-
-        // Copy referral link functionality
+        
+        // --- Copy referral link functionality ---
         const copyLinkBtn = document.querySelector('.copy-link-btn');
         if (copyLinkBtn) {
             copyLinkBtn.addEventListener('click', () => {
@@ -232,8 +179,11 @@
                 });
             });
         }
+
+        // --- TODO: Add your refer.js logic here ---
+        // Your JavaScript logic for loading friends into '#allFriendList'
+        // and '#joinedFriendList' will go in 'refer.js'
     });
   </script>
 </body>
 </html>
-  
