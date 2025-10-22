@@ -8,10 +8,16 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* === FIX: Removed top margin from earnings card === */
+    /* --- Main Layout Fixes --- */
     .earnings-card {
-      margin-top: 0;
+      /* Moves card up, no top margin */
+      margin: 0 15px 15px 15px; 
     }
+    .refer-main-tabs {
+      /* Reduced bottom margin to move content up */
+      margin: 15px 15px 10px 15px; 
+    }
+
     /* --- Earnings Card Layout (side-by-side) --- */
     .earnings-grid {
       display: flex;
@@ -38,7 +44,6 @@
       font-weight: 600;
       color: var(--text-dark, #1a202c);
     }
-    /* UPDATED: Redeem Button uses your primary color */
     .redeem-btn {
       background-color: var(--primary-color, #1e3c72);
       font-size: 1.1em;
@@ -54,7 +59,6 @@
       border-radius: 10px;
       padding: 4px;
       display: flex;
-      margin: 15px;
       box-shadow: none; 
     }
     .refer-main-tabs .tab-button {
@@ -72,7 +76,6 @@
       text-decoration: none;
       margin: 0;
     }
-    /* UPDATED: Active tab uses your primary color */
     .refer-main-tabs .tab-button.active {
       background-color: var(--primary-color, #1e3c72);
       color: #ffffff;
@@ -105,7 +108,6 @@
       transition: all 0.2s ease;
       position: relative; 
     }
-    /* UPDATED: Active tab uses your primary color */
     .friends-sub-tabs .friends-sub-tab-button.active {
       background-color: var(--primary-color, #1e3c72);
       color: #ffffff;
@@ -116,7 +118,7 @@
       content: none; 
     }
 
-    /* UPDATED: Invite Button uses your primary color */
+    /* --- Invite Button (for friend list) --- */
     .invite-btn-simple {
       background-color: var(--primary-color, #1e3c72);
       color: white;
@@ -135,7 +137,7 @@
     .invite-btn-simple:hover { background-color: var(--secondary-color, #2a5298); }
     .invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
 
-    /* --- Search Bar Polish --- */
+    /* --- Search Bar --- */
     .search-input-wrapper {
       position: relative;
       margin-bottom: 15px;
@@ -162,20 +164,21 @@
       background: white;
     }
 
-    /* --- New Invite Card --- */
+    /* --- New Invite Card (Red Box) --- */
     .invite-header-card {
       background: #ffffff;
       border-radius: 12px;
       padding: 25px;
-      /* === FIX: Removed top margin to move it "uper side" === */
+      /* FIX: Moves card up */
       margin: 0 15px 15px 15px; 
       box-shadow: var(--card-shadow);
       border: 1px solid var(--border-color);
     }
+    /* FIX: Smaller font size */
     .invite-header-card h2 {
       margin-top: 0;
       margin-bottom: 20px;
-      font-size: 1.8em;
+      font-size: 1.6em; /* Was 1.8em */
       font-weight: 700;
       color: var(--text-dark, #1a202c);
     }
@@ -196,7 +199,6 @@
       text-overflow: ellipsis;
       padding-right: 10px;
     }
-    /* UPDATED: Copy button uses your primary color */
     .copy-btn-inset {
       background-color: var(--primary-color, #1e3c72);
       color: white;
@@ -219,15 +221,16 @@
       padding: 15px 10px;
       text-align: center;
     }
+    /* FIX: Smaller font size */
     .commission-card .level-label {
-      font-size: 0.9em;
+      font-size: 0.85em; /* Was 0.9em */
       font-weight: 500;
       color: #666;
       margin-bottom: 5px;
     }
-    /* UPDATED: Percent text uses your primary color */
+    /* FIX: Smaller font size */
     .commission-card .level-percent {
-      font-size: 1.6em;
+      font-size: 1.4em; /* Was 1.6em */
       font-weight: 700;
       color: var(--primary-color, #1e3c72);
     }
@@ -238,12 +241,7 @@
       overflow-y: auto;
       padding-right: 5px; 
     }
-    .scrollable-friend-list .empty-list-message {
-      text-align: center;
-      color: #888;
-      padding: 20px 0;
-    }
-
+    
   </style>
 </head>
 <body>
@@ -361,8 +359,7 @@
         
         <div id="joined" class="friends-tab-content">
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            <p class="empty-list-message">No friends have purchased a plan yet.</p>
-          </div>
+             </div>
         </div>
       </div>
     </div>
@@ -401,7 +398,7 @@
             });
         });
 
-        // --- "All" / "Joined" (Friends) Tab logic (FIXED) ---
+        // --- "All" / "Joined" (Friends) Tab logic (This works) ---
         const friendsSubTabs = document.querySelectorAll('.friends-sub-tabs .friends-sub-tab-button');
         const friendsTabContents = document.querySelectorAll('.friends-tab-content');
 
@@ -470,4 +467,5 @@
     });
   </script>
 </body>
-</html>
+                                                        </html>
+                                                        
