@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+    /* === FIX: Removed top margin from earnings card === */
+    .earnings-card {
+      margin-top: 0;
+    }
     /* --- Earnings Card Layout (side-by-side) --- */
     .earnings-grid {
       display: flex;
@@ -158,12 +162,13 @@
       background: white;
     }
 
-    /* --- New Invite Card (from previous step) --- */
+    /* --- New Invite Card --- */
     .invite-header-card {
       background: #ffffff;
       border-radius: 12px;
       padding: 25px;
-      margin: 15px;
+      /* === FIX: Removed top margin to move it "uper side" === */
+      margin: 0 15px 15px 15px; 
       box-shadow: var(--card-shadow);
       border: 1px solid var(--border-color);
     }
@@ -227,7 +232,7 @@
       color: var(--primary-color, #1e3c72);
     }
 
-    /* --- Scrollable Friends List (from previous step) --- */
+    /* --- Scrollable Friends List --- */
     .scrollable-friend-list {
       max-height: 210px; /* Approx 3.5 items */
       overflow-y: auto;
@@ -264,12 +269,10 @@
   <main>
     <div class="refer-page-container">
       <div class="tabs refer-main-tabs">
-        <a href="#" class="tab-button" data-tab="invite">Invite</a>
-        <a href="#" class="tab-button active" data-tab="earnings">My Earnings</a>
+        <a href="#" class="tab-button active" data-tab="invite">Invite</a> <a href="#" class="tab-button" data-tab="earnings">My Earnings</a>
       </div>
 
-      <section id="earnings" class="tab-content active">
-        <div class="card earnings-card">
+      <section id="earnings" class="tab-content"> <div class="card earnings-card">
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
@@ -288,8 +291,7 @@
         </div>
       </section>
 
-      <section id="invite" class="tab-content">
-        <div class="invite-header-card">
+      <section id="invite" class="tab-content active"> <div class="invite-header-card">
           <h2>Invite Friends, Earn Rewards!</h2>
           <div class="referral-link-box">
             <span id="referralLinkText">Loading your link...</span>
@@ -440,6 +442,7 @@
             firebase.auth().onAuthStateChanged(user => {
                 if (user) {
                     // Create the unique referral link
+                    // === PLEASE UPDATE 'your-website.com' ===
                     const uniqueLink = `https://sahin354.github.io/inv/register.html?ref=${user.uid}`;
                     
                     // Update the text on the page
