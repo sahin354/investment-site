@@ -84,7 +84,7 @@ function loadUserData(userId) {
 
 
 // --- Session Management Variables ---
-const INACTIVITY_TIMEOUT_MS = 1 * 60 * 1000; // 1 Minutes
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 Minutes
 let inactivityTimer;
 let sessionListener = null; // Holds the Firestore unsubscribe function
 
