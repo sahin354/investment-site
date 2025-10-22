@@ -176,15 +176,24 @@ function initializeCommonJs() {
 
     // --- Inactivity Timer Functions ---
     
-    function resetInactivityTimer() {
+    /**
+     * Resets the inactivity timer.
+     * @param {string} [eventType] - The name of the event that triggered the reset (e.g., 'mousemove')
+     */
+    function resetInactivityTimer(eventType) { 
         if (inactivityTimer) clearTimeout(inactivityTimer);
         
-        // === ADDED FOR TESTING: Log to console ===
-        console.log(`TIMER: Reset! New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`); 
+        // === ENHANCED LOGGING FOR TESTING ===
+        if (eventType) {
+            console.log(`TIMER: Reset by "${eventType}" event. New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`);
+        } else {
+            // This is the first call from onAuthStateChanged
+            console.log(`TIMER: Initialized. New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`);
+        }
         
         inactivityTimer = setTimeout(
             () => {
-                // === ADDED FOR TESTING: Log to console ===
+                // === ENHANCED LOGGING FOR TESTING ===
                 console.log("TIMER: Fired! Logging out now."); 
                 autoLogout("You have been logged out due to inactivity.");
             }, 
@@ -201,10 +210,16 @@ function initializeCommonJs() {
 
     function setupActivityListeners() {
         const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
-        // Clear old listeners first to be safe (optional)
+        
+        // This function will be the single handler
+        const activityHandler = (e) => {
+            resetInactivityTimer(e.type); // Pass the event type (e.g., 'mousemove')
+        };
+
+        // Clear old listeners first and add new ones
         activityEvents.forEach(eventName => {
-             document.removeEventListener(eventName, resetInactivityTimer, true);
-             document.addEventListener(eventName, resetInactivityTimer, true);
+             document.removeEventListener(eventName, activityHandler, true);
+             document.addEventListener(eventName, activityHandler, true);
         });
         console.log("Activity listeners attached.");
     }
@@ -283,7 +298,7 @@ function initializeCommonJs() {
 
                 // 4. Start Inactivity Timer
                 setupActivityListeners();
-                resetInactivityTimer();
+                resetInactivityTimer(); // Initial call, no event type
                 
                 // 5. Start Single-Session Management
                 initializeSession(user.uid);
@@ -357,3 +372,4 @@ function initializeCommonJs() {
     }); // End DOMContentLoaded
 
 } // End initializeCommonJs
+            
