@@ -8,67 +8,56 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* --- New Earnings Card Layout (side-by-side) --- */
+    /* --- Earnings Card Layout (side-by-side) --- */
     .earnings-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px; /* Spacing between items */
-      margin-bottom: 20px; /* Space before the button */
+      gap: 10px;
+      margin-bottom: 20px;
     }
-
     .earnings-item {
-      /* Each item will try to be 50% */
-      flex: 1 1 calc(50% - 5px); /* Grow, shrink, and base width (50% minus half the gap) */
+      flex: 1 1 calc(50% - 5px);
       box-sizing: border-box; 
       padding: 0; 
     }
-
-    /* This rule makes "Locked Reward" take the full line */
     .earnings-item.full-width {
-      flex: 1 1 100%; /* Make this item take full width */
-      margin-top: 10px; /* Add some space above the locked reward */
+      flex: 1 1 100%;
+      margin-top: 10px;
     }
-
     .earnings-label {
       font-size: 0.9em;
       color: var(--text-light, #555);
       margin-bottom: 4px;
     }
-
     .earnings-amount {
       font-size: 1.6em;
       font-weight: 600;
       color: var(--text-dark, #1a202c);
     }
-
-    /* --- New Redeem Button Style --- */
     .redeem-btn {
-      background-color: #a0aFFF; /* Light purple/blue from screenshot */
+      background-color: #a0aFFF;
       font-size: 1.1em;
       padding: 15px;
-      border-radius: 10px; /* More rounded */
+      border-radius: 10px;
       box-shadow: 0 4px 12px rgba(160, 175, 255, 0.4);
     }
-    .redeem-btn:hover {
-      background-color: #8a9bff;
-    }
+    .redeem-btn:hover { background-color: #8a9bff; }
 
-    /* --- New Pill-Style Main Tabs (Invite / My Earnings) --- */
+    /* --- Pill-Style Main Tabs (Invite / My Earnings) --- */
     .refer-main-tabs {
-      background-color: #f0f2f5; /* Light grey background for the container */
+      background-color: #f0f2f5;
       border-radius: 10px;
       padding: 4px;
       display: flex;
-      margin: 15px; /* Match card margin */
+      margin: 15px;
       box-shadow: none; 
     }
-
     .refer-main-tabs .tab-button {
       flex: 1;
       padding: 10px 15px;
-      border: none; /* Remove border from original style */
-      border-radius: 8px; /* Rounded corners for the pill */
-      background-color: transparent; /* Inactive is transparent */
+      border: none;
+      border-radius: 8px;
+      background-color: transparent;
       color: var(--text-light, #555);
       font-size: 1em;
       font-weight: 500;
@@ -76,30 +65,28 @@
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
-      margin: 0; /* Remove margin from original style */
+      margin: 0;
     }
-
     .refer-main-tabs .tab-button.active {
-      background-color: #ffffff; /* Active is white */
+      background-color: #ffffff;
       color: var(--text-dark, #1a202c);
       font-weight: 600;
-      border: none; /* Ensure no border */
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Shadow for active pill */
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
-    /* --- New Pill-Style Friends Sub-Tabs (All / Joined) --- */
+    /* --- Pill-Style Friends Sub-Tabs (All / Joined) --- */
     .friends-sub-tabs {
       background-color: #f0f2f5;
       border-radius: 10px;
       padding: 4px;
       display: flex;
-      border-bottom: none; /* Remove original border */
+      border-bottom: none;
       margin-bottom: 20px;
     }
-
     .friends-sub-tabs .friends-sub-tab-button {
       flex: 1;
-      padding: 8px 10px; /* Slightly smaller */
+      padding: 8px 10px;
       border: none;
       border-radius: 8px;
       background: none;
@@ -112,43 +99,34 @@
       transition: all 0.2s ease;
       position: relative; 
     }
-
     .friends-sub-tabs .friends-sub-tab-button.active {
       background-color: #ffffff;
       color: var(--text-dark, #1a202c);
       font-weight: 600;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
     }
-
-    /* Remove the old underline style */
     .friends-sub-tabs .friends-sub-tab-button.active::after {
       content: none; 
     }
 
-    /* --- New Invite Button Style (with icon) --- */
+    /* --- Invite Button Style (with icon) --- */
     .invite-btn-simple {
-      background-color: #6A7BFF; /* Match other blue/purple */
+      background-color: #6A7BFF;
       color: white;
-      border: none; /* Remove border */
+      border: none;
       padding: 8px 15px;
-      border-radius: 8px; /* More rounded */
+      border-radius: 8px;
       font-weight: 500;
       font-size: 0.9em;
       cursor: pointer;
       transition: background-color 0.2s;
       display: flex;
       align-items: center;
-      gap: 6px; /* Space between text and icon */
+      gap: 6px;
       box-shadow: 0 2px 8px rgba(106, 123, 255, 0.3);
     }
-
-    .invite-btn-simple:hover {
-      background-color: #5a6bf0;
-    }
-
-    .invite-btn-simple .fa-whatsapp {
-      font-size: 1.1em; /* Make icon slightly larger */
-    }
+    .invite-btn-simple:hover { background-color: #5a6bf0; }
+    .invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
 
     /* --- Search Bar Polish --- */
     .search-input-wrapper {
@@ -164,20 +142,108 @@
     }
     .search-input-wrapper input {
       width: 100%;
-      padding: 12px 15px 12px 40px; /* Add padding for icon */
+      padding: 12px 15px 12px 40px;
       border: 1px solid #eef2f7;
       border-radius: 10px;
       background: #f8f9fa;
       font-size: 1em;
-      box-sizing: border-box; /* Important */
+      box-sizing: border-box;
     }
     .search-input-wrapper input:focus {
       outline: none;
       border-color: #6A7BFF;
       background: white;
     }
+
+    /* === NEW STYLES FOR INVITE SECTION & SCROLL === */
+    
+    /* New Invite Card */
+    .invite-header-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 15px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border-color);
+    }
+    .invite-header-card h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--text-dark, #1a202c);
+    }
+
+    /* New Referral Link Box */
+    .referral-link-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f4f6f9;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 20px;
+    }
+    #referralLinkText {
+      font-size: 0.95em;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+    .copy-btn-inset {
+      background-color: var(--primary-color, #1e3c72);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-weight: bold;
+      cursor: pointer;
+      flex-shrink: 0; /* Prevents button from shrinking */
+    }
+
+    /* New Commission Level Cards */
+    .commission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .commission-card {
+      background-color: #f8fafc;
+      border: 1px solid #eef2f7;
+      border-radius: 10px;
+      padding: 15px 10px;
+      text-align: center;
+    }
+    .commission-card .level-label {
+      font-size: 0.9em;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .commission-card .level-percent {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: var(--primary-color, #1e3c72);
+    }
+
+    /* New Scrollable Friends List */
+    .scrollable-friend-list {
+      max-height: 210px; /* Approx 3.5 items, adjust as needed */
+      overflow-y: auto;
+      /* Add some padding to the right for the scrollbar */
+      padding-right: 5px; 
+    }
+    /* Style for the "empty" message */
+    .scrollable-friend-list .empty-list-message {
+      text-align: center;
+      color: #888;
+      padding: 20px 0;
+    }
+
   </style>
-  </head>
+</head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
@@ -226,13 +292,27 @@
       </section>
 
       <section id="invite" class="tab-content">
-        <div class="card invite-card">
-          <h2 style="margin-top:0;">Invite friends to earn rewards!</h2>
-          <p>Your referral link: <span id="referralLink">https://adani.com/ref/UZ123456</span> <button class="copy-link-btn">Copy</button></p>
-          <div class="commission-levels">
-            <p>Level 1: 20%</p>
-            <p>Level 2: 8%</p>
-            <p>Level 3: 1%</p>
+        <div class="invite-header-card">
+          <h2>Invite Friends, Earn Rewards!</h2>
+          
+          <div class="referral-link-box">
+            <span id="referralLinkText">Loading your link...</span>
+            <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
+          </div>
+
+          <div class="commission-grid">
+            <div class="commission-card">
+              <div class="level-label">Level 1</div>
+              <div class="level-percent">20%</div>
+            </div>
+            <div class="commission-card">
+              <div class="level-label">Level 2</div>
+              <div class="level-percent">8%</div>
+            </div>
+            <div class="commission-card">
+              <div class="level-label">Level 3</div>
+              <div class="level-percent">1%</div>
+            </div>
           </div>
         </div>
       </section>
@@ -250,7 +330,7 @@
         </div>
         
         <div id="all" class="friends-tab-content active">
-          <div class="friend-list" id="allFriendList">
+          <div class="friend-list scrollable-friend-list" id="allFriendList">
             <div class="friend-item">
               <div class="friend-details">
                 <div class="friend-name">HM Hariram Manglaw</div>
@@ -272,12 +352,26 @@
               </div>
               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
             </div>
+            <div class="friend-item">
+              <div class="friend-details">
+                <div class="friend-name">Test Friend 4</div>
+                <div class="friend-phone">1234567890</div>
+              </div>
+              <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
+            </div>
+            <div class="friend-item">
+              <div class="friend-details">
+                <div class="friend-name">Test Friend 5</div>
+                <div class="friend-phone">1234567890</div>
+              </div>
+              <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
+            </div>
           </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
-          <div class="friend-list" id="joinedFriendList">
-            <p style="text-align: center; color: #888; padding: 20px 0;">No friends have purchased a plan yet.</p>
+          <div class="friend-list scrollable-friend-list" id="joinedFriendList">
+            <p class="empty-list-message">No friends have purchased a plan yet.</p>
           </div>
         </div>
       </div>
@@ -298,8 +392,8 @@
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
   <script src="refer.js"></script> 
+  
   <script>
-    // --- JAVASCRIPT TYPO FIXED HERE ---
     document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const referMainTabs = document.querySelectorAll('.refer-main-tabs .tab-button');
@@ -308,15 +402,11 @@
         referMainTabs.forEach(tab => {
             tab.addEventListener('click', (e) => { 
                 e.preventDefault();
-                
                 referMainTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
                 mainContents.forEach(c => c.classList.remove('active'));
                 const targetContent = document.getElementById(tab.dataset.tab);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
+                if (targetContent) targetContent.classList.add('active');
             });
         });
 
@@ -327,32 +417,71 @@
         friendsSubTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault(); 
-                
                 friendsSubTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-
                 friendsTabContents.forEach(c => c.classList.remove('active'));
                 const targetContent = document.getElementById(tab.dataset.friendTab);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
+                if (targetContent) targetContent.classList.add('active');
             });
         });
         
-        // --- Copy referral link functionality ---
-        const copyLinkBtn = document.querySelector('.copy-link-btn');
+        // --- NEW: Copy referral link functionality ---
+        const copyLinkBtn = document.getElementById('copyReferralBtn');
         if (copyLinkBtn) {
             copyLinkBtn.addEventListener('click', () => {
-                const referralLink = document.getElementById('referralLink').textContent;
-                navigator.clipboard.writeText(referralLink).then(() => {
+                const referralLinkText = document.getElementById('referralLinkText').textContent;
+                
+                if (referralLinkText === 'Loading your link...') {
+                    alert('Please wait for your link to load.');
+                    return;
+                }
+                
+                navigator.clipboard.writeText(referralLinkText).then(() => {
                     alert('Referral link copied!');
                 }).catch(err => {
                     console.error('Failed to copy link: ', err);
                 });
             });
         }
+        
+        /**
+         * NEW: Function to load your unique referral link
+         * Add your Firebase logic here (in refer.js or common.js)
+         */
+        function loadReferralData() {
+            // 1. Get the currently logged-in user
+            const user = firebase.auth().currentUser;
+
+            if (user) {
+                // 2. Create the unique referral link
+                const uniqueLink = `https://your-website.com/register.html?ref=${user.uid}`;
+                
+                // 3. Update the text on the page
+                const linkElement = document.getElementById('referralLinkText');
+                if (linkElement) {
+                    linkElement.textContent = uniqueLink;
+                }
+            } else {
+                // User is not logged in, wait for common.js to redirect
+                const linkElement = document.getElementById('referralLinkText');
+                if (linkElement) {
+                    linkElement.textContent = 'Error: Not logged in.';
+                }
+            }
+        }
+        
+        // Load the referral link as soon as the page is ready
+        // We wait for Firebase to be ready first
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                loadReferralData();
+                // You can also load your friend lists here
+                // loadAllFriends(user.uid);
+                // loadJoinedFriends(user.uid);
+            }
+        });
     });
   </script>
 </body>
-    </html>
-    
+                                     </html>
+                                                         
