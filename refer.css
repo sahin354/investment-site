@@ -1,133 +1,197 @@
-/* === STYLES FOR REFER & EARN PAGE === */
+/* === STYLES SPECIFICALLY FOR REFER & EARN PAGE === */
 
-/* --- Main Layout Fixes --- */
-.earnings-card {
-  /* Moves card up, no top margin */
-  margin: 0 15px 15px 15px; 
-}
-.refer-main-tabs {
-  /* Reduced bottom margin to move content up */
-  margin: 15px 15px 10px 15px; 
+/* --- CSS Variables (Copied for context, uses values from your main style.css) --- */
+:root {
+  --primary-color: #1e3c72;
+  --secondary-color: #2a5298;
+  --text-dark: #1a202c;
+  --text-light: #555;
+  --card-bg: #ffffff;
+  --bg-light: #f8f9fa;
+  --border-color: #eef2f7;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* --- Earnings Card Layout (side-by-side) --- */
-.earnings-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+/* --- Main Layout Adjustments for this page --- */
+main {
+  padding: 10px; /* Reduced padding for mobile */
+  max-width: 500px;
+  margin: 0 auto;
 }
-.earnings-item {
-  flex: 1 1 calc(50% - 5px);
-  box-sizing: border-box; 
-  padding: 0; 
-}
-.earnings-item.full-width {
-  flex: 1 1 100%;
-  margin-top: 10px;
-}
-.earnings-label {
-  font-size: 0.9em;
-  color: var(--text-light, #555);
-  margin-bottom: 4px;
-}
-.earnings-amount {
-  font-size: 1.6em;
-  font-weight: 600;
-  color: var(--text-dark, #1a202c);
-}
-.redeem-btn {
-  background-color: var(--primary-color, #1e3c72);
-  font-size: 1.1em;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
-}
-.redeem-btn:hover { background-color: var(--secondary-color, #2a5298); }
 
-/* --- Pill-Style Main Tabs (Invite / My Earnings) --- */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+}
+
+/* --- Main Tabs (Invite / My Earnings) --- */
 .refer-main-tabs {
   background-color: #f0f2f5;
   border-radius: 10px;
   padding: 4px;
   display: flex;
-  box-shadow: none; 
+  margin-bottom: 10px; /* Reduced margin */
 }
+
 .refer-main-tabs .tab-button {
   flex: 1;
-  padding: 10px 15px;
+  padding: 12px 15px;
   border: none;
   border-radius: 8px;
   background-color: transparent;
-  color: var(--text-light, #555);
+  color: var(--text-light);
   font-size: 1em;
   font-weight: 500;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  margin: 0;
 }
+
 .refer-main-tabs .tab-button.active {
-  background-color: var(--primary-color, #1e3c72);
+  background-color: var(--primary-color);
   color: #ffffff;
   font-weight: 600;
-  border: none;
   box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
 }
 
-/* --- Pill-Style Friends Sub-Tabs (All / Joined) --- */
-.friends-sub-tabs {
-  background-color: #f0f2f5;
-  border-radius: 10px;
-  padding: 4px;
+/* --- Tab Content --- */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* --- Earnings Card --- */
+.earnings-card {
+    margin-top: 0; /* Remove extra space */
+}
+.earnings-grid {
   display: flex;
-  border-bottom: none;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-bottom: 20px;
 }
-.friends-sub-tabs .friends-sub-tab-button {
-  flex: 1;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  font-size: 0.95em;
-  font-weight: 500;
-  color: #888;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s ease;
-  position: relative; 
+.earnings-item {
+  flex: 1 1 calc(50% - 8px); /* 2 columns on desktop */
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
 }
-.friends-sub-tabs .friends-sub-tab-button.active {
-  background-color: var(--primary-color, #1e3c72);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
+.earnings-item.full-width {
+  flex: 1 1 100%;
 }
-.friends-sub-tabs .friends-sub-tab-button.active::after {
-  content: none; 
+.earnings-label {
+  font-size: 0.9em;
+  color: var(--text-light);
+  margin-bottom: 8px;
 }
-
-/* --- Invite Button (for friend list) --- */
-.invite-btn-simple {
-  background-color: var(--primary-color, #1e3c72);
+.earnings-amount {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.redeem-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
   border: none;
-  padding: 8px 15px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.9em;
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
+}
+.redeem-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(30, 60, 114, 0.5);
+}
+
+/* --- Invite Card --- */
+.invite-header-card {
+    margin-top: 0; /* Remove extra space */
+}
+.invite-header-card h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.5em; /* Smaller font */
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.referral-link-box {
   display: flex;
   align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+  background-color: #f4f6f9;
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
 }
-.invite-btn-simple:hover { background-color: var(--secondary-color, #2a5298); }
-.invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
+#referralLinkText {
+  flex: 1;
+  font-size: 0.95em;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+.copy-btn-inset {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+.copy-btn-inset:hover {
+  background-color: var(--secondary-color);
+}
+
+.commission-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.commission-card {
+  background-color: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  padding: 15px 10px;
+  text-align: center;
+}
+.commission-card .level-label {
+  font-size: 0.85em; /* Smaller font */
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 5px;
+}
+.commission-card .level-percent {
+  font-size: 1.4em; /* Smaller font */
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* --- Friends Card --- */
+.friends-card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.3em;
+  font-weight: 600;
+  color: var(--text-dark);
+}
 
 /* --- Search Bar --- */
 .search-input-wrapper {
@@ -156,80 +220,123 @@
   background: white;
 }
 
-/* --- New Invite Card (Red Box) --- */
-.invite-header-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 25px;
-  /* FIX: Moves card up */
-  margin: 0 15px 15px 15px; 
-  box-shadow: var(--card-shadow);
-  border: 1px solid var(--border-color);
-}
-/* FIX: Smaller font size */
-.invite-header-card h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.6em; /* Was 1.8em */
-  font-weight: 700;
-  color: var(--text-dark, #1a202c);
-}
-.referral-link-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f4f6f9;
+/* --- Friends Sub Tabs --- */
+.friends-sub-tabs {
+  background-color: #f0f2f5;
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 4px;
+  display: flex;
   margin-bottom: 20px;
 }
-#referralLinkText {
-  font-size: 0.95em;
-  color: #555;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 10px;
-}
-.copy-btn-inset {
-  background-color: var(--primary-color, #1e3c72);
-  color: white;
+.friends-sub-tabs .friends-sub-tab-button {
+  flex: 1;
+  padding: 10px 15px;
   border: none;
   border-radius: 8px;
-  padding: 10px 18px;
-  font-weight: bold;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.commission-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.commission-card {
-  background-color: #f8fafc;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  padding: 15px 10px;
-  text-align: center;
-}
-/* FIX: Smaller font size */
-.commission-card .level-label {
-  font-size: 0.85em; /* Was 0.9em */
+  background: none;
+  font-size: 0.95em;
   font-weight: 500;
-  color: #666;
-  margin-bottom: 5px;
+  color: #888;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
 }
-/* FIX: Smaller font size */
-.commission-card .level-percent {
-  font-size: 1.4em; /* Was 1.6em */
-  font-weight: 700;
-  color: var(--primary-color, #1e3c72);
+.friends-sub-tabs .friends-sub-tab-button.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
 }
 
-/* --- Scrollable Friends List --- */
-.scrollable-friend-list {
-  max-height: 210px; /* Approx 3.5 items */
-  overflow-y: auto;
-  padding-right: 5px; 
+/* --- Friend List --- */
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+.friend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+.friend-details { flex: 1; }
+.friend-name { font-weight: 600; margin-bottom: 4px; }
+.friend-phone { font-size: 0.9em; color: var(--text-light); }
+
+.invite-btn-simple {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+}
+.invite-btn-simple:hover { background-color: var(--secondary-color); }
+.invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
+
+.scrollable-friend-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.status-badge {
+  background-color: #28a745; /* Green */
+  color: white;
+  font-size: 0.8em;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+/* --- Bottom Navigation (Uses styles from your main style.css) --- */
+/* Styles for .bottom-nav, .bottom-nav a, etc. are in style.css */
+.bottom-nav-spacer {
+  height: 70px; /* Keep this */
+}
+
+
+/* --- Mobile Responsive Adjustments --- */
+@media (max-width: 480px) {
+  /* Inherit main padding from body/main if needed, or set explicitly */
+  /* main { padding: 10px; } */ /* This is already set in main styles */
+  
+  .card {
+    padding: 15px;
+  }
+  
+  /* Stack earnings items on mobile */
+  .earnings-item {
+    flex: 1 1 100%;
+  }
+  
+  /* Levels stay 3-across (no change needed here) */
+  /* .commission-grid { grid-template-columns: repeat(3, 1fr); } */
+  
+  .referral-link-box {
+    flex-direction: column;
+    gap: 10px;
+  }
+  #referralLinkText {
+    width: 100%;
+    text-align: center;
+    padding-right: 0;
+  }
+  .copy-btn-inset {
+    width: 100%;
+  }
+  }
