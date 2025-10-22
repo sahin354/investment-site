@@ -14,11 +14,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
         });
 } else {
     // Fallback if firebase isn't loaded yet (e.g., on login page)
-    // The onAuthStateChanged listener will still be attached inside initializeCommonJs
-    // and will run once Firebase does load.
     console.warn("Firebase not loaded immediately. Deferring setup.");
-    // We still call initializeCommonJs to set up sidebar listeners
-    // and the auth state listener (which will wait for Firebase).
     document.addEventListener('DOMContentLoaded', initializeCommonJs);
 }
 
@@ -30,39 +26,26 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
  */
 function updateUserInfo(user) {
     if (!user) return;
-
     const shortUid = user.uid.substring(0, 10) + '...';
     const userEmail = user.email || 'No email';
 
     // Update sidebar
     const sidebarId = document.getElementById('sidebarId');
-    if (sidebarId) {
-        sidebarId.innerHTML = `<div class="sidebar-id">ID: ${shortUid}</div>`;
-    }
-    
+    if (sidebarId) sidebarId.innerHTML = `<div class="sidebar-id">ID: ${shortUid}</div>`;
     const sidebarVIP = document.getElementById('sidebarVIP');
-    if (sidebarVIP) {
-        // This is placeholder, you'd fetch this from Firestore
-        sidebarVIP.innerHTML = '<div class="sidebar-vip">VIP Member</div>';
-    }
+    if (sidebarVIP) sidebarVIP.innerHTML = '<div class="sidebar-vip">VIP Member</div>';
     
     // Update profile page
     const profileId = document.getElementById('profileId');
-    if (profileId) {
-        profileId.textContent = `ID: ${shortUid}`;
-    }
-    
+    if (profileId) profileId.textContent = `ID: ${shortUid}`;
     const profileEmail = document.getElementById('profileEmail');
-    if (profileEmail) {
-        profileEmail.textContent = userEmail;
-    }
+    if (profileEmail) profileEmail.textContent = userEmail;
 }
 
 /**
  * Load additional user data from Firestore
  */
 function loadUserData(userId) {
-    // Ensure Firestore is available
     if (typeof firebase === 'undefined' || !firebase.firestore) {
         console.error("Firestore not available for loadUserData.");
         return;
@@ -75,37 +58,23 @@ function loadUserData(userId) {
             const userData = doc.data();
             console.log('User data loaded:', userData);
             
-            // Update balance on 'Mine' page
-            const balanceElement = document.getElementById('profileBalance'); // Assumes ID from your old code
+            const balanceElement = document.getElementById('profileBalance'); 
             if (balanceElement && userData.balance !== undefined) {
                 balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
             }
-
-            // Update balance on 'Recharge' page
             const rechargeBalance = document.getElementById('currentBalanceAmount');
             if (rechargeBalance && userData.balance !== undefined) {
                 rechargeBalance.textContent = `₹${userData.balance.toFixed(2)}`;
             }
-            
-            // You can update other elements here (e.g., VIP status)
-            // Example:
-            // const sidebarVIP = document.getElementById('sidebarVIP');
-            // if (sidebarVIP && userData.vipLevel) {
-            //    sidebarVIP.innerHTML = `<div class="sidebar-vip">${userData.vipLevel}</div>`;
-            // }
-
         } else {
-            // Create user document if it doesn't exist
             console.log("No user document found, creating one...");
             userDoc.set({
                 email: firebase.auth().currentUser.email,
                 balance: 0,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 uid: userId
-                // Add any other default fields
             }).then(() => {
                 console.log('New user document created');
-                // Call loadUserData again to populate fields
                 loadUserData(userId); 
             }).catch(err => {
                 console.error("Error creating user document:", err);
@@ -118,50 +87,96 @@ function loadUserData(userId) {
 
 
 // --- Main Initialization Function ---
-// This function sets up all listeners for the entire app.
 function initializeCommonJs() {
+
+    // --- START: On-Screen Debugger for Mobile ---
+    let debugElement = null;
+    let lastMoveLog = 0; // To prevent "mousemove" flooding
+
+    /**
+     * Creates or finds the on-screen debug element.
+     */
+    function setupDebugger() {
+        if (document.getElementById('mobileDebugger')) {
+            debugElement = document.getElementById('mobileDebugger');
+            return;
+        }
+        
+        debugElement = document.createElement('div');
+        debugElement.id = 'mobileDebugger';
+        
+        // Style it to be visible on top of everything
+        debugElement.style.position = 'fixed';
+        debugElement.style.bottom = '75px'; // Above the 70px bottom-nav-spacer
+        debugElement.style.left = '5px';
+        debugElement.style.right = '5px';
+        debugElement.style.padding = '8px';
+        debugElement.style.background = 'rgba(255, 255, 100, 0.9)'; // Bright yellow
+        debugElement.style.color = 'black';
+        debugElement.style.border = '1px solid black';
+        debugElement.style.borderRadius = '5px';
+        debugElement.style.zIndex = '9999';
+        debugElement.style.fontSize = '12px';
+        debugElement.style.fontFamily = 'monospace';
+        debugElement.style.wordBreak = 'break-all';
+        
+        document.body.appendChild(debugElement);
+        debugElement.innerHTML = 'Debugger Initialized...';
+    }
+
+    /**
+     * Updates the text of the on-screen debug element.
+     * @param {string} message - The message to display.
+     */
+    function updateDebugInfo(message) {
+        if (!debugElement) {
+            setupDebugger();
+        }
+
+        // Throttle "mousemove" to prevent unreadable flooding
+        if (message.includes("mousemove")) {
+            const now = Date.now();
+            if (now - lastMoveLog < 1000) { // Only log mousemove once per second
+                return; 
+            }
+            lastMoveLog = now;
+        }
+        debugElement.textContent = message;
+    }
+    // --- END: On-Screen Debugger ---
+
 
     // --- Check for Firebase Dependencies ---
     if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) {
-        console.warn("Firebase not fully loaded. Session management features may be disabled.");
+        console.warn("Firebase not fully loaded.");
     }
     
     const db = (firebase.firestore) ? firebase.firestore() : null;
 
     // --- Session Management Variables ---
     
-    // Inactivity Timer
     // =================================================================
     // === MODIFIED FOR TESTING: Set to 1 Minute (1 * 60 * 1000) ===
     const INACTIVITY_TIMEOUT_MS = 1 * 60 * 1000; // 1 Minute
     // =================================================================
     let inactivityTimer;
 
-    // Single Session
-    let sessionListener = null; // Holds the Firestore unsubscribe function
-
+    let sessionListener = null; 
 
     // --- Session Management Core Functions ---
 
-    /**
-     * Centralized function to log the user out.
-     * Stops all timers and listeners before signing out.
-     */
     function autoLogout(message) {
-        console.log(`Logging out: ${message}`);
+        updateDebugInfo(`Logging out: ${message}`);
         
-        // Stop all session managers
         stopInactivityTimer();
         stopSessionListener();
-
-        // Clear local session ID on any logout
         localStorage.removeItem('currentSessionID');
 
         if (firebase && firebase.auth) {
             firebase.auth().signOut()
                 .then(() => {
                     alert(message);
-                    window.location.href = 'login.html'; // Ensure this is your login page
+                    window.location.href = 'login.html'; 
                 })
                 .catch((error) => {
                     console.error("Error during auto-logout:", error);
@@ -176,25 +191,17 @@ function initializeCommonJs() {
 
     // --- Inactivity Timer Functions ---
     
-    /**
-     * Resets the inactivity timer.
-     * @param {string} [eventType] - The name of the event that triggered the reset (e.g., 'mousemove')
-     */
     function resetInactivityTimer(eventType) { 
         if (inactivityTimer) clearTimeout(inactivityTimer);
         
-        // === ENHANCED LOGGING FOR TESTING ===
-        if (eventType) {
-            console.log(`TIMER: Reset by "${eventType}" event. New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`);
-        } else {
-            // This is the first call from onAuthStateChanged
-            console.log(`TIMER: Initialized. New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`);
-        }
+        const message = eventType ? 
+            `TIMER: Reset by "${eventType}". New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s` : 
+            `TIMER: Initialized. New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`;
+        updateDebugInfo(message);
         
         inactivityTimer = setTimeout(
             () => {
-                // === ENHANCED LOGGING FOR TESTING ===
-                console.log("TIMER: Fired! Logging out now."); 
+                updateDebugInfo("TIMER: Fired! Logging out now."); 
                 autoLogout("You have been logged out due to inactivity.");
             }, 
             INACTIVITY_TIMEOUT_MS
@@ -204,68 +211,64 @@ function initializeCommonJs() {
     function stopInactivityTimer() {
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
-            console.log("Inactivity timer stopped.");
+            updateDebugInfo("Inactivity timer stopped.");
         }
     }
 
     function setupActivityListeners() {
         const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
         
-        // This function will be the single handler
         const activityHandler = (e) => {
-            resetInactivityTimer(e.type); // Pass the event type (e.g., 'mousemove')
+            resetInactivityTimer(e.type); 
         };
 
-        // Clear old listeners first and add new ones
         activityEvents.forEach(eventName => {
              document.removeEventListener(eventName, activityHandler, true);
              document.addEventListener(eventName, activityHandler, true);
         });
-        console.log("Activity listeners attached.");
+        updateDebugInfo("Activity listeners attached.");
     }
     
     // --- Single Session Management Functions ---
     
     function stopSessionListener() {
         if (sessionListener) {
-            sessionListener(); // This unsubscribes from Firestore
+            sessionListener(); 
             sessionListener = null;
-            console.log("Single-session listener stopped.");
+            updateDebugInfo("Single-session listener stopped.");
         }
     }
 
     function initializeSession(uid) {
         if (!db) {
-             console.warn("Firestore not available. Single-session feature disabled.");
+             updateDebugInfo("Firestore not available. Single-session feature disabled.");
              return;
         }
 
-        const sessionRef = db.collection('user_sessions').doc(uid);
+        const sessionRef = db..collection('user_sessions').doc(uid);
         let mySessionID = localStorage.getItem('currentSessionID');
 
         if (!mySessionID) {
-            // New login for this browser
             mySessionID = Date.now().toString() + Math.random().toString();
             localStorage.setItem('currentSessionID', mySessionID);
             
-            console.log("New login. Setting master session ID in Firestore.");
+            updateDebugInfo("New login. Setting master session ID in Firestore.");
             sessionRef.set({
                 currentSessionID: mySessionID,
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(err => console.error("Could not set session in Firestore:", err));
         }
 
-        // Attach the listener
-        stopSessionListener(); // Stop previous listener
+        stopSessionListener(); 
         
-        console.log("Attaching session listener...");
+        updateDebugInfo("Attaching session listener...");
         sessionListener = sessionRef.onSnapshot(doc => {
             if (doc.exists) {
                 const masterSessionID = doc.data().currentSessionID;
                 const localSessionID = localStorage.getItem('currentSessionID');
 
                 if (localSessionID && masterSessionID && localSessionID !== masterSessionID) {
-                    console.log("Newer session detected. Logging out this (old) session.");
+                    updateDebugInfo("Newer session detected. Logging out this (old) session.");
                     autoLogout("This account was logged in on a new device. You have been logged out.");
                 }
             }
@@ -277,99 +280,78 @@ function initializeCommonJs() {
     // --- Main Auth State Observer (The Single Source of Truth) ---
     if (firebase && firebase.auth) {
         firebase.auth().onAuthStateChanged((user) => {
+            // We need the debugger to run *before* any redirects
+            // So we set it up here, inside the auth listener
+            document.addEventListener('DOMContentLoaded', setupDebugger);
+
             const currentPage = window.location.pathname.split('/').pop();
-            const authPages = ['login.html', 'register.html', 'verify-email.html']; // Add any other auth-related pages
+            const authPages = ['login.html', 'register.html', 'verify-email.html']; 
             
             if (user) {
                 // --- User is SIGNED IN ---
-                console.log('User signed in:', user.uid);
+                updateDebugInfo(`User signed in: ${user.uid.substring(0, 5)}...`);
                 
-                // 1. Update UI
                 updateUserInfo(user);
-                
-                // 2. Load Firestore data
                 loadUserData(user.uid);
                 
-                // 3. Redirect away from auth pages
                 if (authPages.includes(currentPage)) {
-                    console.log("User logged in, redirecting from auth page to index.html");
+                    updateDebugInfo("Redirecting from auth page to index.html");
                     window.location.href = 'index.html';
                 }
 
-                // 4. Start Inactivity Timer
                 setupActivityListeners();
-                resetInactivityTimer(); // Initial call, no event type
-                
-                // 5. Start Single-Session Management
+                resetInactivityTimer(); // Initial call
                 initializeSession(user.uid);
 
             } else {
                 // --- User is SIGNED OUT ---
-                console.log('User signed out');
+                updateDebugInfo("User signed out.");
                 
-                // 1. Redirect to login if not on an auth page
                 if (!authPages.includes(currentPage)) {
-                    console.log("User signed out, redirecting to login.html");
+                    updateDebugInfo("Redirecting to login.html");
                     window.location.href = 'login.html';
                 }
 
-                // 2. Stop Inactivity Timer
                 stopInactivityTimer();
-                
-                // 3. Stop Single-Session Listener
                 stopSessionListener();
-
-                // 4. Clean up local session ID
                 localStorage.removeItem('currentSessionID');
             }
         });
     } else {
          console.error("FATAL: Firebase Auth is not loaded. App cannot function.");
-         // You might want to show an error to the user here
+         // We can't use the debugger if the page hasn't loaded,
+         // but we can try an alert.
+         alert("FATAL: Firebase Auth is not loaded.");
     }
 
-
-    // --- DOM Listeners (Run once) ---
-    // This listener sets up static elements like the sidebar
+    // --- Static DOM Listeners (Sidebar, Logout Button) ---
     document.addEventListener('DOMContentLoaded', () => {
         
-        // Sidebar functionality
+        // Setup debugger just in case auth hasn't run yet
+        setupDebugger();
+
+        // Sidebar
         const menuBtn = document.getElementById('menuBtn');
         const closeBtn = document.getElementById('closeBtn');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
-        }
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
-        }
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
-        }
+        if (menuBtn) menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
+        if (closeBtn) closeBtn.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
 
-        // Manual Logout Button Handler
-        // Finds any button with class 'logout-btn' (like on mine.html)
+        // Manual Logout Button
         const logoutButton = document.querySelector('.logout-btn'); 
-        if (logoutButton) {
-            // Check if a listener is already attached, to be safe
-            if (!logoutButton.hasLogoutListener) {
-                logoutButton.addEventListener('click', () => {
-                    console.log("Manual logout. Clearing session and signing out.");
-                    
-                    // Manually clear local session first
-                    localStorage.removeItem('currentSessionID'); 
-                    
-                    // Then sign out, which will trigger the onAuthStateChanged listener
-                    if(firebase && firebase.auth) {
-                         firebase.auth().signOut();
-                    }
-                });
-                logoutButton.hasLogoutListener = true; // Flag to prevent multiple listeners
-            }
+        if (logoutButton && !logoutButton.hasLogoutListener) {
+            logoutButton.addEventListener('click', () => {
+                updateDebugInfo("Manual logout. Clearing session...");
+                localStorage.removeItem('currentSessionID'); 
+                if(firebase && firebase.auth) {
+                     firebase.auth().signOut();
+                }
+            });
+            logoutButton.hasLogoutListener = true; 
         }
         
     }); // End DOMContentLoaded
 
 } // End initializeCommonJs
-            
