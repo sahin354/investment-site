@@ -6,7 +6,178 @@
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
-</head>
+
+  <style>
+    /* --- New Earnings Card Layout (side-by-side) --- */
+    .earnings-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px; /* Spacing between items */
+      margin-bottom: 20px; /* Space before the button */
+    }
+
+    .earnings-item {
+      /* Each item will try to be 50% */
+      flex: 1 1 calc(50% - 5px); /* Grow, shrink, and base width (50% minus half the gap) */
+      box-sizing: border-box; 
+      padding: 0; 
+    }
+
+    /* This rule makes "Locked Reward" take the full line */
+    .earnings-item.full-width {
+      flex: 1 1 100%; /* Make this item take full width */
+      margin-top: 10px; /* Add some space above the locked reward */
+    }
+
+    .earnings-label {
+      font-size: 0.9em;
+      color: var(--text-light, #555);
+      margin-bottom: 4px;
+    }
+
+    .earnings-amount {
+      font-size: 1.6em;
+      font-weight: 600;
+      color: var(--text-dark, #1a202c);
+    }
+
+    /* --- New Redeem Button Style --- */
+    .redeem-btn {
+      background-color: #a0aFFF; /* Light purple/blue from screenshot */
+      font-size: 1.1em;
+      padding: 15px;
+      border-radius: 10px; /* More rounded */
+      box-shadow: 0 4px 12px rgba(160, 175, 255, 0.4);
+    }
+    .redeem-btn:hover {
+      background-color: #8a9bff;
+    }
+
+    /* --- New Pill-Style Main Tabs (Invite / My Earnings) --- */
+    .refer-main-tabs {
+      background-color: #f0f2f5; /* Light grey background for the container */
+      border-radius: 10px;
+      padding: 4px;
+      display: flex;
+      margin: 15px; /* Match card margin */
+      box-shadow: none; 
+    }
+
+    .refer-main-tabs .tab-button {
+      flex: 1;
+      padding: 10px 15px;
+      border: none; /* Remove border from original style */
+      border-radius: 8px; /* Rounded corners for the pill */
+      background-color: transparent; /* Inactive is transparent */
+      color: var(--text-light, #555);
+      font-size: 1em;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      margin: 0; /* Remove margin from original style */
+    }
+
+    .refer-main-tabs .tab-button.active {
+      background-color: #ffffff; /* Active is white */
+      color: var(--text-dark, #1a202c);
+      font-weight: 600;
+      border: none; /* Ensure no border */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Shadow for active pill */
+    }
+
+    /* --- New Pill-Style Friends Sub-Tabs (All / Joined) --- */
+    .friends-sub-tabs {
+      background-color: #f0f2f5;
+      border-radius: 10px;
+      padding: 4px;
+      display: flex;
+      border-bottom: none; /* Remove original border */
+      margin-bottom: 20px;
+    }
+
+    .friends-sub-tabs .friends-sub-tab-button {
+      flex: 1;
+      padding: 8px 10px; /* Slightly smaller */
+      border: none;
+      border-radius: 8px;
+      background: none;
+      font-size: 0.95em;
+      font-weight: 500;
+      color: #888;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative; 
+    }
+
+    .friends-sub-tabs .friends-sub-tab-button.active {
+      background-color: #ffffff;
+      color: var(--text-dark, #1a202c);
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Remove the old underline style */
+    .friends-sub-tabs .friends-sub-tab-button.active::after {
+      content: none; 
+    }
+
+    /* --- New Invite Button Style (with icon) --- */
+    .invite-btn-simple {
+      background-color: #6A7BFF; /* Match other blue/purple */
+      color: white;
+      border: none; /* Remove border */
+      padding: 8px 15px;
+      border-radius: 8px; /* More rounded */
+      font-weight: 500;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px; /* Space between text and icon */
+      box-shadow: 0 2px 8px rgba(106, 123, 255, 0.3);
+    }
+
+    .invite-btn-simple:hover {
+      background-color: #5a6bf0;
+    }
+
+    .invite-btn-simple .fa-whatsapp {
+      font-size: 1.1em; /* Make icon slightly larger */
+    }
+
+    /* --- Search Bar Polish --- */
+    .search-input-wrapper {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    .search-input-wrapper .fa-search {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 12px 15px 12px 40px; /* Add padding for icon */
+      border: 1px solid #eef2f7;
+      border-radius: 10px;
+      background: #f8f9fa;
+      font-size: 1em;
+      box-sizing: border-box; /* Important */
+    }
+    .search-input-wrapper input:focus {
+      outline: none;
+      border-color: #6A7BFF;
+      background: white;
+    }
+  </style>
+  </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
@@ -101,7 +272,7 @@
               </div>
               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
             </div>
-            </div>
+          </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
@@ -128,7 +299,8 @@
   <script src="common.js"></script>
   <script src="refer.js"></script> 
   <script>
-    document..addEventListener('DOMContentLoaded', () => {
+    // --- JAVASCRIPT TYPO FIXED HERE ---
+    document.addEventListener('DOMContentLoaded', () => {
         // --- Main "Invite" / "My Earnings" Tab logic ---
         const referMainTabs = document.querySelectorAll('.refer-main-tabs .tab-button');
         const mainContents = document.querySelectorAll('.refer-page-container > .tab-content');
@@ -182,5 +354,5 @@
     });
   </script>
 </body>
-  </html>
-  
+    </html>
+    
