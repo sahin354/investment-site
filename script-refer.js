@@ -327,24 +327,23 @@ function loadUserData() {
 
 // Load friends data
 function loadFriendsData() {
-  // Sample friends data
+  // Sample friends data (only non-joined friends in "All" tab)
   const allFriends = [
-    { name: 'HM Hariram Manglaw', phone: '9980989304', joined: false },
-    { name: 'SD Santu Dey', phone: '8985688909', joined: false },
-    { name: 'MV Mauhet Verma', phone: '8943870809', joined: false },
-    { name: 'AK Ankit Kumar', phone: '9876543210', joined: false },
-    { name: 'RS Rohan Sharma', phone: '9876543211', joined: false },
-    { name: 'PK Priya Singh', phone: '9876543212', joined: false }
+    { name: 'HM Hariram Manglaw', phone: '9980989304' },
+    { name: 'SD Santu Dey', phone: '8985688909' },
+    { name: 'MV Mauhet Verma', phone: '8943870809' },
+    { name: 'AK Ankit Kumar', phone: '9876543210' },
+    { name: 'RS Rohan Sharma', phone: '9876543211' },
+    { name: 'PK Priya Singh', phone: '9876543212' }
   ];
   
-  // Sample joined friends data
+  // Sample joined friends data (only shown in "Joined" tab)
   const joinedFriends = [
-    { name: 'RJ Rajesh Jain', phone: '9876543213', joined: true, earnings: '₹50' },
-    { name: 'SM Smita Mehta', phone: '9876543214', joined: true, earnings: '₹25' },
-    { name: 'VP Vijay Patel', phone: '9876543215', joined: true, earnings: '₹75' }
+    { name: 'RJ Rajesh Jain', phone: '9876543213', earnings: '₹50' },
+    { name: 'SM Smita Mehta', phone: '9876543214', earnings: '₹25' }
   ];
   
-  // Render all friends
+  // Render all friends (non-joined only)
   const allFriendList = document.getElementById('allFriendList');
   if (allFriendList) {
     allFriendList.innerHTML = '';
@@ -364,7 +363,7 @@ function loadFriendsData() {
     }
   }
   
-  // Render joined friends
+  // Render joined friends (only in joined tab)
   const joinedFriendList = document.getElementById('joinedFriendList');
   if (joinedFriendList) {
     joinedFriendList.innerHTML = '';
@@ -447,4 +446,4 @@ function showToast(message, isError = false) {
       }
     }, 300);
   }, 3000);
-                    }
+                                                    }
