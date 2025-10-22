@@ -1,3 +1,5 @@
+/* === STYLES SPECIFICALLY FOR REFER & EARN PAGE === */
+
 /* --- CSS Variables --- */
 :root {
   --primary-color: #1e3c72;
@@ -61,22 +63,26 @@ body {
 }
 
 /* --- Sidebar Styles --- */
+/* Styles for sidebar are assumed to be in your main style.css or handled by common.js */
+/* Basic positioning for the sidebar elements if needed */
 .side-menu {
   position: fixed;
   top: 0;
-  left: -280px;
+  left: 0; /* Changed from -280px to align with common.js logic */
   width: 280px;
+  max-width: 85vw;
   height: 100%;
-  background-color: white;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  transition: left 0.3s ease;
-  z-index: 1000;
-  padding: 20px;
-  overflow-y: auto;
+  background-color: #ffffff;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
 }
 
-.side-menu.active {
-  left: 0;
+body.sidebar-open .side-menu {
+    transform: translateX(0);
 }
 
 .sidebar-overlay {
@@ -86,62 +92,68 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: none;
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.sidebar-overlay.active {
-  display: block;
+body.sidebar-open .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .sidebar-header {
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  padding: 25px 20px;
 }
-
-#sidebarId, #sidebarVIP {
-  margin-bottom: 8px;
-  font-size: 0.95em;
-  color: var(--text-light);
+#sidebarId { font-weight: bold; margin-bottom: 5px; font-size: 1.1em; }
+#sidebarVIP {
+    background-color: rgba(255, 215, 0, 0.8);
+    color: #333;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
 }
-
 .sidebar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-grow: 1;
+  padding-top: 15px;
 }
-
 .sidebar-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  background: none;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  gap: 15px;
+  width: 100%;
+  padding: 15px 20px;
+  background-color: transparent;
+  border: none;
+  text-align: left;
   font-size: 1em;
-  color: var(--text-dark);
+  color: #333;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
-
-.sidebar-btn:hover {
-  background-color: var(--bg-light);
-}
+.sidebar-btn:hover { background-color: var(--bg-light); }
+.sidebar-btn i { width: 20px; text-align: center; }
 
 .close-btn {
   position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 1.8em;
+  top: 10px;
+  right: 15px;
+  font-size: 2.5em;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
-  color: var(--text-light);
+  transition: color 0.2s;
 }
+.close-btn:hover { color: white; }
+
 
 /* --- Main Content Styles --- */
 main {
-  padding: 15px;
+  padding: 10px;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -161,7 +173,7 @@ main {
   border-radius: 10px;
   padding: 4px;
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .refer-main-tabs .tab-button {
@@ -196,13 +208,15 @@ main {
 }
 
 /* --- Earnings Card --- */
+.earnings-card {
+    margin-top: 0;
+}
 .earnings-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
 }
-
 .earnings-item {
   flex: 1 1 calc(50% - 8px);
   padding: 15px;
@@ -210,23 +224,19 @@ main {
   border-radius: 10px;
   border: 1px solid var(--border-color);
 }
-
 .earnings-item.full-width {
   flex: 1 1 100%;
 }
-
 .earnings-label {
   font-size: 0.9em;
   color: var(--text-light);
   margin-bottom: 8px;
 }
-
 .earnings-amount {
   font-size: 1.5em;
   font-weight: 700;
   color: var(--text-dark);
 }
-
 .redeem-btn {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
@@ -240,13 +250,15 @@ main {
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(30, 60, 114, 0.4);
 }
-
 .redeem-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(30, 60, 114, 0.5);
 }
 
 /* --- Invite Card --- */
+.invite-header-card {
+    margin-top: 0;
+}
 .invite-header-card h2 {
   margin-top: 0;
   margin-bottom: 20px;
@@ -254,7 +266,6 @@ main {
   font-weight: 700;
   color: var(--text-dark);
 }
-
 .referral-link-box {
   display: flex;
   align-items: center;
@@ -263,7 +274,6 @@ main {
   padding: 12px 15px;
   margin-bottom: 20px;
 }
-
 #referralLinkText {
   flex: 1;
   font-size: 0.95em;
@@ -273,7 +283,6 @@ main {
   text-overflow: ellipsis;
   padding-right: 10px;
 }
-
 .copy-btn-inset {
   background-color: var(--primary-color);
   color: white;
@@ -285,11 +294,9 @@ main {
   flex-shrink: 0;
   transition: background-color 0.2s;
 }
-
 .copy-btn-inset:hover {
   background-color: var(--secondary-color);
 }
-
 .copy-btn-inset.copied {
   background-color: var(--success-color);
 }
@@ -299,7 +306,6 @@ main {
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
-
 .commission-card {
   background-color: #f8fafc;
   border: 1px solid #eef2f7;
@@ -307,14 +313,12 @@ main {
   padding: 15px 10px;
   text-align: center;
 }
-
 .commission-card .level-label {
   font-size: 0.85em;
   font-weight: 500;
   color: #666;
   margin-bottom: 5px;
 }
-
 .commission-card .level-percent {
   font-size: 1.4em;
   font-weight: 700;
@@ -335,7 +339,6 @@ main {
   position: relative;
   margin-bottom: 15px;
 }
-
 .search-input-wrapper .fa-search {
   position: absolute;
   left: 15px;
@@ -343,7 +346,6 @@ main {
   transform: translateY(-50%);
   color: #aaa;
 }
-
 .search-input-wrapper input {
   width: 100%;
   padding: 12px 15px 12px 40px;
@@ -353,7 +355,6 @@ main {
   font-size: 1em;
   box-sizing: border-box;
 }
-
 .search-input-wrapper input:focus {
   outline: none;
   border-color: var(--primary-color);
@@ -368,7 +369,6 @@ main {
   display: flex;
   margin-bottom: 20px;
 }
-
 .friends-sub-tabs .friends-sub-tab-button {
   flex: 1;
   padding: 10px 15px;
@@ -383,7 +383,6 @@ main {
   text-align: center;
   transition: all 0.2s ease;
 }
-
 .friends-sub-tabs .friends-sub-tab-button.active {
   background-color: var(--primary-color);
   color: #ffffff;
@@ -397,7 +396,6 @@ main {
   flex-direction: column;
   gap: 12px;
 }
-
 .friend-item {
   display: flex;
   justify-content: space-between;
@@ -407,34 +405,13 @@ main {
   border-radius: 10px;
   border: 1px solid var(--border-color);
 }
-
-.friend-details {
-  flex: 1;
-}
-
-.friend-name {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.friend-phone {
-  font-size: 0.9em;
-  color: var(--text-light);
-}
-
-.friend-status {
+.friend-details { flex: 1; }
+.friend-name { font-weight: 600; margin-bottom: 4px; }
+.friend-phone { font-size: 0.9em; color: var(--text-light); }
+.friend-status { /* Style for the 'Joined - ₹X Earned' text */
   font-size: 0.8em;
   color: var(--success-color);
   margin-top: 4px;
-  font-weight: 500;
-}
-
-.status-badge {
-  background-color: var(--success-color);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8em;
   font-weight: 500;
 }
 
@@ -453,57 +430,31 @@ main {
   gap: 6px;
   box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
 }
+.invite-btn-simple:hover { background-color: var(--secondary-color); }
+.invite-btn-simple .fa-whatsapp { font-size: 1.1em; }
 
-.invite-btn-simple:hover {
-  background-color: var(--secondary-color);
-}
-
-.invite-btn-simple .fa-whatsapp {
-  font-size: 1.1em;
-}
-
+/* FIX: Limit height and enable scroll */
 .scrollable-friend-list {
-  max-height: 300px;
+  max-height: 210px; /* Adjust this value to show ~3 items */
   overflow-y: auto;
-  padding-right: 5px;
+  padding-right: 5px; /* Space for scrollbar */
+}
+
+.status-badge {
+  background-color: var(--success-color);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+  flex-shrink: 0; /* Prevent shrinking */
+  margin-left: 10px; /* Space from details */
 }
 
 /* --- Bottom Navigation --- */
+/* Styles for .bottom-nav are assumed to be in your main style.css */
 .bottom-nav-spacer {
   height: 70px;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
-.bottom-nav a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-light);
-  font-size: 0.8em;
-  transition: color 0.2s;
-}
-
-.bottom-nav a i {
-  font-size: 1.3em;
-  margin-bottom: 4px;
-}
-
-.bottom-nav a.active {
-  color: var(--primary-color);
-  font-weight: 600;
 }
 
 /* --- Toast Notification --- */
@@ -520,58 +471,61 @@ main {
   transform: translateX(150%);
   transition: transform 0.3s ease;
 }
-
 .toast.show {
   transform: translateX(0);
 }
 
 /* --- Mobile Responsive Adjustments --- */
 @media (max-width: 480px) {
-  main {
-    padding: 10px;
-  }
+  /* Inherit main padding from body/main if needed */
+  /* main { padding: 10px; } */ /* Already set */
   
   .card {
     padding: 15px;
   }
   
+  /* Stack earnings items on mobile */
   .earnings-item {
     flex: 1 1 100%;
   }
   
+  /* FIX: Keep Level cards side-by-side */
   .commission-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 10px; /* Keep the gap */
   }
   
+  /* Stack referral link box elements */
   .referral-link-box {
     flex-direction: column;
     gap: 10px;
   }
-  
   #referralLinkText {
     width: 100%;
     text-align: center;
     padding-right: 0;
   }
-  
   .copy-btn-inset {
     width: 100%;
   }
   
+  /* Adjust friend item layout for mobile */
   .friend-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    /* Keep flex row for details and button/badge */
+    /* flex-direction: column; */ /* Removed this stacking */
+    align-items: center; /* Vertically center */
+    /* gap: 10px; */ /* Removed gap */
   }
-  
   .friend-details {
-    width: 100%;
+     /* Allow details to take space */
+     flex-grow: 1; 
+     /* width: 100%; */ /* Removed width */
   }
-  
   .invite-btn-simple {
-    width: 100%;
-    justify-content: center;
+     /* Let button size naturally */
+     /* width: 100%; */ /* Removed width */
+     /* justify-content: center; */ /* Removed center */
+     flex-shrink: 0; /* Prevent shrinking */
   }
   
   .toast {
@@ -581,3 +535,4 @@ main {
     text-align: center;
   }
   }
+                    
