@@ -4,20 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adani Corporation - Refer & Earn</title>
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="style.css" />
-  
-  <link rel="stylesheet" href="refer.css" />
-
+  <link rel="stylesheet" href="refer.css">
 </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header">
-      <div id="sidebarId">Loading...</div>
-      <div id="sidebarVIP">...</div>
+      <div id="sidebarId">User ID: 123456</div>
+      <div id="sidebarVIP">VIP Level: Silver</div>
     </div>
     <div class="sidebar-actions">
       <button class="sidebar-btn"><i class="fas fa-headset"></i> Customer Support</button>
@@ -44,18 +39,18 @@
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
-              <div class="earnings-amount" id="totalRewardAmount">₹0.00</div> 
+              <div class="earnings-amount">₹0.00</div>
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-amount" id="availableRewardAmount">₹0.00</div> 
+              <div class="earnings-amount">₹0.00</div>
             </div>
             <div class="earnings-item full-width">
               <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-amount" id="lockedRewardAmount">₹0.00</div> 
+              <div class="earnings-amount">₹0.00</div>
             </div>
           </div>
-          <button class="submit-btn redeem-btn" id="redeemBtn">Redeem Reward</button>
+          <button class="redeem-btn">Redeem Reward</button>
         </div>
       </section>
 
@@ -87,7 +82,7 @@
         <h3>Friends</h3>
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchFriendsInput" placeholder="Search friends">
+          <input type="text" id="searchFriends" placeholder="Search friends">
         </div>
 
         <div class="friends-sub-tabs">
@@ -97,48 +92,14 @@
         
         <div id="all" class="friends-tab-content active">
           <div class="friend-list scrollable-friend-list" id="allFriendList">
-             <div class="friend-item">
-               <div class="friend-details">
-                 <div class="friend-name">HM Hariram Manglaw</div>
-                 <div class="friend-phone">9980989304</div>
-               </div>
-               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-             </div>
-             <div class="friend-item">
-               <div class="friend-details">
-                 <div class="friend-name">SD Santu Dey</div>
-                 <div class="friend-phone">8985688909</div>
-               </div>
-               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-             </div>
-             <div class="friend-item">
-               <div class="friend-details">
-                 <div class="friend-name">MV Mauhet Verma</div>
-                 <div class="friend-phone">8943870809</div>
-               </div>
-               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-             </div>
-              <div class="friend-item">
-               <div class="friend-details">
-                 <div class="friend-name">Test Friend 4</div>
-                 <div class="friend-phone">1234567890</div>
-               </div>
-               <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-             </div>
+            <!-- Friends will be loaded dynamically -->
           </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            <div class="friend-item">
-              <div class="friend-details">
-                <div class="friend-name">Joined Friend 1</div>
-                <div class="friend-phone">9876543210</div>
-                <div class="friend-status">Joined - ₹50 Earned</div>
-              </div>
-              <div class="status-badge">Joined</div>
-            </div>
-             </div>
+            <!-- Joined friends will be loaded dynamically -->
+          </div>
         </div>
       </div>
     </div>
@@ -152,14 +113,6 @@
     <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
   </footer>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebaseConfig.js"></script>
-  
-  <script src="common.js"></script>
-  
-  <script src="refer.js"></script> 
-  
+  <script src="script-refer.js"></script>
 </body>
 </html>
