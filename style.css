@@ -851,4 +851,129 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   border-color: #6A7BFF;
   background: white;
 }
-    
+
+/* --- Mobile Layout Fixes --- */
+@media (max-width: 768px) {
+  /* Main container adjustments */
+  .refer-page-container {
+    padding: 0 10px;
+  }
+  
+  /* Fix for cards to use full width with proper spacing */
+  .earnings-card,
+  .invite-header-card {
+    margin: 0 0 15px 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Adjust earnings grid for smaller screens */
+  .earnings-grid {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .earnings-item {
+    flex: 1 1 100% !important;
+    margin-bottom: 10px;
+  }
+  
+  .earnings-item.full-width {
+    margin-top: 0;
+  }
+  
+  /* Fix tab layouts for mobile */
+  .refer-main-tabs {
+    margin: 10px 0 !important;
+    width: 100%;
+  }
+  
+  .friends-sub-tabs {
+    margin-bottom: 15px;
+  }
+  
+  /* Adjust commission grid for mobile */
+  .commission-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .commission-card {
+    padding: 12px 8px;
+  }
+  
+  /* Fix referral link box for mobile */
+  .referral-link-box {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+  
+  #referralLinkText {
+    width: 100%;
+    text-align: center;
+    padding-right: 0;
+    margin-bottom: 5px;
+  }
+  
+  .copy-btn-inset {
+    width: 100%;
+  }
+  
+  /* Adjust friend list items for mobile */
+  .friend-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 10px;
+  }
+  
+  .friend-details {
+    width: 100%;
+  }
+  
+  .invite-btn-simple {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Fix scrollable friend list height */
+  .scrollable-friend-list {
+    max-height: 250px;
+  }
+  
+  /* Adjust font sizes for mobile */
+  .invite-header-card h2 {
+    font-size: 1.4em;
+  }
+  
+  .earnings-amount {
+    font-size: 1.4em;
+  }
+  
+  .commission-card .level-percent {
+    font-size: 1.3em;
+  }
+}
+
+/* Additional mobile-specific fixes for very small screens */
+@media (max-width: 480px) {
+  .refer-main-tabs .tab-button,
+  .friends-sub-tabs .friends-sub-tab-button {
+    font-size: 0.9em;
+    padding: 8px 10px;
+  }
+  
+  .earnings-amount {
+    font-size: 1.3em;
+  }
+  
+  .redeem-btn {
+    padding: 12px;
+    font-size: 1em;
+  }
+  
+  .invite-header-card {
+    padding: 20px 15px;
+  }
+}
