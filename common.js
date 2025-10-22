@@ -131,7 +131,10 @@ function initializeCommonJs() {
     // --- Session Management Variables ---
     
     // Inactivity Timer
-    const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+    // =================================================================
+    // === MODIFIED FOR TESTING: Set to 1 Minute (1 * 60 * 1000) ===
+    const INACTIVITY_TIMEOUT_MS = 1 * 60 * 1000; // 1 Minute
+    // =================================================================
     let inactivityTimer;
 
     // Single Session
@@ -175,8 +178,16 @@ function initializeCommonJs() {
     
     function resetInactivityTimer() {
         if (inactivityTimer) clearTimeout(inactivityTimer);
+        
+        // === ADDED FOR TESTING: Log to console ===
+        console.log(`TIMER: Reset! New logout in ${INACTIVITY_TIMEOUT_MS / 1000}s`); 
+        
         inactivityTimer = setTimeout(
-            () => autoLogout("You have been logged out due to inactivity."), 
+            () => {
+                // === ADDED FOR TESTING: Log to console ===
+                console.log("TIMER: Fired! Logging out now."); 
+                autoLogout("You have been logged out due to inactivity.");
+            }, 
             INACTIVITY_TIMEOUT_MS
         );
     }
@@ -346,4 +357,3 @@ function initializeCommonJs() {
     }); // End DOMContentLoaded
 
 } // End initializeCommonJs
-                        
