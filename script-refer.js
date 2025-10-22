@@ -1,39 +1,86 @@
 // Refer & Earn Page JavaScript
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize all functionality for this page
-  initReferPage();
+  // Initialize the application
+  initApp();
 });
 
-function initReferPage() {
-  // Initialize Sidebar (if needed, otherwise handled by common.js)
-  // initSidebar(); // Assuming common.js handles this now
-
-  // Initialize page-specific elements and listeners
+function initApp() {
+  // Initialize all functionality
+  initSidebar();
   initMainTabs();
   initFriendTabs();
   initCopyReferral();
   initWhatsAppInvites();
   initSearchFriends();
   initRedeemButton();
-
-  // Load dynamic data (referral link, earnings, friends)
-  loadUserData(); // Loads placeholder data and referral link
-  // You would replace loadUserData with your actual Firebase loading functions
-  // loadFirebaseData(); 
+  loadUserData();
+  loadFriendsData();
 }
 
-// Sidebar functionality (if common.js doesn't handle it)
-/* function initSidebar() {
+// Sidebar functionality
+function initSidebar() {
   const menuBtn = document.getElementById('menuBtn');
   const sideMenu = document.getElementById('sideMenu');
   const closeBtn = document.getElementById('closeBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
   
-  // Add event listeners as in your script-refer.js
-  // ... (use code from script-refer.js if needed) ...
-} 
-*/
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => {
+      sideMenu.classList.add('active');
+      sidebarOverlay.classList.add('active');
+    });
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      sideMenu.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    });
+  }
+  
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      sideMenu.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    });
+  }
+  
+  // Sidebar button actions
+  const sidebarButtons = document.querySelectorAll('.sidebar-btn');
+  sidebarButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const buttonText = this.textContent.trim();
+      handleSidebarAction(buttonText);
+    });
+  });
+}
+
+function handleSidebarAction(action) {
+  switch(action) {
+    case 'Customer Support':
+      showToast('Opening customer support...');
+      // In a real app, this would open a support chat or dial a number
+      setTimeout(() => {
+        window.open('tel:+1234567890');
+      }, 500);
+      break;
+    case 'Telegram Channel':
+      showToast('Opening Telegram channel...');
+      window.open('https://t.me/example', '_blank');
+      break;
+    case 'Settings':
+      showToast('Opening settings...');
+      // In a real app, this would navigate to settings page
+      break;
+    default:
+      console.log('Sidebar action:', action);
+  }
+  
+  // Close sidebar after action
+  document.getElementById('sideMenu').classList.remove('active');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
 
 // Main "Invite" / "My Earnings" Tab functionality
 function initMainTabs() {
@@ -54,13 +101,27 @@ function initMainTabs() {
       if (targetContent) {
         targetContent.classList.add('active');
         
-        // If switching to earnings tab, maybe refresh data (optional)
+        // If switching to earnings tab, refresh earnings data
         if (tab.dataset.tab === 'earnings') {
-          // refreshEarningsData(); // You might call your Firebase listener setup here
+          refreshEarningsData();
         }
       }
     });
   });
+}
+
+// Refresh earnings data (simulated)
+function refreshEarningsData() {
+  // In a real app, this would fetch data from an API
+  const totalReward = document.querySelector('#earnings .earnings-item:nth-child(1) .earnings-amount');
+  const availableReward = document.querySelector('#earnings .earnings-item:nth-child(2) .earnings-amount');
+  const lockedReward = document.querySelector('#earnings .earnings-item:nth-child(3) .earnings-amount');
+  
+  if (totalReward) totalReward.textContent = '₹125.50';
+  if (availableReward) availableReward.textContent = '₹75.50';
+  if (lockedReward) lockedReward.textContent = '₹50.00';
+  
+  showToast('Earnings data updated');
 }
 
 // "All" / "Joined" (Friends) Tab functionality
@@ -80,11 +141,6 @@ function initFriendTabs() {
       friendsTabContents.forEach(c => c.classList.remove('active'));
       const targetContent = document.getElementById(tab.dataset.friendTab);
       if (targetContent) targetContent.classList.add('active');
-
-      // Clear search when switching tabs
-      const searchInput = document.getElementById('searchFriendsInput');
-      if(searchInput) searchInput.value = '';
-      filterFriends(''); // Show all friends in the new tab
     });
   });
 }
@@ -92,48 +148,43 @@ function initFriendTabs() {
 // Copy referral link functionality
 function initCopyReferral() {
   const copyLinkBtn = document.getElementById('copyReferralBtn');
-  const referralLinkEl = document.getElementById('referralLinkText'); // Get the span
-
-  if (copyLinkBtn && referralLinkEl) {
+  
+  if (copyLinkBtn) {
     copyLinkBtn.addEventListener('click', () => {
-      const referralLinkText = referralLinkEl.textContent; // Get text from span
+      const referralLinkText = document.getElementById('referralLinkText').textContent;
       
       if (referralLinkText === 'Loading your link...') {
-         alert('Link is still loading, please wait.');
-         return;
+        showToast('Please wait for your link to load.', true);
+        return;
       }
       
       // Use modern clipboard API
       navigator.clipboard.writeText(referralLinkText).then(() => {
         // Show success feedback
-        const originalText = copyLinkBtn.textContent;
         copyLinkBtn.textContent = 'Copied!';
-        copyLinkBtn.classList.add('copied'); // Use class for styling
+        copyLinkBtn.classList.add('copied');
         
-        showToast('Referral link copied!');
+        showToast('Referral link copied to clipboard!');
         
         // Reset button after 2 seconds
         setTimeout(() => {
-          copyLinkBtn.textContent = originalText;
+          copyLinkBtn.textContent = 'Copy';
           copyLinkBtn.classList.remove('copied');
         }, 2000);
       }).catch(err => {
         console.error('Failed to copy link: ', err);
-        // Fallback for older browsers or if permissions fail
-        fallbackCopyText(referralLinkText); 
+        
+        // Fallback for older browsers
+        fallbackCopyText(referralLinkText);
       });
     });
   }
 }
 
-// Fallback copy method
+// Fallback copy method for older browsers
 function fallbackCopyText(text) {
   const textArea = document.createElement('textarea');
   textArea.value = text;
-  // Make it non-visible
-  textArea.style.position = 'fixed';
-  textArea.style.top = '-9999px';
-  textArea.style.left = '-9999px';
   document.body.appendChild(textArea);
   textArea.focus();
   textArea.select();
@@ -142,17 +193,6 @@ function fallbackCopyText(text) {
     const successful = document.execCommand('copy');
     if (successful) {
       showToast('Referral link copied!');
-      // Update button state if needed (similar to above)
-      const copyLinkBtn = document.getElementById('copyReferralBtn');
-      if (copyLinkBtn) {
-          const originalText = copyLinkBtn.textContent;
-          copyLinkBtn.textContent = 'Copied!';
-          copyLinkBtn.classList.add('copied');
-          setTimeout(() => {
-            copyLinkBtn.textContent = originalText;
-            copyLinkBtn.classList.remove('copied');
-          }, 2000);
-      }
     } else {
       showToast('Failed to copy link. Please copy manually.', true);
     }
@@ -164,245 +204,247 @@ function fallbackCopyText(text) {
   document.body.removeChild(textArea);
 }
 
-
 // WhatsApp invite functionality
 function initWhatsAppInvites() {
-  // Use event delegation on the list containers for potentially dynamic content
-  const allFriendList = document.getElementById('allFriendList');
-  
-  if (allFriendList) {
-      allFriendList.addEventListener('click', function(event) {
-          if (event.target.closest('.invite-btn-simple')) {
-              const button = event.target.closest('.invite-btn-simple');
-              const friendItem = button.closest('.friend-item');
-              const friendName = friendItem.querySelector('.friend-name').textContent;
-              const referralLink = document.getElementById('referralLinkText').textContent;
+  // Event delegation for dynamically loaded friend items
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.invite-btn-simple')) {
+      const button = e.target.closest('.invite-btn-simple');
+      const friendItem = button.closest('.friend-item');
+      const friendName = friendItem.querySelector('.friend-name').textContent;
+      const referralLink = document.getElementById('referralLinkText').textContent;
+      
+      // Create personalized message
+      const message = `Hi ${friendName}! Join me on this amazing platform and let's earn together. Use my referral link: ${referralLink}`;
+      
+      // Open WhatsApp with pre-filled message
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      showToast(`Opening WhatsApp to invite ${friendName}`);
+      
+      // Track the invite
+      trackFriendInvite(friendName);
+    }
+  });
+}
 
-              if (referralLink === 'Loading your link...') {
-                   alert('Please wait for your link to load before inviting.');
-                   return;
-              }
-              
-              // Create personalized message
-              const message = `Hi ${friendName}! Join me on this amazing platform and let's earn together. Use my referral link: ${referralLink}`;
-              
-              // Open WhatsApp with pre-filled message
-              const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-              window.open(whatsappUrl, '_blank');
-              
-              showToast(`Opening WhatsApp to invite ${friendName}`);
-          }
-      });
+// Track friend invite (simulated)
+function trackFriendInvite(friendName) {
+  // In a real app, this would send data to your backend
+  console.log(`Invite sent to: ${friendName}`);
+  
+  // Update local storage to track invites
+  const invitedFriends = JSON.parse(localStorage.getItem('invitedFriends') || '[]');
+  if (!invitedFriends.includes(friendName)) {
+    invitedFriends.push(friendName);
+    localStorage.setItem('invitedFriends', JSON.stringify(invitedFriends));
   }
 }
 
 // Search friends functionality
 function initSearchFriends() {
-  const searchInput = document.getElementById('searchFriendsInput');
+  const searchInput = document.getElementById('searchFriends');
   
   if (searchInput) {
     searchInput.addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase().trim();
-      filterFriends(searchTerm);
-    });
-  }
-}
-
-// Helper function to filter friends based on search term
-function filterFriends(searchTerm) {
-    const activeFriendTab = document.querySelector('.friends-sub-tab-button.active')?.dataset.friendTab;
-    if (!activeFriendTab) return; // Exit if no active tab found
-
-    const friendList = document.getElementById(`${activeFriendTab}FriendList`);
-    
-    if (friendList) {
+      const searchTerm = this.value.toLowerCase();
+      const activeFriendTab = document.querySelector('.friends-sub-tab-button.active').dataset.friendTab;
+      const friendList = document.getElementById(`${activeFriendTab}FriendList`);
+      
+      if (friendList) {
         const friendItems = friendList.querySelectorAll('.friend-item');
-        let visibleCount = 0;
+        let hasVisibleItems = false;
         
         friendItems.forEach(item => {
-          const friendNameEl = item.querySelector('.friend-name');
-          const friendPhoneEl = item.querySelector('.friend-phone');
+          const friendName = item.querySelector('.friend-name').textContent.toLowerCase();
+          const friendPhone = item.querySelector('.friend-phone').textContent;
           
-          // Ensure elements exist before accessing textContent
-          const friendName = friendNameEl ? friendNameEl.textContent.toLowerCase() : '';
-          const friendPhone = friendPhoneEl ? friendPhoneEl.textContent : ''; // No need for lowercase on phone
-
-          // Check if name or phone includes the search term
-          const isMatch = (friendName.includes(searchTerm) || friendPhone.includes(searchTerm));
-          
-          if (isMatch) {
-            item.style.display = 'flex'; // Use 'flex' as defined in CSS
-            visibleCount++;
+          if (friendName.includes(searchTerm) || friendPhone.includes(searchTerm)) {
+            item.style.display = 'flex';
+            hasVisibleItems = true;
           } else {
             item.style.display = 'none';
           }
         });
-
-        // Optional: Show a message if no results found
-        // You might need a dedicated element for this message
-        const noResultsMessage = friendList.querySelector('.no-results-message'); 
-        if (visibleCount === 0 && friendItems.length > 0) {
-            if (!noResultsMessage) {
-                const p = document.createElement('p');
-                p.className = 'no-results-message'; // Add a class for styling
-                p.textContent = 'No matching friends found.';
-                p.style.textAlign = 'center';
-                p.style.color = '#888';
-                p.style.padding = '20px 0';
-                friendList.appendChild(p);
-            } else {
-                noResultsMessage.style.display = 'block';
-            }
-        } else if (noResultsMessage) {
-            noResultsMessage.style.display = 'none'; // Hide if results are found
+        
+        // Show empty state if no results
+        const emptyState = friendList.querySelector('.empty-state');
+        if (!hasVisibleItems && !emptyState) {
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'empty-state';
+          emptyDiv.innerHTML = `
+            <i class="fas fa-search"></i>
+            <p>No friends found matching "${searchTerm}"</p>
+          `;
+          friendList.appendChild(emptyDiv);
+        } else if (hasVisibleItems && emptyState) {
+          emptyState.remove();
         }
-    }
+      }
+    });
+  }
 }
-
 
 // Redeem button functionality
 function initRedeemButton() {
-  const redeemBtn = document.getElementById('redeemBtn');
+  const redeemBtn = document.querySelector('.redeem-btn');
   
   if (redeemBtn) {
     redeemBtn.addEventListener('click', function() {
-      const availableAmountEl = document.getElementById('availableRewardAmount');
-      const availableAmountText = availableAmountEl ? availableAmountEl.textContent : '₹0.00';
+      const availableAmount = document.querySelector('#earnings .earnings-item:nth-child(2) .earnings-amount').textContent;
       
-      // Extract number from the text (e.g., "₹75.50" -> 75.50)
-      const amountValue = parseFloat(availableAmountText.replace('₹', ''));
-
-      if (isNaN(amountValue) || amountValue <= 0) {
+      if (availableAmount === '₹0.00') {
         showToast('No rewards available to redeem', true);
       } else {
-        showToast(`Redeeming ${availableAmountText}...`);
-        // !! IMPORTANT !!
-        // In a real app, this should trigger a Firebase Cloud Function
-        // to securely process the redemption on the server.
-        // Never trust the client-side amount.
-        console.log("Triggering Cloud Function for redemption (simulation)"); 
-        
-        // Simulate success/failure after backend call
+        showToast(`Redeeming ${availableAmount}...`);
+        // In a real app, this would process the redemption
         setTimeout(() => {
-          // Assume success for demo
-          showToast('Redemption successful! Amount will be credited.'); 
-          // You would update the UI based on the *actual* result from the Cloud Function
-          // For example, fetch updated reward amounts.
+          showToast('Redemption successful! Amount will be credited within 24 hours.');
         }, 1500);
       }
     });
   }
 }
 
+// Load user data and generate referral link
+function loadUserData() {
+  // In a real app, this would come from Firebase or your backend
+  const userId = '123456';
+  const vipLevel = 'Silver';
+  
+  document.getElementById('sidebarId').textContent = `User ID: ${userId}`;
+  document.getElementById('sidebarVIP').textContent = `VIP Level: ${vipLevel}`;
+  
+  // Update referral link with user ID
+  const referralLink = `https://sahin354.github.io/inv/register.html?ref=${userId}`;
+  
+  // Simulate loading delay
+  setTimeout(() => {
+    document.getElementById('referralLinkText').textContent = referralLink;
+  }, 1000);
+}
+
+// Load friends data
+function loadFriendsData() {
+  // Sample friends data
+  const allFriends = [
+    { name: 'HM Hariram Manglaw', phone: '9980989304', joined: false },
+    { name: 'SD Santu Dey', phone: '8985688909', joined: false },
+    { name: 'MV Mauhet Verma', phone: '8943870809', joined: false },
+    { name: 'AK Ankit Kumar', phone: '9876543210', joined: false },
+    { name: 'RS Rohan Sharma', phone: '9876543211', joined: false },
+    { name: 'PK Priya Singh', phone: '9876543212', joined: false }
+  ];
+  
+  // Sample joined friends data
+  const joinedFriends = [
+    { name: 'RJ Rajesh Jain', phone: '9876543213', joined: true, earnings: '₹50' },
+    { name: 'SM Smita Mehta', phone: '9876543214', joined: true, earnings: '₹25' },
+    { name: 'VP Vijay Patel', phone: '9876543215', joined: true, earnings: '₹75' }
+  ];
+  
+  // Render all friends
+  const allFriendList = document.getElementById('allFriendList');
+  if (allFriendList) {
+    allFriendList.innerHTML = '';
+    
+    if (allFriends.length === 0) {
+      allFriendList.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-users"></i>
+          <p>No friends to display</p>
+        </div>
+      `;
+    } else {
+      allFriends.forEach(friend => {
+        const friendItem = createFriendItem(friend, false);
+        allFriendList.appendChild(friendItem);
+      });
+    }
+  }
+  
+  // Render joined friends
+  const joinedFriendList = document.getElementById('joinedFriendList');
+  if (joinedFriendList) {
+    joinedFriendList.innerHTML = '';
+    
+    if (joinedFriends.length === 0) {
+      joinedFriendList.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-user-check"></i>
+          <p>No friends have joined yet</p>
+          <p style="font-size: 0.9em; margin-top: 5px;">Invite friends to start earning!</p>
+        </div>
+      `;
+    } else {
+      joinedFriends.forEach(friend => {
+        const friendItem = createFriendItem(friend, true);
+        joinedFriendList.appendChild(friendItem);
+      });
+    }
+  }
+}
+
+// Create friend item element
+function createFriendItem(friend, isJoined) {
+  const friendItem = document.createElement('div');
+  friendItem.className = 'friend-item';
+  
+  if (isJoined) {
+    friendItem.innerHTML = `
+      <div class="friend-details">
+        <div class="friend-name">${friend.name}</div>
+        <div class="friend-phone">${friend.phone}</div>
+        <div class="friend-status">Earned ${friend.earnings}</div>
+      </div>
+      <div class="status-badge">Joined</div>
+    `;
+  } else {
+    friendItem.innerHTML = `
+      <div class="friend-details">
+        <div class="friend-name">${friend.name}</div>
+        <div class="friend-phone">${friend.phone}</div>
+      </div>
+      <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
+    `;
+  }
+  
+  return friendItem;
+}
+
 // Toast notification system
 function showToast(message, isError = false) {
-  // Remove existing toasts quickly
-  document.querySelectorAll('.toast').forEach(toast => toast.remove());
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll('.toast');
+  existingToasts.forEach(toast => toast.remove());
   
   // Create new toast
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;
   
+  // Add error styling if needed
   if (isError) {
-    toast.style.backgroundColor = '#dc3545'; // Use a standard error color
+    toast.classList.add('error');
   }
   
   document.body.appendChild(toast);
   
-  // Force reflow to ensure transition works
-  void toast.offsetWidth; 
-  
   // Show toast
-  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
   
-  // Hide and remove toast
+  // Hide toast after 3 seconds
   setTimeout(() => {
     toast.classList.remove('show');
-    toast.addEventListener('transitionend', () => {
-       if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, { once: true }); // Remove after transition finishes
+    
+    // Remove from DOM after transition
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
   }, 3000);
-}
-
-// Simulate loading user data (Replace with Firebase logic)
-function loadUserData() {
-    // This function now primarily focuses on the referral link,
-    // assuming common.js handles sidebar info.
-    // Use onAuthStateChanged to ensure Firebase is ready.
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            const userId = user.uid; // Get the actual logged-in user's ID
-            
-            // Update referral link with user ID
-            // === UPDATE DOMAIN ===
-            const referralLink = `https://sahin354.github.io/inv/register.html?ref=${userId}`;
-            const linkElement = document.getElementById('referralLinkText');
-            if (linkElement) {
-                linkElement.textContent = referralLink;
-            }
-
-            // TODO: Load actual earnings data from Firestore
-            // Example: listenToUserRewards(userId);
-
-            // TODO: Load actual friend lists from Firestore
-            // Example: loadAllFriends(userId);
-            // Example: loadJoinedFriends(userId);
-
-        } else {
-            // User not logged in (common.js should handle redirect)
-            const linkElement = document.getElementById('referralLinkText');
-            if (linkElement) {
-                linkElement.textContent = 'Error: Not logged in.';
-            }
-        }
-    });
-}
-
-// Placeholder functions for loading friends (replace with Firebase logic)
-function loadAllFriends(userId) {
-    console.log("Loading all friends for user:", userId);
-    const listEl = document.getElementById('allFriendList');
-    listEl.innerHTML = ''; // Clear example data
-    // ... Add Firebase query and populate list ...
-    // Example item:
-    // listEl.innerHTML += `
-    //   <div class="friend-item">
-    //     <div class="friend-details">
-    //       <div class="friend-name">Firestore Friend</div>
-    //       <div class="friend-phone">111222333</div>
-    //     </div>
-    //     <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
-    //   </div>`;
-}
-
-function loadJoinedFriends(userId) {
-    console.log("Loading joined friends for user:", userId);
-    const listEl = document.getElementById('joinedFriendList');
-    listEl.innerHTML = ''; // Clear example data
-    // ... Add Firebase query and populate list ...
-    // Example item:
-    // listEl.innerHTML += `
-    //   <div class="friend-item">
-    //     <div class="friend-details">
-    //       <div class="friend-name">Firestore Joined</div>
-    //       <div class="friend-phone">444555666</div>
-    //       <div class="friend-status">Joined - ₹10 Earned</div>
-    //     </div>
-    //     <div class="status-badge">Joined</div>
-    //   </div>`;
-}
-
-// Placeholder for real-time earnings listener (replace with Firebase logic)
-function listenToUserRewards(userId) {
-    console.log("Listening to rewards for user:", userId);
-    const totalRewardEl = document.getElementById('totalRewardAmount');
-    const availableRewardEl = document.getElementById('availableRewardAmount');
-    const lockedRewardEl = document.getElementById('lockedRewardAmount');
-    // ... Add Firebase onSnapshot listener ...
-    // Inside the listener, update:
-    // totalRewardEl.textContent = `₹${data.total.toFixed(2)}`;
-    // availableRewardEl.textContent = `₹${data.available.toFixed(2)}`;
-    // lockedRewardEl.textContent = `₹${data.locked.toFixed(2)}`;
-        }
-              
+                    }
