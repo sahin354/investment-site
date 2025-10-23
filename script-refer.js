@@ -111,13 +111,13 @@ function initMainTabs() {
 // Refresh earnings data (simulated)
 function refreshEarningsData() {
   // In a real app, this would fetch data from an API
-  const totalReward = document.querySelector('#earnings .earnings-item:nth-child(1) .earnings-amount');
-  const availableReward = document.querySelector('#earnings .earnings-item:nth-child(2) .earnings-amount');
-  const lockedReward = document.querySelector('#earnings .earnings-item.full-width .earnings-amount');
+  const earningsItems = document.querySelectorAll('#earnings .earnings-item');
   
-  if (totalReward) totalReward.textContent = '₹125.50';
-  if (availableReward) availableReward.textContent = '₹75.50';
-  if (lockedReward) lockedReward.textContent = '₹50.00';
+  if (earningsItems.length >= 3) {
+    earningsItems[0].querySelector('.earnings-amount').textContent = '₹125.50'; // Total Reward
+    earningsItems[1].querySelector('.earnings-amount').textContent = '₹75.50';  // Available to Redeem
+    earningsItems[2].querySelector('.earnings-amount').textContent = '₹50.00';  // Locked Reward
+  }
   
   showToast('Earnings data updated');
 }
@@ -459,4 +459,4 @@ function showToast(message, isError = false) {
       }
     }, 300);
   }, 3000);
-      }
+}
