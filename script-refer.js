@@ -60,7 +60,6 @@ function handleSidebarAction(action) {
   switch(action) {
     case 'Customer Support':
       showToast('Opening customer support...');
-      // In a real app, this would open a support chat or dial a number
       setTimeout(() => {
         window.open('tel:+1234567890');
       }, 500);
@@ -71,7 +70,6 @@ function handleSidebarAction(action) {
       break;
     case 'Settings':
       showToast('Opening settings...');
-      // In a real app, this would navigate to settings page
       break;
     default:
       console.log('Sidebar action:', action);
@@ -115,7 +113,7 @@ function refreshEarningsData() {
   // In a real app, this would fetch data from an API
   const totalReward = document.querySelector('#earnings .earnings-item:nth-child(1) .earnings-amount');
   const availableReward = document.querySelector('#earnings .earnings-item:nth-child(2) .earnings-amount');
-  const lockedReward = document.querySelector('#earnings .earnings-item:nth-child(3) .earnings-amount');
+  const lockedReward = document.querySelector('#earnings .earnings-item.full-width .earnings-amount');
   
   if (totalReward) totalReward.textContent = '₹125.50';
   if (availableReward) availableReward.textContent = '₹75.50';
@@ -325,22 +323,27 @@ function loadUserData() {
   }, 1000);
 }
 
+// Get initials from name
+function getNameInitials(name) {
+  return name.split(' ').map(word => word[0]).join('').toUpperCase();
+}
+
 // Load friends data
 function loadFriendsData() {
   // Sample friends data (only non-joined friends in "All" tab)
   const allFriends = [
-    { name: 'HM Hariram Manglaw', phone: '9980989304' },
-    { name: 'SD Santu Dey', phone: '8985688909' },
-    { name: 'MV Mauhet Verma', phone: '8943870809' },
-    { name: 'AK Ankit Kumar', phone: '9876543210' },
-    { name: 'RS Rohan Sharma', phone: '9876543211' },
-    { name: 'PK Priya Singh', phone: '9876543212' }
+    { name: 'Hariram Manglaw', phone: '9980989304' },
+    { name: 'Santu Dey', phone: '8985688909' },
+    { name: 'Mauhet Verma', phone: '8943870809' },
+    { name: 'Ankit Kumar', phone: '9876543210' },
+    { name: 'Rohan Sharma', phone: '9876543211' },
+    { name: 'Priya Singh', phone: '9876543212' }
   ];
   
   // Sample joined friends data (only shown in "Joined" tab)
   const joinedFriends = [
-    { name: 'RJ Rajesh Jain', phone: '9876543213', earnings: '₹50' },
-    { name: 'SM Smita Mehta', phone: '9876543214', earnings: '₹25' }
+    { name: 'Rajesh Jain', phone: '9876543213', earnings: '₹50' },
+    { name: 'Smita Mehta', phone: '9876543214', earnings: '₹25' }
   ];
   
   // Render all friends (non-joined only)
@@ -390,10 +393,16 @@ function createFriendItem(friend, isJoined) {
   const friendItem = document.createElement('div');
   friendItem.className = 'friend-item';
   
+  const initials = getNameInitials(friend.name);
+  
   if (isJoined) {
     friendItem.innerHTML = `
+      <div class="friend-avatar">${initials}</div>
       <div class="friend-details">
-        <div class="friend-name">${friend.name}</div>
+        <div class="friend-name">
+          <span class="name-initials">${initials}</span>
+          ${friend.name}
+        </div>
         <div class="friend-phone">${friend.phone}</div>
         <div class="friend-status">Earned ${friend.earnings}</div>
       </div>
@@ -401,8 +410,12 @@ function createFriendItem(friend, isJoined) {
     `;
   } else {
     friendItem.innerHTML = `
+      <div class="friend-avatar">${initials}</div>
       <div class="friend-details">
-        <div class="friend-name">${friend.name}</div>
+        <div class="friend-name">
+          <span class="name-initials">${initials}</span>
+          ${friend.name}
+        </div>
         <div class="friend-phone">${friend.phone}</div>
       </div>
       <button class="invite-btn-simple">Invite <i class="fab fa-whatsapp"></i></button>
@@ -446,4 +459,4 @@ function showToast(message, isError = false) {
       }
     }, 300);
   }, 3000);
-                                                    }
+      }
