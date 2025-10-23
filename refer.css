@@ -195,43 +195,37 @@ main {
   display: block;
 }
 
-/* --- Earnings Card - New Block Layout --- */
+/* --- Earnings Card - New Simple Layout --- */
 .earnings-grid {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
   margin-bottom: 20px;
 }
 
-.earnings-row {
-  display: flex;
-  gap: 15px;
-}
-
 .earnings-item {
-  flex: 1;
-  padding: 20px 15px;
-  background-color: #f8fafc;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
   text-align: center;
-}
-
-.earnings-item.full-width {
-  flex: 1 1 100%;
+  padding: 0;
 }
 
 .earnings-label {
-  font-size: 0.85em;
+  font-size: 0.95em;
   color: var(--text-light);
   margin-bottom: 8px;
   font-weight: 500;
 }
 
 .earnings-amount {
-  font-size: 1.6em;
+  font-size: 2em;
   font-weight: 700;
   color: var(--text-dark);
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 20px 0;
+  width: 100%;
 }
 
 .redeem-btn {
@@ -253,7 +247,7 @@ main {
   box-shadow: 0 6px 15px rgba(30, 60, 114, 0.5);
 }
 
-/* --- Invite Card --- */
+/* --- Invite Card - New Simple Layout --- */
 .invite-header-card h2 {
   margin-top: 0;
   margin-bottom: 20px;
@@ -304,35 +298,32 @@ main {
   background-color: var(--success-color);
 }
 
-.commission-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+/* --- Commission List - New Simple Layout --- */
+.commission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.commission-card {
-  background-color: #f8fafc;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  padding: 18px 10px;
-  text-align: center;
-  transition: transform 0.2s;
+.commission-item {
+  padding: 0;
 }
 
-.commission-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.commission-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
 }
 
-.commission-card .level-label {
-  font-size: 0.9em;
+.level-badge {
+  font-size: 1em;
   font-weight: 500;
-  color: #666;
-  margin-bottom: 8px;
+  color: var(--text-dark);
 }
 
-.commission-card .level-percent {
-  font-size: 1.6em;
+.level-percent {
+  font-size: 1.3em;
   font-weight: 700;
   color: var(--primary-color);
 }
@@ -407,7 +398,7 @@ main {
   box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
 }
 
-/* --- Friend List - New Layout --- */
+/* --- Friend List --- */
 .friend-list {
   display: flex;
   flex-direction: column;
@@ -607,18 +598,8 @@ main {
     padding: 15px;
   }
   
-  .earnings-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .earnings-item {
-    flex: 1 1 100%;
-  }
-  
-  .commission-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .earnings-amount {
+    font-size: 1.8em;
   }
   
   .referral-link-box {
@@ -657,4 +638,4 @@ main {
     left: 10px;
     text-align: center;
   }
-  }
+}
