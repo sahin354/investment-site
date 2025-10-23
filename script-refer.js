@@ -340,10 +340,10 @@ function loadFriendsData() {
     { name: 'Priya Singh', phone: '9876543212' }
   ];
   
-  // Sample joined friends data (only shown in "Joined" tab)
+  // Sample joined friends data (only shown in "Joined" tab when they recharge)
+  // Initially empty - will be populated when friends recharge
   const joinedFriends = [
-    { name: 'Rajesh Jain', phone: '9876543213', earnings: '₹50' },
-    { name: 'Smita Mehta', phone: '9876543214', earnings: '₹25' }
+    // This array is initially empty - friends will appear here only after they recharge
   ];
   
   // Render all friends (non-joined only)
@@ -366,7 +366,7 @@ function loadFriendsData() {
     }
   }
   
-  // Render joined friends (only in joined tab)
+  // Render joined friends (only in joined tab - initially empty)
   const joinedFriendList = document.getElementById('joinedFriendList');
   if (joinedFriendList) {
     joinedFriendList.innerHTML = '';
@@ -375,8 +375,8 @@ function loadFriendsData() {
       joinedFriendList.innerHTML = `
         <div class="empty-state">
           <i class="fas fa-user-check"></i>
-          <p>No friends have joined yet</p>
-          <p style="font-size: 0.9em; margin-top: 5px;">Invite friends to start earning!</p>
+          <p>No one has recharged yet</p>
+          <p style="font-size: 0.9em; margin-top: 5px;">When your friends recharge, they will appear here</p>
         </div>
       `;
     } else {
@@ -425,6 +425,30 @@ function createFriendItem(friend, isJoined) {
   return friendItem;
 }
 
+// Simulate friend recharge (for testing)
+function simulateFriendRecharge() {
+  // This function would be called when a friend recharges
+  // For demo purposes, we'll add some joined friends after 5 seconds
+  setTimeout(() => {
+    const joinedFriends = [
+      { name: 'Rajesh Jain', phone: '9876543213', earnings: '₹50' },
+      { name: 'Smita Mehta', phone: '9876543214', earnings: '₹25' }
+    ];
+    
+    const joinedFriendList = document.getElementById('joinedFriendList');
+    if (joinedFriendList) {
+      joinedFriendList.innerHTML = '';
+      
+      joinedFriends.forEach(friend => {
+        const friendItem = createFriendItem(friend, true);
+        joinedFriendList.appendChild(friendItem);
+      });
+      
+      showToast('Friends have recharged! Check the Joined tab.');
+    }
+  }, 5000);
+}
+
 // Toast notification system
 function showToast(message, isError = false) {
   // Remove existing toasts
@@ -460,3 +484,9 @@ function showToast(message, isError = false) {
     }, 300);
   }, 3000);
 }
+
+// Initialize the app and simulate recharge for demo
+initApp();
+
+// For demo purposes, simulate friends recharging after 5 seconds
+simulateFriendRecharge();
