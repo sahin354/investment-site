@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="refer.css">
 </head>
 <body>
+  <div id="toastNotification" class="toast"></div>
+
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header">
@@ -89,7 +91,7 @@
         <h3>Friends</h3>
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchFriends" placeholder="Search friends">
+          <input type="text" id="searchFriends" placeholder="Search friends by name">
         </div>
 
         <div class="friends-sub-tabs">
@@ -99,14 +101,13 @@
         
         <div id="all" class="friends-tab-content active">
           <div class="friend-list scrollable-friend-list" id="allFriendList">
-            <!-- Friends will be loaded dynamically -->
+            <div class="loading-state">Loading...</div>
           </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            <!-- Joined friends will be loaded dynamically -->
-          </div>
+            </div>
         </div>
       </div>
     </div>
