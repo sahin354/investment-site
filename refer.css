@@ -195,6 +195,15 @@ main {
   display: block;
 }
 
+.friends-tab-content {
+  display: none;
+}
+
+.friends-tab-content.active {
+  display: block;
+}
+
+
 /* --- Earnings Card - New Simple Layout --- */
 .earnings-grid {
   display: flex;
@@ -398,111 +407,46 @@ main {
   box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
 }
 
-/* --- Friend List --- */
+
+/* ================================================================
+   START: UPDATED FRIEND LIST STYLES
+   This section is updated to only show Name and Phone,
+   as you requested.
+================================================================
+*/
 .friend-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
+/* This is the new, simple friend item */
 .friend-item {
-  display: flex;
+  display: flex; /* Changed to 'flex' for search filtering */
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
+  padding: 16px 15px;
   background-color: #f8fafc;
   border-radius: 10px;
   border: 1px solid var(--border-color);
-  transition: all 0.2s;
 }
 
-.friend-item:hover {
-  background-color: #f0f4f8;
-}
-
-.friend-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.9em;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.friend-details {
+.friend-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .friend-name {
   font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 1.05em;
   color: var(--text-dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.name-initials {
-  font-weight: 700;
-  color: var(--primary-color);
-  background: #eef2f7;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.85em;
 }
 
 .friend-phone {
-  font-size: 0.9em;
+  font-size: 0.95em;
   color: var(--text-light);
-}
-
-.friend-status {
-  font-size: 0.8em;
-  color: var(--success-color);
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.status-badge {
-  background-color: var(--success-color);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8em;
-  font-weight: 500;
-}
-
-.invite-btn-simple {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
-  flex-shrink: 0;
-}
-
-.invite-btn-simple:hover {
-  background-color: var(--secondary-color);
-}
-
-.invite-btn-simple .fa-whatsapp {
-  font-size: 1.1em;
 }
 
 .scrollable-friend-list {
@@ -511,7 +455,8 @@ main {
   padding-right: 5px;
 }
 
-.empty-state {
+/* Styles for loading and empty messages */
+.empty-state, .loading-state {
   text-align: center;
   padding: 30px 20px;
   color: var(--text-light);
@@ -523,9 +468,15 @@ main {
   color: #ccc;
 }
 
-.empty-state p {
+.empty-state p, .loading-state {
   margin: 0;
+  font-style: italic;
 }
+/* ================================================================
+   END: UPDATED FRIEND LIST STYLES
+================================================================
+*/
+
 
 /* --- Bottom Navigation --- */
 .bottom-nav-spacer {
@@ -569,19 +520,21 @@ main {
 .toast {
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 50%;
+  transform: translate(-50%, -150%); /* Start hidden above screen */
   background-color: var(--success-color);
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  transform: translateX(150%);
+  z-index: 1001; /* Above sidebar overlay */
   transition: transform 0.3s ease;
+  font-size: 0.95em;
+  font-weight: 500;
 }
 
 .toast.show {
-  transform: translateX(0);
+  transform: translate(-50%, 0); /* Slide into view */
 }
 
 .toast.error {
@@ -616,26 +569,27 @@ main {
   .copy-btn-inset {
     width: 100%;
   }
-  
+
+  /* Update: Keep friend-item as flex-row */
   .friend-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-direction: row; /* Ensure it stays as a row */
+    align-items: center;
+    gap: 0;
   }
   
-  .friend-details {
+  .friend-info {
     width: 100%;
   }
-  
-  .invite-btn-simple {
-    width: 100%;
-    justify-content: center;
-  }
-  
+
   .toast {
     top: 10px;
     right: 10px;
     left: 10px;
     text-align: center;
+    transform: translate(0, -150%); /* Adjust for full width */
   }
+  
+  .toast.show {
+    transform: translate(0, 0);
   }
+}
