@@ -319,3 +319,26 @@ function initializeApp() {
 // It waits for the HTML to be ready, then calls initializeApp.
 document.addEventListener('DOMContentLoaded', initializeApp);
                            
+// --- ADD THIS CODE TO YOUR common.js FILE ---
+
+// This code handles the new Settings sub-menu in the sidebar
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Find the settings button and the sub-menu
+    const settingsBtn = document.getElementById('settingsToggleBtn');
+    const submenu = document.getElementById('settingsSubmenu');
+
+    // Check if the elements exist on the page
+    if (settingsBtn && submenu) {
+        
+        // Add a click listener to the Settings button
+        settingsBtn.addEventListener('click', () => {
+            
+            // Toggle the 'active' class on both the button and the submenu
+            settingsBtn.classList.toggle('active');
+            submenu.classList.toggle('active');
+        });
+    }
+});
+
+// --- END OF NEW CODE ---
