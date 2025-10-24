@@ -1120,3 +1120,53 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .settings-submenu .sub-item:hover {
   background-color: #f1f3f5;
 }
+
+/* --- New Settings Submenu Styles --- */
+
+/* This styles the Settings <button> to look right */
+#settingsToggleBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* This is the chevron icon (the '›') */
+#settingsToggleBtn .chevron {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #aaa;
+  transition: transform 0.2s ease;
+}
+
+/* This rotates the chevron when the menu is open */
+#settingsToggleBtn.active .chevron {
+  transform: rotate(90deg);
+  color: var(--primary-color, #1e3c72);
+}
+
+/* This is the sub-menu. It is HIDDEN. */
+.settings-submenu {
+  display: none;
+  flex-direction: column;
+  gap: 8px; /* Space between sub-items */
+  padding-left: 20px; /* Indents the sub-items */
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+/* This class is added by JavaScript to SHOW the menu */
+.settings-submenu.active {
+  display: flex;
+}
+
+/* This styles the links in the sub-menu */
+.settings-submenu .sub-item {
+  font-size: 0.9em; /* Make them slightly smaller */
+  background-color: #f8f9fa;
+  border-left: 3px solid var(--primary-color, #1e3c72);
+}
+
+.settings-submenu .sub-item:hover {
+  background-color: #f1f3f5;
+}
