@@ -977,3 +977,47 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     padding: 20px 15px;
   }
 }
+
+/* --- Styles for Static Legal Pages --- */
+.static-content-card {
+    padding: 20px;
+    line-height: 1.7;
+}
+
+.static-content-card h3 {
+    font-size: 1.5em;
+    color: var(--text-dark, #1a202c);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border-color, #eef2f7);
+    padding-bottom: 10px;
+}
+
+.static-content-card h4 {
+    font-size: 1.2em;
+    color: var(--text-dark, #1a202c);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.static-content-card p {
+    font-size: 0.95em;
+    color: var(--text-light, #555);
+    margin-bottom: 15px;
+}
+
+.static-content-card ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.static-content-card li {
+    color: var(--text-light, #555);
+    margin-bottom: 8px;
+}
+
+.static-content-card a {
+    color: var(--primary-color, #1e3c72);
+    text-decoration: none;
+    font-weight: 600;
+}
+    
