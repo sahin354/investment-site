@@ -1,4 +1,4 @@
-// --- Global Functions (Define all functions first) ---
+// Global Functions (Define all functions first)
 
 /**
  * Update user information in sidebar and profile
@@ -14,19 +14,17 @@ function updateUserInfo(user) {
     if (sidebarId) {
         sidebarId.innerHTML = `<div class="sidebar-id">ID: ${shortUid}</div>`;
     }
-    
     const sidebarVIP = document.getElementById('sidebarVIP');
     if (sidebarVIP) {
         // This is placeholder, you'd fetch this from Firestore
         sidebarVIP.innerHTML = '<div class="sidebar-vip">VIP Member</div>';
     }
-    
+
     // Update profile page
     const profileId = document.getElementById('profileId');
     if (profileId) {
         profileId.textContent = `ID: ${shortUid}`;
     }
-    
     const profileEmail = document.getElementById('profileEmail');
     if (profileEmail) {
         profileEmail.textContent = userEmail;
@@ -42,16 +40,17 @@ function loadUserData(userId) {
         console.error("Firestore not available for loadUserData.");
         return;
     }
+
     const db = firebase.firestore();
     const userDoc = db.collection('users').doc(userId);
-    
+
     userDoc.get().then((doc) => {
         if (doc.exists) {
             const userData = doc.data();
-            console.log('User data loaded:', userData);
-            
+            console.log('User data loaded', userData);
+
             // Update balance on 'Mine' page
-            const balanceElement = document.getElementById('profileBalance'); 
+            const balanceElement = document.getElementById('profileBalance');
             if (balanceElement && userData.balance !== undefined) {
                 balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
             }
@@ -61,7 +60,7 @@ function loadUserData(userId) {
             if (rechargeBalance && userData.balance !== undefined) {
                 rechargeBalance.textContent = `₹${userData.balance.toFixed(2)}`;
             }
-            
+
         } else {
             // Create user document if it doesn't exist
             console.log("No user document found, creating one...");
@@ -72,18 +71,17 @@ function loadUserData(userId) {
                 uid: userId
             }).then(() => {
                 console.log('New user document created');
-                loadUserData(userId); 
+                loadUserData(userId); // Reload to populate
             }).catch(err => {
                 console.error("Error creating user document:", err);
             });
         }
     }).catch((error) => {
-        console.error('Error loading user data:', error);
+        console.error('Error loading user data: ', error);
     });
 }
 
-
-// --- Session Management Variables ---
+// Session Management Variables
 const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 Minutes
 let inactivityTimer;
 let sessionListener = null; // Holds the Firestore unsubscribe function
@@ -93,7 +91,6 @@ let sessionListener = null; // Holds the Firestore unsubscribe function
  */
 function autoLogout(message) {
     console.log(`Logging out: ${message}`);
-    
     stopInactivityTimer();
     stopSessionListener();
     localStorage.removeItem('currentSessionID');
@@ -102,7 +99,7 @@ function autoLogout(message) {
         firebase.auth().signOut()
             .then(() => {
                 alert(message);
-                window.location.href = 'login.html'; 
+                window.location.href = 'login.html';
             })
             .catch((error) => {
                 console.error("Error during auto-logout:", error);
@@ -110,27 +107,26 @@ function autoLogout(message) {
                 window.location.href = 'login.html';
             });
     } else {
-         alert(message);
-         window.location.href = 'login.html';
+        alert(message);
+        window.location.href = 'login.html';
     }
 }
 
 // --- Inactivity Timer Functions ---
-
-function resetInactivityTimer(eventType) { 
+function resetInactivityTimer(eventType) {
     if (inactivityTimer) clearTimeout(inactivityTimer);
     
-    if (eventType) {
-        // console.log(`TIMER: Reset by "${eventType}" event.`); // Uncomment for testing
-    } else {
-        // console.log(`TIMER: Initialized. New logout in 30m`); // Uncomment for testing
-    }
-    
+    // if (eventType) {
+    //     console.log(`TIMER: Reset by "${eventType}" event`);
+    // } else {
+    //     console.log(`TIMER: Initialized. New logout in 30m`);
+    // }
+
     inactivityTimer = setTimeout(
         () => {
-            // console.log("TIMER: Fired! Logging out now."); // Uncomment for testing
+            // console.log("TIMER: Fired! Logging out now.");
             autoLogout("You have been logged out due to inactivity.");
-        }, 
+        },
         INACTIVITY_TIMEOUT_MS
     );
 }
@@ -144,20 +140,18 @@ function stopInactivityTimer() {
 
 function setupActivityListeners() {
     const activityEvents = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
-    
     const activityHandler = (e) => {
-        resetInactivityTimer(e.type); 
+        resetInactivityTimer(e.type);
     };
 
     activityEvents.forEach(eventName => {
-         document.removeEventListener(eventName, activityHandler, true);
-         document.addEventListener(eventName, activityHandler, true);
+        document.removeEventListener(eventName, activityHandler, true); // Clean up first
+        document.addEventListener(eventName, activityHandler, true);
     });
     console.log("Activity listeners attached.");
 }
 
 // --- Single Session Management Functions ---
-
 function stopSessionListener() {
     if (sessionListener) {
         sessionListener(); // This unsubscribes from Firestore
@@ -169,8 +163,8 @@ function stopSessionListener() {
 function initializeSession(uid) {
     const db = (firebase.firestore) ? firebase.firestore() : null;
     if (!db) {
-         console.warn("Firestore not available. Single-session feature disabled.");
-         return;
+        console.warn("Firestore not available. Single-session feature disabled.");
+        return;
     }
 
     const sessionRef = db.collection('user_sessions').doc(uid);
@@ -179,34 +173,31 @@ function initializeSession(uid) {
     if (!mySessionID) {
         mySessionID = Date.now().toString() + Math.random().toString();
         localStorage.setItem('currentSessionID', mySessionID);
-        
-        console.log("New login. Setting master session ID in Firestore.");
-        sessionRef.set({
-            currentSessionID: mySessionID,
-            lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(err => console.error("Could not set session in Firestore:", err));
     }
-
-    stopSessionListener(); 
     
+    console.log("New login. Setting master session ID in Firestore.");
+    sessionRef.set({
+        currentSessionID: mySessionID,
+        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(err => console.error("Could not set session in Firestore:", err));
+
+    stopSessionListener();
     console.log("Attaching session listener...");
-    sessionListener = sessionRef.onSnapshot(doc => {
+    sessionListener = sessionRef.onSnapshot((doc) => {
         if (doc.exists) {
             const masterSessionID = doc.data().currentSessionID;
             const localSessionID = localStorage.getItem('currentSessionID');
-
             if (localSessionID && masterSessionID && localSessionID !== masterSessionID) {
                 console.log("Newer session detected. Logging out this (old) session.");
                 autoLogout("This account was logged in on a new device. You have been logged out.");
             }
         }
-    }, error => {
+    }, (error) => {
         console.error("Error with session listener:", error);
     });
 }
 
 // --- Main Auth State Listener ---
-
 function attachAuthListener() {
     if (!firebase || !firebase.auth) {
         console.error("Auth listener not attached: Firebase not ready.");
@@ -215,33 +206,30 @@ function attachAuthListener() {
 
     firebase.auth().onAuthStateChanged((user) => {
         const currentPage = window.location.pathname.split('/').pop();
-        const authPages = ['login.html', 'register.html', 'verify-email.html']; 
-        
+        const authPages = ['login.html', 'register.html', 'verify-email.html'];
+
         if (user) {
-            // --- User is SIGNED IN ---
-            console.log('User signed in:', user.uid);
-            
+            // User is SIGNED IN
+            console.log('User signed in: ', user.uid);
             updateUserInfo(user);
             loadUserData(user.uid);
-            
+
             if (authPages.includes(currentPage)) {
                 console.log("Redirecting from auth page to index.html");
                 window.location.href = 'index.html';
             }
-
+            
             setupActivityListeners();
             resetInactivityTimer(); // Initial call
             initializeSession(user.uid);
 
         } else {
-            // --- User is SIGNED OUT ---
+            // User is SIGNED OUT
             console.log('User signed out');
-            
             if (!authPages.includes(currentPage)) {
                 console.log("Redirecting to login.html");
                 window.location.href = 'login.html';
             }
-
             stopInactivityTimer();
             stopSessionListener();
             localStorage.removeItem('currentSessionID');
@@ -250,7 +238,6 @@ function attachAuthListener() {
 }
 
 // --- Sidebar and Logout Button Setup ---
-
 function setupSidebar() {
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeBtn');
@@ -265,36 +252,53 @@ function setupSidebar() {
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
     }
+    
+    // --- START: This is the new, correct code for the dropdown ---
+    // It is now safely inside setupSidebar()
+    
+    const settingsBtn = document.getElementById('settingsToggleBtn');
+    const submenu = document.getElementById('settingsSubmenu');
+
+    // Check if the elements exist on the page
+    if (settingsBtn && submenu) {
+        
+        // Add a click listener to the Settings button
+        settingsBtn.addEventListener('click', () => {
+            
+            // Toggle the 'active' class on both the button and the submenu
+            settingsBtn.classList.toggle('active');
+            submenu.classList.toggle('active');
+        });
+    }
+    // --- END: New dropdown code ---
 }
 
 function setupLogoutButton() {
-    const logoutButton = document.querySelector('.logout-btn'); 
+    const logoutButton = document.querySelector('.logout-btn');
     if (logoutButton && !logoutButton.hasLogoutListener) {
         logoutButton.addEventListener('click', () => {
             console.log("Manual logout. Clearing session...");
-            localStorage.removeItem('currentSessionID'); 
-            if(firebase && firebase.auth) {
-                 firebase.auth().signOut();
+            localStorage.removeItem('currentSessionID');
+            if (firebase && firebase.auth) {
+                firebase.auth().signOut();
             }
         });
-        logoutButton.hasLogoutListener = true; 
+        logoutButton.hasLogoutListener = true;
     }
 }
 
-
 // --- Main App Initialization ---
-
 /**
- * This is the main entry point, called when the DOM is ready.
+ *This is the main entry point, called when the DOM is ready.
  */
 function initializeApp() {
     console.log("DOM loaded. Initializing app...");
-    
+
     // 1. Setup static UI elements (Sidebar, Logout button)
     // This is safe now because the DOM is loaded.
-    setupSidebar(); 
+    setupSidebar();
     setupLogoutButton();
-    
+
     // 2. Check for Firebase and set up auth persistence
     if (typeof firebase !== 'undefined' && firebase.auth) {
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -318,93 +322,6 @@ function initializeApp() {
 // This is the only event listener that runs on script load.
 // It waits for the HTML to be ready, then calls initializeApp.
 document.addEventListener('DOMContentLoaded', initializeApp);
-                           
-// --- ADD THIS CODE TO YOUR common.js FILE ---
 
-// This code handles the new Settings sub-menu in the sidebar
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Find the settings button and the sub-menu
-    const settingsBtn = document.getElementById('settingsToggleBtn');
-    const submenu = document.getElementById('settingsSubmenu');
-
-    // Check if the elements exist on the page
-    if (settingsBtn && submenu) {
+// --- ALL DUPLICATE CODE FROM THE END OF YOUR FILE HAS BEEN REMOVED ---
         
-        // Add a click listener to the Settings button
-        settingsBtn.addEventListener('click', () => {
-            
-            // Toggle the 'active' class on both the button and the submenu
-            settingsBtn.classList.toggle('active');
-            submenu.classList.toggle('active');
-        });
-    }
-});
-
-// --- END OF NEW CODE ---
-
-// --- ADD THIS CODE TO YOUR common.js FILE ---
-
-// This code handles the new Settings sub-menu in the sidebar
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Find the settings button and the sub-menu
-    const settingsBtn = document.getElementById('settingsToggleBtn');
-    const submenu = document.getElementById('settingsSubmenu');
-
-    // Check if the elements exist on the page
-    if (settingsBtn && submenu) {
-        
-        // Add a click listener to the Settings button
-        settingsBtn.addEventListener('click', () => {
-            
-            // Toggle the 'active' class on both the button and the submenu
-            settingsBtn.classList.toggle('active');
-            submenu.classList.toggle('active');
-        });
-    }
-});
-
-// --- ADD THIS CODE TO YOUR common.js FILE ---
-
-// This code handles the new Settings sub-menu in the sidebar
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Find the settings button and the sub-menu
-    const settingsBtn = document.getElementById('settingsToggleBtn');
-    const submenu = document.getElementById('settingsSubmenu');
-
-    // Check if the elements exist on the page
-    if (settingsBtn && submenu) {
-        
-        // Add a click listener to the Settings button
-        settingsBtn.addEventListener('click', () => {
-            
-            // Toggle the 'active' class on both the button and the submenu
-            settingsBtn.classList.toggle('active');
-            submenu.classList.toggle('active');
-        });
-    }
-});
-
-// --- ADD THIS CODE TO YOUR common.js FILE ---
-
-// This code handles the new Settings sub-menu in the sidebar
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Find the settings button and the sub-menu
-    const settingsBtn = document.getElementById('settingsToggleBtn');
-    const submenu = document.getElementById('settingsSubmenu');
-
-    // Check if the elements exist on the page
-    if (settingsBtn && submenu) {
-        
-        // Add a click listener to the Settings button
-        settingsBtn.addEventListener('click', () => {
-            
-            // Toggle the 'active' class on both the button and the submenu
-            settingsBtn.classList.toggle('active');
-            submenu.classList.toggle('active');
-        });
-    }
-});
