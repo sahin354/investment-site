@@ -6,9 +6,11 @@
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <link rel="stylesheet" href="style.css"> 
   <link rel="stylesheet" href="refer.css"> 
-  </head>
+  
+  <link rel="stylesheet" href="style.css"> 
+  
+</head>
 <body>
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
@@ -37,9 +39,9 @@
         <a href="refund.html" class="sidebar-btn sub-item"><span>💳</span> Refund Policy</a>
       </div>
     </div> 
-
     <span id="closeBtn" class="close-btn">&times;</span> 
-  </aside>
+
+  </aside> 
   <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Refer & Earn
@@ -57,22 +59,19 @@
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
-              {/* Ensure you have IDs here if script-refer.js needs them */}
-              <div class="earnings-amount" id="totalRewardAmount">₹0.00</div> 
+              <div class="earnings-amount">₹0.00</div>
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-amount" id="availableRewardAmount">₹0.00</div>
+              <div class="earnings-amount">₹0.00</div>
             </div>
-             {/* Ensure this item has correct class if needed */}
-            <div class="earnings-item full-width">
+            <div class="earnings-item"> {/* Check if 'full-width' class is needed */}
               <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-amount" id="lockedRewardAmount">₹0.00</div>
+              <div class="earnings-amount">₹0.00</div>
             </div>
           </div>
           <div class="divider"></div>
-           {/* Ensure you have ID here if script-refer.js needs it */}
-          <button class="redeem-btn" id="redeemButton">Redeem Reward</button>
+          <button class="redeem-btn">Redeem Reward</button>
         </div>
       </section>
 
@@ -80,8 +79,7 @@
         <div class="card invite-header-card">
           <h3>Invite Friends, Earn Rewards!</h3>
           <div class="referral-link-box">
-             {/* Ensure ID is correct */}
-            <span id="referralLinkText">Loading...</span>
+            <span id="referralLinkText">https://sahin354.github.io/inv/register.html?ref=123456</span>
             <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
           </div>
           <div class="commission-list">
@@ -111,7 +109,6 @@
         <h3>Friends</h3>
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
-           {/* Ensure ID is correct */}
           <input type="text" id="searchFriends" placeholder="Search friends by name">
         </div>
 
@@ -121,14 +118,12 @@
         </div>
         
         <div id="all" class="friends-tab-content active">
-           {/* Ensure ID is correct */}
           <div class="friend-list scrollable-friend-list" id="allFriendList">
             <div class="loading-state">Loading...</div>
           </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
-           {/* Ensure ID is correct */}
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
             {/* Joined friends content */}
           </div>
@@ -136,7 +131,7 @@
       </div>
     </div>
   </main>
-  <div class="bottom-nav-spacer"></div>
+   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html"><i class="fas fa-home"></i> Home</a>
     <a href="recharge.html"><i class="fas fa-bolt"></i> Recharge</a>
@@ -147,13 +142,14 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script> {/* Keep this if needed */}
 
   <script src="firebaseConfig.js"></script>
-  <script src="common.js"></script> {/* This file MUST contain the dropdown JS code */}
-  <script src="script-refer.js"></script> {/* Ensure this path is correct */}
+  <script src="common.js"></script> {/* This file MUST contain the correct dropdown JS code */}
+  <script src="script-refer.js"></script> {/* This path MUST be correct */}
   
-  {/* Toast Notification element */}
+  {/* Toast Notification element (Add if needed by script-refer.js) */}
   <div id="toastNotification" class="toast"></div> 
+
 </body>
 </html>
