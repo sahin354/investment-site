@@ -7,13 +7,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <link rel="stylesheet" href="style.css"> 
-  
   <link rel="stylesheet" href="refer.css"> 
   </head>
 <body>
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
   <aside id="sideMenu" class="side-menu">
-    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+    <div class="sidebar-header">
+        <div id="sidebarId">Loading...</div>
+        <div id="sidebarVIP">...</div>
+    </div>
     
     <div class="sidebar-actions">
       
@@ -34,9 +37,10 @@
         <a href="refund.html" class="sidebar-btn sub-item"><span>💳</span> Refund Policy</a>
       </div>
     </div> 
-    <span id="closeBtn" class="close-btn">&times;</span> 
 
-  </aside> <header class="top-bar">
+    <span id="closeBtn" class="close-btn">&times;</span> 
+  </aside>
+  <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Refer & Earn
   </header>
@@ -53,34 +57,52 @@
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
-              <div class="earnings-amount" id="totalRewardAmount">₹0.00</div>
+              {/* Ensure you have IDs here if script-refer.js needs them */}
+              <div class="earnings-amount" id="totalRewardAmount">₹0.00</div> 
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Available to Redeem</div>
               <div class="earnings-amount" id="availableRewardAmount">₹0.00</div>
             </div>
-            <div class="earnings-item full-width"> {/* Ensure class for layout */}
+             {/* Ensure this item has correct class if needed */}
+            <div class="earnings-item full-width">
               <div class="earnings-label">Locked Reward</div>
               <div class="earnings-amount" id="lockedRewardAmount">₹0.00</div>
             </div>
           </div>
           <div class="divider"></div>
+           {/* Ensure you have ID here if script-refer.js needs it */}
           <button class="redeem-btn" id="redeemButton">Redeem Reward</button>
         </div>
       </section>
 
       <section id="invite" class="tab-content active">
-         <div class="card invite-header-card">
+        <div class="card invite-header-card">
           <h3>Invite Friends, Earn Rewards!</h3>
           <div class="referral-link-box">
-            <span id="referralLinkText">Loading...</span> {/* Default text */}
+             {/* Ensure ID is correct */}
+            <span id="referralLinkText">Loading...</span>
             <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
           </div>
           <div class="commission-list">
-            {/* Commission items */}
-             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 1</div><div class="level-percent">20%</div></div></div>
-             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 2</div><div class="level-percent">8%</div></div></div>
-             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 3</div><div class="level-percent">1%</div></div></div>
+            <div class="commission-item">
+              <div class="commission-info">
+                <div class="level-badge">Level 1</div>
+                <div class="level-percent">20%</div>
+              </div>
+            </div>
+            <div class="commission-item">
+              <div class="commission-info">
+                <div class="level-badge">Level 2</div>
+                <div class="level-percent">8%</div>
+              </div>
+            </div>
+            <div class="commission-item">
+              <div class="commission-info">
+                <div class="level-badge">Level 3</div>
+                <div class="level-percent">1%</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -89,6 +111,7 @@
         <h3>Friends</h3>
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
+           {/* Ensure ID is correct */}
           <input type="text" id="searchFriends" placeholder="Search friends by name">
         </div>
 
@@ -98,20 +121,21 @@
         </div>
         
         <div id="all" class="friends-tab-content active">
+           {/* Ensure ID is correct */}
           <div class="friend-list scrollable-friend-list" id="allFriendList">
             <div class="loading-state">Loading...</div>
           </div>
         </div>
         
         <div id="joined" class="friends-tab-content">
+           {/* Ensure ID is correct */}
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            {/* Joined friends */}
+            {/* Joined friends content */}
           </div>
         </div>
       </div>
     </div>
   </main>
-
   <div class="bottom-nav-spacer"></div>
   <footer class="bottom-nav">
     <a href="index.html"><i class="fas fa-home"></i> Home</a>
@@ -123,13 +147,13 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script> {/* Add functions if needed */}
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
 
   <script src="firebaseConfig.js"></script>
-  <script src="common.js"></script> {/* Loads sidebar logic */}
-  <script src="script-refer.js"></script> {/* Loads refer page specific logic */}
+  <script src="common.js"></script> {/* This file MUST contain the dropdown JS code */}
+  <script src="script-refer.js"></script> {/* Ensure this path is correct */}
   
-  {/* Toast Notification element (Add if needed by script-refer.js) */}
+  {/* Toast Notification element */}
   <div id="toastNotification" class="toast"></div> 
 </body>
 </html>
