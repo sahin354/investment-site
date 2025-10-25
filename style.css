@@ -63,7 +63,26 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-id { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; }
 .sidebar-vip { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
 .sidebar-actions { flex-grow: 1; padding-top: 15px; }
-.sidebar-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 15px 20px; background-color: transparent; border: none; text-align: left; font-size: 1em; color: #333; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; text-decoration: none; } /* Added text-decoration: none */
+
+/* === THIS IS THE ONLY UPDATED RULE === */
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+    box-sizing: border-box; /* --- THIS LINE WAS ADDED --- */
+}
+/* === END OF UPDATED RULE === */
+
 .sidebar-btn:hover { background-color: var(--bg-light); color: var(--primary-color); }
 .sidebar-btn span { font-size: 1.4em; }
 .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
@@ -74,30 +93,30 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .tabs {
     display: flex;
     justify-content: space-around;
-    background-color: white; 
+    background-color: white;
     padding: 10px 0;
-    margin-top: -5px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    margin-top: -5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .tabs .tab-button {
     flex: 1;
     padding: 10px 15px;
     border: 1px solid #dce4f0;
-    border-radius: 20px; 
+    border-radius: 20px;
     background-color: #f8fafc;
     color: var(--text-light);
     font-size: 0.9em;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
-    margin: 0 5px; 
+    margin: 0 5px;
     transition: all 0.2s ease;
-    text-decoration: none; 
+    text-decoration: none;
 }
 .tabs .tab-button.active {
-    background-color: var(--primary-color); 
+    background-color: var(--primary-color);
     color: white;
-    border-color: var(--primary-color); 
+    border-color: var(--primary-color);
     box-shadow: 0 2px 8px rgba(30, 60, 114, 0.2);
 }
 .tab-content { display: none; padding: 15px; }
@@ -116,7 +135,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .auth-card h2 { text-align: center; margin-top: 0; margin-bottom: 25px; color: var(--text-dark); font-size: 1.6em; }
 .input-group { margin-bottom: 20px; }
 .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
-.input-group input { width: 100%; padding: 12px 15px; border: 1px solid #dce4f0; border-radius: 8px; font-size: 1em; box-sizing: border-box; } /* Added box-sizing */
+.input-group input { width: 100%; padding: 12px 15px; border: 1px solid #dce4f0; border-radius: 8px; font-size: 1em; box-sizing: border-box; }
 .password-wrapper { position: relative; display: flex; align-items: center; }
 .password-wrapper input { padding-right: 40px; }
 .password-toggle-icon { position: absolute; right: 12px; cursor: pointer; user-select: none; font-size: 1.2em; color: #888; }
@@ -148,7 +167,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .balance-amount-small { font-weight: bold; font-size: 1.1em; color: var(--primary-color); }
 .input-container { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 8px; padding: 10px 15px; margin: 20px 0; }
 .input-container span { font-size: 1.5em; font-weight: bold; color: var(--text-light); margin-right: 10px; }
-.input-container input { border: none; outline: none; width: 100%; font-size: 1.8em; font-weight: bold; box-sizing: border-box; } /* Added box-sizing */
+.input-container input { border: none; outline: none; width: 100%; font-size: 1.8em; font-weight: bold; box-sizing: border-box; }
 .quick-amounts-label { text-align: center; font-size: 0.9em; color: #777; }
 .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
 .quick-amount-btn { padding: 10px; background-color: #fff; border: 1px solid #dce4f0; border-radius: 8px; cursor: pointer; }
@@ -181,7 +200,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 /* --- Modern Auth Page Styles --- */
 .auth-page-background { background-color: #f4f7f6; font-family: 'Poppins', sans-serif; }
 .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-.auth-card { background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08); width: 100%; max-width: 450px; }
+.auth-card { background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08); width: 100%; max-width: 450px; box-sizing: border-box; } /* Added box-sizing */
 .auth-card h2 { text-align: center; font-size: 2em; margin-bottom: 30px; color: #1a237e; font-weight: 600; }
 .input-group input:focus { outline: none; border-color: #283593; box-shadow: 0 0 0 3px rgba(40, 53, 147, 0.1); }
 .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(40, 53, 147, 0.3); }
@@ -222,11 +241,11 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   padding: 0;
 }
 .refer-main-tabs {
-    margin-bottom: 15px; 
+    margin-bottom: 15px;
 }
 .friends-sub-tabs {
   display: flex;
-  border-bottom: 1px solid #eee; 
+  border-bottom: 1px solid #eee;
   margin-bottom: 15px;
 }
 .friends-sub-tabs .friends-sub-tab-button {
@@ -241,7 +260,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   text-decoration: none;
   text-align: center;
   transition: color 0.2s;
-  position: relative; 
+  position: relative;
 }
 .friends-sub-tabs .friends-sub-tab-button.active {
   color: var(--primary-color);
@@ -253,7 +272,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%; 
+    width: 60%;
     height: 2px;
     background-color: var(--primary-color);
     border-radius: 1px;
@@ -263,13 +282,13 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .friend-item {
   display: flex;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
 .friend-item:last-child {
   border-bottom: none;
-  margin-bottom: 15px; 
+  margin-bottom: 15px;
 }
 .friend-details {
   display: flex;
@@ -296,7 +315,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   font-size: 0.9em;
   cursor: pointer;
   white-space: nowrap;
-  margin-left: 15px; 
+  margin-left: 15px;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 .invite-btn-simple:hover {
@@ -311,17 +330,17 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .earnings-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px; 
-  margin-bottom: 20px; 
+  gap: 10px;
+  margin-bottom: 20px;
 }
 .earnings-item {
-  flex: 1 1 calc(50% - 5px); 
-  box-sizing: border-box; 
-  padding: 0; 
+  flex: 1 1 calc(50% - 5px);
+  box-sizing: border-box;
+  padding: 0;
 }
 .earnings-item.full-width {
-  flex: 1 1 100%; 
-  margin-top: 10px; 
+  flex: 1 1 100%;
+  margin-top: 10px;
 }
 .earnings-label {
   font-size: 0.9em;
@@ -334,29 +353,29 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   color: var(--text-dark, #1a202c);
 }
 .redeem-btn {
-  background-color: #a0aFFF; 
+  background-color: #a0aFFF;
   font-size: 1.1em;
   padding: 15px;
-  border-radius: 10px; 
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(160, 175, 255, 0.4);
 }
 .redeem-btn:hover {
   background-color: #8a9bff;
 }
 .refer-main-tabs {
-  background-color: #f0f2f5; 
+  background-color: #f0f2f5;
   border-radius: 10px;
   padding: 4px;
   display: flex;
-  margin: 15px; 
-  box-shadow: none; 
+  margin: 15px;
+  box-shadow: none;
 }
 .refer-main-tabs .tab-button {
   flex: 1;
   padding: 10px 15px;
-  border: none; 
-  border-radius: 8px; 
-  background-color: transparent; 
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
   color: var(--text-light, #555);
   font-size: 1em;
   font-weight: 500;
@@ -364,26 +383,26 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  margin: 0; 
+  margin: 0;
 }
 .refer-main-tabs .tab-button.active {
-  background-color: #ffffff; 
+  background-color: #ffffff;
   color: var(--text-dark, #1a202c);
   font-weight: 600;
-  border: none; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); 
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .friends-sub-tabs {
   background-color: #f0f2f5;
   border-radius: 10px;
   padding: 4px;
   display: flex;
-  border-bottom: none; 
+  border-bottom: none;
   margin-bottom: 20px;
 }
 .friends-sub-tabs .friends-sub-tab-button {
   flex: 1;
-  padding: 8px 10px; 
+  padding: 8px 10px;
   border: none;
   border-radius: 8px;
   background: none;
@@ -394,7 +413,7 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   text-decoration: none;
   text-align: center;
   transition: all 0.2s ease;
-  position: relative; 
+  position: relative;
 }
 .friends-sub-tabs .friends-sub-tab-button.active {
   background-color: #ffffff;
@@ -403,28 +422,28 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
 }
 .friends-sub-tabs .friends-sub-tab-button.active::after {
-  content: none; 
+  content: none;
 }
 .invite-btn-simple {
-  background-color: #6A7BFF; 
+  background-color: #6A7BFF;
   color: white;
-  border: none; 
+  border: none;
   padding: 8px 15px;
-  border-radius: 8px; 
+  border-radius: 8px;
   font-weight: 500;
   font-size: 0.9em;
   cursor: pointer;
   transition: background-color 0.2s;
   display: flex;
   align-items: center;
-  gap: 6px; 
+  gap: 6px;
   box-shadow: 0 2px 8px rgba(106, 123, 255, 0.3);
 }
 .invite-btn-simple:hover {
   background-color: #5a6bf0;
 }
 .invite-btn-simple .fa-whatsapp {
-  font-size: 1.1em; 
+  font-size: 1.1em;
 }
 .search-input-wrapper {
   position: relative;
@@ -439,12 +458,12 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 }
 .search-input-wrapper input {
   width: 100%;
-  padding: 12px 15px 12px 40px; 
+  padding: 12px 15px 12px 40px;
   border: 1px solid #eef2f7;
   border-radius: 10px;
   background: #f8f9fa;
   font-size: 1em;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 .search-input-wrapper input:focus {
   outline: none;
@@ -631,11 +650,3 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 
   /* Removed the background-color and border-left from previous version */
 }
-
-/* Hover effect inherits from .sidebar-btn:hover, no extra style needed unless you want something different */
-/*
-.settings-submenu .sub-item:hover {
-   background-color: var(--bg-light);
-   color: var(--primary-color);
-}
-*/
