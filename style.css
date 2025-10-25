@@ -584,53 +584,58 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     font-weight: 600;
 }
 
-/* --- New Settings Submenu Styles --- */
+/* --- REVISED Settings Submenu Styles (Cleaner Look) --- */
 
-/* This styles the Settings <button> to look right */
+/* Styles for the main Settings button (mostly unchanged) */
 #settingsToggleBtn {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Pushes chevron to the right */
   align-items: center;
   width: 100%;
-  box-sizing: border-box; /* Add this */
+  box-sizing: border-box;
 }
-
-/* This is the chevron icon (the '›') */
 #settingsToggleBtn .chevron {
   font-size: 1.4em;
   font-weight: bold;
-  color: #aaa;
-  transition: transform 0.2s ease;
+  color: #aaa; /* Chevron color */
+  transition: transform 0.2s ease; /* Smooth rotation */
 }
-
-/* This rotates the chevron when the menu is open */
 #settingsToggleBtn.active .chevron {
-  transform: rotate(90deg);
-  color: var(--primary-color, #1e3c72);
+  transform: rotate(90deg); /* Point down when open */
+  color: var(--primary-color, #1e3c72); /* Chevron color when open */
 }
 
-/* This is the sub-menu. It is HIDDEN by default. */
+/* Submenu container: Hides/shows, no extra styling */
 .settings-submenu {
-  display: none; /* This line hides the menu */
+  display: none; /* Hidden by default */
   flex-direction: column;
-  gap: 8px; /* Space between sub-items */
-  padding-left: 20px; /* Indents the sub-items */
-  margin-top: -5px;
+  /* Removed padding/gap from container */
+  margin-top: -5px; /* Adjust vertical spacing slightly */
   margin-bottom: 5px;
 }
-
-/* This class is added by JavaScript to SHOW the menu */
 .settings-submenu.active {
-  display: flex; /* This line shows the menu */
+  display: flex; /* Shown when active class is added by JS */
 }
 
-/* This styles the links in the sub-menu */
+/* Sub-items: Make them look like normal buttons but indented */
 .settings-submenu .sub-item {
-  font-size: 0.9em; /* Make them slightly smaller */
-  background-color: #f8f9fa;
-  border-left: 3px solid var(--primary-color, #1e3c72);
+  /* Inherits most styles from .sidebar-btn (like font, color, hover) */
+  font-size: 0.95em; /* Slightly smaller text for hierarchy */
+  /* --- THIS IS THE KEY --- */
+  padding-left: 35px; /* Increase left padding for indentation */
+                        /* Adjust this value (e.g., 40px) if alignment isn't perfect */
+
+  /* Make vertical padding slightly less than main items if desired */
+  padding-top: 12px;
+  padding-bottom: 12px;
+
+  /* Removed the background-color and border-left from previous version */
 }
 
+/* Hover effect inherits from .sidebar-btn:hover, no extra style needed unless you want something different */
+/*
 .settings-submenu .sub-item:hover {
-  background-color: #f1f3f5;
+   background-color: var(--bg-light);
+   color: var(--primary-color);
 }
+*/
