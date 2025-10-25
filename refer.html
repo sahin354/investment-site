@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adani Corporation - Refer & Earn</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="refer.css">
-</head>
+  
+  <link rel="stylesheet" href="style.css"> 
+  
+  <link rel="stylesheet" href="refer.css"> 
+  </head>
 <body>
 <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+    
     <div class="sidebar-actions">
       
       <a href="contact.html" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</a>
@@ -29,10 +33,10 @@
         <a href="privacy-policy.html" class="sidebar-btn sub-item"><span>🔒</span> Privacy Policy</a>
         <a href="refund.html" class="sidebar-btn sub-item"><span>💳</span> Refund Policy</a>
       </div>
-    <span id="closeBtn" class="close-btn">&times;</span>
-  </aside>
-  
-  <header class="top-bar">
+    </div> 
+    <span id="closeBtn" class="close-btn">&times;</span> 
+
+  </aside> <header class="top-bar">
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     Refer & Earn
   </header>
@@ -49,48 +53,34 @@
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="totalRewardAmount">₹0.00</div>
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="availableRewardAmount">₹0.00</div>
             </div>
-            <div class="earnings-item">
+            <div class="earnings-item full-width"> {/* Ensure class for layout */}
               <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="lockedRewardAmount">₹0.00</div>
             </div>
           </div>
           <div class="divider"></div>
-          <button class="redeem-btn">Redeem Reward</button>
+          <button class="redeem-btn" id="redeemButton">Redeem Reward</button>
         </div>
       </section>
 
       <section id="invite" class="tab-content active">
-        <div class="card invite-header-card">
+         <div class="card invite-header-card">
           <h3>Invite Friends, Earn Rewards!</h3>
           <div class="referral-link-box">
-            <span id="referralLinkText">https://sahin354.github.io/inv/register.html?ref=123456</span>
+            <span id="referralLinkText">Loading...</span> {/* Default text */}
             <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
           </div>
           <div class="commission-list">
-            <div class="commission-item">
-              <div class="commission-info">
-                <div class="level-badge">Level 1</div>
-                <div class="level-percent">20%</div>
-              </div>
-            </div>
-            <div class="commission-item">
-              <div class="commission-info">
-                <div class="level-badge">Level 2</div>
-                <div class="level-percent">8%</div>
-              </div>
-            </div>
-            <div class="commission-item">
-              <div class="commission-info">
-                <div class="level-badge">Level 3</div>
-                <div class="level-percent">1%</div>
-              </div>
-            </div>
+            {/* Commission items */}
+             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 1</div><div class="level-percent">20%</div></div></div>
+             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 2</div><div class="level-percent">8%</div></div></div>
+             <div class="commission-item"><div class="commission-info"><div class="level-badge">Level 3</div><div class="level-percent">1%</div></div></div>
           </div>
         </div>
       </section>
@@ -115,7 +105,8 @@
         
         <div id="joined" class="friends-tab-content">
           <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            </div>
+            {/* Joined friends */}
+          </div>
         </div>
       </div>
     </div>
@@ -129,6 +120,16 @@
     <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
   </footer>
 
-  <script src="script-refer.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script> {/* Add functions if needed */}
+
+  <script src="firebaseConfig.js"></script>
+  <script src="common.js"></script> {/* Loads sidebar logic */}
+  <script src="script-refer.js"></script> {/* Loads refer page specific logic */}
+  
+  {/* Toast Notification element (Add if needed by script-refer.js) */}
+  <div id="toastNotification" class="toast"></div> 
 </body>
 </html>
