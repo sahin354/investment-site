@@ -169,6 +169,7 @@ main {
 }
 
 /* --- Main Tabs (Invite / My Earnings) --- */
+/* This is your original style. It will not conflict anymore. */
 .refer-main-tabs {
   background-color: #f0f2f5;
   border-radius: 10px;
