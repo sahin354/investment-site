@@ -26,7 +26,7 @@ body {
 }
 
 /* ================================================================
-  START: UPDATED CODE FROM style.css
+  START: CODE FROM index.html (style.css)
   This code fixes your sidebar, header, and footer.
   ================================================================
 */
@@ -39,7 +39,6 @@ body {
 }
 main { 
     padding-top: 60px; 
-    /* The padding: 15px from your refer.css is now in main > .card */
 }
 .bottom-nav {
     display: flex; justify-content: space-around; position: fixed;
@@ -76,11 +75,12 @@ body.sidebar-open .sidebar-overlay { opacity: 1; pointer-events: auto; }
     background-color: #ffffff; z-index: 999; display: flex; flex-direction: column;
     box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1); transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
+    /* Removed padding: 20px from refer.css */
 }
 body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 25px 20px; }
-#sidebarId { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; } /* Updated */
-#sidebarVIP { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; } /* Updated */
+#sidebarId { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; color: white; }
+#sidebarVIP { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
 .sidebar-actions { flex-grow: 1; padding-top: 15px; }
 .sidebar-btn {
     display: flex;
@@ -89,7 +89,8 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     width: 100%;
     padding: 15px 20px;
     background-color: transparent;
-    border: none;
+    border: none; /* Removed border */
+    border-radius: 0; /* Removed border-radius */
     text-align: left;
     font-size: 1em;
     color: #333;
@@ -103,22 +104,56 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
 .close-btn:hover { color: white; }
 
+/*
+  Settings Submenu styles from style (4).css 
+  This makes the dropdown work correctly.
+*/
+#settingsToggleBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+#settingsToggleBtn .chevron {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #aaa;
+  transition: transform 0.2s ease;
+}
+#settingsToggleBtn.active .chevron {
+  transform: rotate(90deg);
+  color: var(--primary-color, #1e3c72);
+}
+.settings-submenu {
+  display: none;
+  flex-direction: column;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+.settings-submenu.active {
+  display: flex;
+}
+.settings-submenu .sub-item {
+  font-size: 0.95em;
+  padding-left: 35px; /* Indents the sub-items */
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 /* ================================================================
-  END: UPDATED CODE FROM style.css
+  END: CODE FROM index.html (style.css)
   ================================================================
 */
 
 
 /* ================================================================
-  START: YOUR ORIGINAL refer.css STYLES
-  This code is from your refer (2).css file. 
-  It is NOT changed.
+  START: YOUR ORIGINAL refer.css STYLES (Unchanged)
   ================================================================
 */
 
 /* --- Main Content Styles --- */
 main {
-  /* padding: 15px; */ /* Moved padding to .card */
   max-width: 500px;
   margin: 0 auto;
 }
@@ -184,10 +219,7 @@ main {
 }
 
 
-/* ================================================================
-   START: UPDATED Earnings Card Styles (to match image)
-================================================================
-*/
+/* --- UPDATED Earnings Card Styles --- */
 .earnings-grid {
   display: grid;
   grid-template-columns: 1fr 1fr; /* 2 columns */
@@ -212,11 +244,6 @@ main {
   font-weight: 700;
   color: var(--text-dark);
 }
-/* ================================================================
-   END: UPDATED Earnings Card Styles
-================================================================
-*/
-
 
 .divider {
   height: 1px;
@@ -244,11 +271,7 @@ main {
   box-shadow: 0 6px 15px rgba(30, 60, 114, 0.5);
 }
 
-/* ================================================================
-   START: UPDATED Invite Card Styles
-================================================================
-*/
-/* This now styles the <h3> tag from the HTML */
+/* --- UPDATED Invite Card Styles --- */
 .invite-header-card h3 {
   margin-top: 0;
   margin-bottom: 15px; /* Less space */
@@ -299,10 +322,7 @@ main {
   background-color: var(--success-color);
 }
 
-/* ================================================================
-   START: UPDATED Commission List Styles
-================================================================
-*/
+/* --- UPDATED Commission List Styles --- */
 .commission-list {
   display: flex;
   flex-direction: column;
@@ -335,11 +355,6 @@ main {
   font-weight: 700;
   color: var(--primary-color);
 }
-/* ================================================================
-   END: UPDATED Invite/Commission Styles
-================================================================
-*/
-
 
 /* --- Friends Card --- */
 .friends-card h3 {
