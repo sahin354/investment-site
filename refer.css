@@ -25,134 +25,6 @@ body {
   line-height: 1.6;
 }
 
-/* ================================================================
-  START: CODE FROM index.html (style.css)
-  This code fixes your sidebar, header, and footer.
-  ================================================================
-*/
-
-/* --- Core Layout Components (From style.css) --- */
-.top-bar {
-    background: var(--primary-color); color: white; padding: 15px 20px;
-    font-size: 1.2em; font-weight: bold; text-align: center;
-    position: fixed; top: 0; left: 0; right: 0; z-index: 900;
-}
-main { 
-    padding-top: 60px; 
-}
-.bottom-nav {
-    display: flex; justify-content: space-around; position: fixed;
-    bottom: 0; left: 0; right: 0; background-color: white;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 10px 0; z-index: 900;
-}
-/* This is your original bottom nav style from refer (2).css */
-.bottom-nav a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-light);
-  font-size: 0.8em;
-  transition: color 0.2s;
-}
-.bottom-nav a i {
-  font-size: 1.3em;
-  margin-bottom: 4px;
-}
-.bottom-nav a.active {
-  color: var(--primary-color);
-  font-weight: 600;
-}
-.bottom-nav-spacer { height: 70px; }
-
-
-/* --- Hamburger Menu & Sidebar (From style.css) --- */
-.menu-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; }
-.menu-btn span { display: block; width: 22px; height: 2px; background-color: white; margin: 5px 0; }
-body.sidebar-open { overflow: hidden; }
-.sidebar-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); z-index: 998; opacity: 0;
-    pointer-events: none; transition: opacity 0.3s ease-in-out;
-}
-body.sidebar-open .sidebar-overlay { opacity: 1; pointer-events: auto; }
-.side-menu {
-    position: fixed; top: 0; left: 0; width: 280px; max-width: 85vw; height: 100%;
-    background-color: #ffffff; z-index: 999; display: flex; flex-direction: column;
-    box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1); transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-}
-body.sidebar-open .side-menu { transform: translateX(0); }
-.sidebar-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 25px 20px; }
-#sidebarId { font-size: 1.1em; font-weight: bold; margin-bottom: 5px; color: white; }
-#sidebarVIP { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
-.sidebar-actions { flex-grow: 1; padding-top: 15px; }
-.sidebar-btn {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
-    padding: 15px 20px;
-    background-color: transparent;
-    border: none;
-    text-align: left;
-    font-size: 1em;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    text-decoration: none;
-    box-sizing: border-box;
-}
-.sidebar-btn:hover { background-color: var(--bg-light); color: var(--primary-color); }
-.sidebar-btn span { font-size: 1.4em; }
-.close-btn { position: absolute; top: 10px; right: 15px; font-size: 2.5em; color: rgba(255, 255, 255, 0.8); cursor: pointer; transition: color 0.2s ease; }
-.close-btn:hover { color: white; }
-
-/* Settings Submenu styles from style (4).css */
-#settingsToggleBtn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-#settingsToggleBtn .chevron {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #aaa;
-  transition: transform 0.2s ease;
-}
-#settingsToggleBtn.active .chevron {
-  transform: rotate(90deg);
-  color: var(--primary-color, #1e3c72);
-}
-.settings-submenu {
-  display: none;
-  flex-direction: column;
-  margin-top: -5px;
-  margin-bottom: 5px;
-}
-.settings-submenu.active {
-  display: flex;
-}
-.settings-submenu .sub-item {
-  font-size: 0.95em;
-  padding-left: 35px; /* Indents the sub-items */
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-/* ================================================================
-  END: CODE FROM index.html (style.css)
-  ================================================================
-*/
-
-
-/* ================================================================
-  START: YOUR ORIGINAL refer.css STYLES (Unchanged)
-  ================================================================
-*/
-
 /* --- Main Content Styles --- */
 main {
   max-width: 500px;
@@ -166,41 +38,6 @@ main {
   margin: 15px; 
   box-shadow: var(--card-shadow);
   border: 1px solid var(--border-color);
-}
-
-/* --- Main Tabs (Invite / My Earnings) --- */
-/* This is your original style. It will not conflict anymore. */
-.refer-main-tabs {
-  background-color: #f0f2f5;
-  border-radius: 10px;
-  padding: 4px;
-  display: flex;
-  margin-bottom: 15px;
-  margin-left: 15px; 
-  margin-right: 15px; 
-  margin-top: 15px; 
-}
-
-.refer-main-tabs .tab-button {
-  flex: 1;
-  padding: 12px 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: transparent;
-  color: var(--text-light);
-  font-size: 1em;
-  font-weight: 500;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.refer-main-tabs .tab-button.active {
-  background-color: var(--primary-color);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
 }
 
 /* --- Tab Content --- */
@@ -380,35 +217,6 @@ main {
   background: white;
 }
 
-/* --- Friends Sub Tabs --- */
-.friends-sub-tabs {
-  background-color: #f0f2f5;
-  border-radius: 10px;
-  padding: 4px;
-  display: flex;
-  margin-bottom: 20px;
-}
-.friends-sub-tabs .friends-sub-tab-button {
-  flex: 1;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  font-size: 0.95em;
-  font-weight: 500;
-  color: #888;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-.friends-sub-tabs .friends-sub-tab-button.active {
-  background-color: var(--primary-color);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 1px 4px rgba(30, 60, 114, 0.3);
-}
-
 /* --- Friend List --- */
 .friend-list {
   display: flex;
@@ -490,9 +298,6 @@ main {
   .card {
     padding: 15px;
     margin: 10px; 
-  }
-  .refer-main-tabs {
-    margin: 10px;
   }
   .earnings-amount {
     font-size: 1.6em; 
