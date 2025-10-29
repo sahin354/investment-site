@@ -475,9 +475,11 @@ main {
   font-size: 0.95em;
   font-weight: 500;
 }
+
 .toast.show {
   transform: translate(-50%, 0);
 }
+
 .toast.error {
   background-color: #dc3545;
 }
