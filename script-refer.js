@@ -1,21 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- 1. Sidebar Controls ---
-  const menuBtn = document.getElementById("menuBtn");
-  const closeBtn = document.getElementById("closeBtn");
-  const sideMenu = document.getElementById("sideMenu");
-  const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-  const toggleSidebar = () => {
-    sideMenu.classList.toggle("active");
-    sidebarOverlay.classList.toggle("active");
-  };
-
-  menuBtn.addEventListener("click", toggleSidebar);
-  closeBtn.addEventListener("click", toggleSidebar);
-  sidebarOverlay.addEventListener("click", toggleSidebar);
-
-  // --- 2. Main Tab Controls (Invite / My Earnings) ---
-  const mainTabButtons = document.querySelectorAll(".refer-main-tabs .tab-button");
+  // --- 1. Main Tab Controls (Invite / My Earnings) ---
+  const mainTabButtons = document.querySelectorAll(
+    ".refer-main-tabs .tab-button"
+  );
   const mainTabContents = document.querySelectorAll("main .tab-content");
 
   mainTabButtons.forEach((button) => {
@@ -38,8 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- 3. Friends Sub-Tab Controls (All / Joined) ---
-  const friendTabButtons = document.querySelectorAll(".friends-sub-tabs .friends-sub-tab-button");
+  // --- 2. Friends Sub-Tab Controls (All / Joined) ---
+  const friendTabButtons = document.querySelectorAll(
+    ".friends-sub-tabs .friends-sub-tab-button"
+  );
   const friendTabContents = document.querySelectorAll(".friends-tab-content");
 
   friendTabButtons.forEach((button) => {
@@ -62,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- 4. Toast Notification Function ---
+  // --- 3. Toast Notification Function ---
   const toast = document.getElementById("toastNotification");
 
   function showToast(message, isError = false) {
@@ -79,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  // --- 5. Copy Referral Link ---
+  // --- 4. Copy Referral Link ---
   const copyBtn = document.getElementById("copyReferralBtn");
   const linkText = document.getElementById("referralLinkText").textContent;
 
@@ -101,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // --- 6. (NEW) Load Referrals Functionality ---
+  // --- 5. (NEW) Load Referrals Functionality ---
   const allListContainer = document.getElementById("allFriendList");
   const joinedListContainer = document.getElementById("joinedFriendList");
 
@@ -184,12 +173,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 7. (NEW) Search Functionality ---
+  // --- 6. (NEW) Search Functionality ---
   const searchInput = document.getElementById("searchFriends");
 
   searchInput.addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    
+
     // Find which tab content is currently active
     const activeTabPane = document.querySelector(".friends-tab-content.active");
     if (!activeTabPane) return;
@@ -208,28 +197,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Optional: Show a "not found" message
-    const emptyState = activeTabPane.querySelector('.empty-state');
-    if(emptyState) emptyState.style.display = 'none'; // Hide empty state while searching
+    const emptyState = activeTabPane.querySelector(".empty-state");
+    if (emptyState) emptyState.style.display = "none"; // Hide empty state while searching
 
     // (This part is extra, you can remove if not needed)
-    let noResultsMsg = activeTabPane.querySelector('.no-results');
+    let noResultsMsg = activeTabPane.querySelector(".no-results");
     if (!foundOne && friends.length > 0) {
       if (!noResultsMsg) {
-        noResultsMsg = document.createElement('div');
-        noResultsMsg.className = 'empty-state no-results';
+        noResultsMsg = document.createElement("div");
+        noResultsMsg.className = "empty-state no-results";
         noResultsMsg.innerHTML = `<p>No friends found matching "${searchTerm}".</p>`;
         activeTabPane.appendChild(noResultsMsg);
       }
-      noResultsMsg.style.display = 'block';
+      noResultsMsg.style.display = "block";
     } else if (noResultsMsg) {
-      noResultsMsg.style.display = 'none';
+      noResultsMsg.style.display = "none";
     }
     // If search is empty, show empty state again if it was there
-    if(searchTerm === '' && emptyState) emptyState.style.display = 'block';
-
+    if (searchTerm === "" && emptyState) emptyState.style.display = "block";
   });
 
   // --- Load the friend lists when the page starts ---
   loadReferrals();
 });
-                                
