@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adani Corporation - Recharge</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-header">
+        <div id="sidebarId">Loading...</div>
+        <div id="sidebarVIP">...</div>
+    </div>
+    <div class="sidebar-actions">
+      <button class="sidebar-btn"><span>🧑‍💼</span> Customer Support</button>
+      <button class="sidebar-btn"><span>💬</span> Telegram Channel</button>
+      <button class="sidebar-btn"><span>⚙️</span> Settings</button>
+    </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    Recharge
+  </header>
+  <main class="page-container">
+    <div class="card current-balance-card">
+      <div>Current Balance</div>
+      <div id="currentBalance" class="balance-amount-small">₹0.00</div>
+    </div>
+    <div class="card">
+      <h3>Recharge Amount</h3>
+      <div class="input-container">
+        <span>₹</span>
+        <input type="number" id="rechargeAmount" placeholder="0" min="0" value="0">
+      </div>
+      <div class="quick-amounts-label">Quick Select</div>
+      <div class="quick-amounts">
+        <button class="quick-amount-btn" data-amount="100">₹100</button>
+        <button class="quick-amount-btn" data-amount="500">₹500</button>
+        <button class="quick-amount-btn" data-amount="1000">₹1000</button>
+        <button class="quick-amount-btn" data-amount="2000">₹2000</button>
+        <button class="quick-amount-btn" data-amount="5000">₹5000</button>
+        <button class="quick-amount-btn" data-amount="10000">₹10000</button>
+      </div>
+      <button id="proceedRecharge" class="submit-btn">Proceed to Recharge</button>
+    </div>
+  </main>
+  <div class="bottom-nav-spacer"></div>
+  <footer class="bottom-nav">
+    <a href="index.html">Home</a>
+    <a href="recharge.html" class="active">Recharge</a>
+    <a href="refer.html">Refer</a>
+    <a href="mine.html">Mine</a>
+  </footer>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="common.js"></script>
+  <script src="script-recharge.js"></script>
+</body>
+</html>
