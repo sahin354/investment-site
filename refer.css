@@ -603,3 +603,160 @@ main {
     transform: translate(0, 0);
   }
 }
+
+/* --- Hamburger Menu & Sidebar --- */
+.menu-btn { 
+    position: absolute; 
+    left: 20px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    cursor: pointer; 
+}
+.menu-btn span { 
+    display: block; 
+    width: 22px; 
+    height: 2px; 
+    background-color: white; 
+    margin: 5px 0; 
+}
+
+body.sidebar-open { 
+    overflow: hidden; 
+}
+
+.sidebar-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 998; 
+    opacity: 0;
+    pointer-events: none; 
+    transition: opacity 0.3s ease-in-out;
+}
+
+body.sidebar-open .sidebar-overlay { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
+
+.side-menu {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 280px; 
+    max-width: 85vw; 
+    height: 100%;
+    background-color: #ffffff; 
+    z-index: 999; 
+    display: flex; 
+    flex-direction: column;
+    box-shadow: 4px 0px 15px rgba(0, 0, 0, 0.1); 
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+body.sidebar-open .side-menu { 
+    transform: translateX(0); 
+}
+
+.sidebar-header { 
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+    color: white; 
+    padding: 25px 20px; 
+}
+.sidebar-id { 
+    font-size: 1.1em; 
+    font-weight: bold; 
+    margin-bottom: 5px; 
+}
+.sidebar-vip { 
+    background-color: rgba(255, 215, 0, 0.8); 
+    color: #333; 
+    display: inline-block; 
+    padding: 3px 10px; 
+    border-radius: 15px; 
+    font-size: 0.8em; 
+    font-weight: bold; 
+}
+.sidebar-actions { 
+    flex-grow: 1; 
+    padding-top: 15px; 
+}
+
+.sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding: 15px 20px;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.sidebar-btn:hover { 
+    background-color: var(--bg-light); 
+    color: var(--primary-color); 
+}
+.sidebar-btn span { 
+    font-size: 1.4em; 
+}
+
+.close-btn { 
+    position: absolute; 
+    top: 10px; 
+    right: 15px; 
+    font-size: 2.5em; 
+    color: rgba(255, 255, 255, 0.8); 
+    cursor: pointer; 
+    transition: color 0.2s ease; 
+}
+.close-btn:hover { 
+    color: white; 
+}
+
+/* --- REVISED Settings Submenu Styles (Cleaner Look) --- */
+
+#settingsToggleBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+#settingsToggleBtn .chevron {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #aaa; 
+  transition: transform 0.2s ease;
+}
+#settingsToggleBtn.active .chevron {
+  transform: rotate(90deg); 
+  color: var(--primary-color, #1e3c72);
+}
+
+.settings-submenu {
+  display: none; 
+  flex-direction: column;
+  margin-top: -5px; 
+  margin-bottom: 5px;
+}
+.settings-submenu.active {
+  display: flex; 
+}
+
+.settings-submenu .sub-item {
+  font-size: 0.95em; 
+  padding-left: 35px; 
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
