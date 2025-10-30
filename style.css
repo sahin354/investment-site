@@ -21,13 +21,39 @@ body {
     position: fixed; top: 0; left: 0; right: 0; z-index: 900;
 }
 main { padding-top: 60px; }
+
+/* === THIS SECTION IS UPDATED === */
 .bottom-nav {
-    display: flex; justify-content: space-around; position: fixed;
-    bottom: 0; left: 0; right: 0; background-color: white;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); padding: 10px 0; z-index: 900;
+    display: flex; 
+    justify-content: space-around; 
+    position: fixed;
+    bottom: 0; left: 0; right: 0; 
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+    padding: 10px 0; 
+    z-index: 900;
 }
-.bottom-nav a { color: var(--text-light); text-decoration: none; font-size: 0.9em; }
-.bottom-nav a.active { color: var(--primary-color); font-weight: bold; }
+.bottom-nav a { 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light); 
+    text-decoration: none; 
+    font-size: 0.9em; 
+    transition: color 0.2s;
+    flex: 1;
+}
+.bottom-nav a i {
+    font-size: 1.2em;
+    margin-right: 6px; /* Adds space between icon and text */
+}
+.bottom-nav a.active { 
+    color: var(--primary-color); 
+    font-weight: bold; 
+}
+/* === END OF UPDATED SECTION === */
+
 .bottom-nav-spacer { height: 70px; }
 /* --- Reusable Components --- */
 .card {
@@ -64,7 +90,6 @@ body.sidebar-open .side-menu { transform: translateX(0); }
 .sidebar-vip { background-color: rgba(255, 215, 0, 0.8); color: #333; display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; }
 .sidebar-actions { flex-grow: 1; padding-top: 15px; }
 
-/* === THIS IS THE ONLY UPDATED RULE === */
 .sidebar-btn {
     display: flex;
     align-items: center;
@@ -79,9 +104,8 @@ body.sidebar-open .side-menu { transform: translateX(0); }
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
     text-decoration: none;
-    box-sizing: border-box; /* --- THIS LINE WAS ADDED --- */
+    box-sizing: border-box; 
 }
-/* === END OF UPDATED RULE === */
 
 .sidebar-btn:hover { background-color: var(--bg-light); color: var(--primary-color); }
 .sidebar-btn span { font-size: 1.4em; }
@@ -429,224 +453,4 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   color: white;
   border: none;
   padding: 8px 15px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(106, 123, 255, 0.3);
-}
-.invite-btn-simple:hover {
-  background-color: #5a6bf0;
-}
-.invite-btn-simple .fa-whatsapp {
-  font-size: 1.1em;
-}
-.search-input-wrapper {
-  position: relative;
-  margin-bottom: 15px;
-}
-.search-input-wrapper .fa-search {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-}
-.search-input-wrapper input {
-  width: 100%;
-  padding: 12px 15px 12px 40px;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  background: #f8f9fa;
-  font-size: 1em;
-  box-sizing: border-box;
-}
-.search-input-wrapper input:focus {
-  outline: none;
-  border-color: #6A7BFF;
-  background: white;
-}
-
-/* --- Mobile Layout Fixes --- */
-@media (max-width: 768px) {
-  .refer-page-container {
-    padding: 0 10px;
-  }
-  .earnings-card,
-  .invite-header-card {
-    margin: 0 0 15px 0 !important;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .earnings-grid {
-    flex-direction: column;
-    gap: 15px;
-  }
-  .earnings-item {
-    flex: 1 1 100% !important;
-    margin-bottom: 10px;
-  }
-  .earnings-item.full-width {
-    margin-top: 0;
-  }
-  .refer-main-tabs {
-    margin: 10px 0 !important;
-    width: 100%;
-  }
-  .friends-sub-tabs {
-    margin-bottom: 15px;
-  }
-  .commission-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  .commission-card {
-    padding: 12px 8px;
-  }
-  .referral-link-box {
-    flex-direction: column;
-    gap: 10px;
-    padding: 12px;
-  }
-  #referralLinkText {
-    width: 100%;
-    text-align: center;
-    padding-right: 0;
-    margin-bottom: 5px;
-  }
-  .copy-btn-inset {
-    width: 100%;
-  }
-  .friend-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 12px 10px;
-  }
-  .friend-details {
-    width: 100%;
-  }
-  .invite-btn-simple {
-    width: 100%;
-    justify-content: center;
-  }
-  .scrollable-friend-list {
-    max-height: 250px;
-  }
-  .invite-header-card h2 {
-    font-size: 1.4em;
-  }
-  .earnings-amount {
-    font-size: 1.4em;
-  }
-  .commission-card .level-percent {
-    font-size: 1.3em;
-  }
-}
-
-@media (max-width: 480px) {
-  .refer-main-tabs .tab-button,
-  .friends-sub-tabs .friends-sub-tab-button {
-    font-size: 0.9em;
-    padding: 8px 10px;
-  }
-  .earnings-amount {
-    font-size: 1.3em;
-  }
-  .redeem-btn {
-    padding: 12px;
-    font-size: 1em;
-  }
-  .invite-header-card {
-    padding: 20px 15px;
-  }
-}
-
-/* --- Styles for Static Legal Pages --- */
-.static-content-card {
-    padding: 20px;
-    line-height: 1.7;
-}
-.static-content-card h3 {
-    font-size: 1.5em;
-    color: var(--text-dark, #1a202c);
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--border-color, #eef2f7);
-    padding-bottom: 10px;
-}
-.static-content-card h4 {
-    font-size: 1.2em;
-    color: var(--text-dark, #1a202c);
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-.static-content-card p {
-    font-size: 0.95em;
-    color: var(--text-light, #555);
-    margin-bottom: 15px;
-}
-.static-content-card ul {
-    padding-left: 20px;
-    margin-bottom: 15px;
-}
-.static-content-card li {
-    color: var(--text-light, #555);
-    margin-bottom: 8px;
-}
-.static-content-card a {
-    color: var(--primary-color, #1e3c72);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-/* --- REVISED Settings Submenu Styles (Cleaner Look) --- */
-
-/* Styles for the main Settings button (mostly unchanged) */
-#settingsToggleBtn {
-  display: flex;
-  justify-content: space-between; /* Pushes chevron to the right */
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-#settingsToggleBtn .chevron {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #aaa; /* Chevron color */
-  transition: transform 0.2s ease; /* Smooth rotation */
-}
-#settingsToggleBtn.active .chevron {
-  transform: rotate(90deg); /* Point down when open */
-  color: var(--primary-color, #1e3c72); /* Chevron color when open */
-}
-
-/* Submenu container: Hides/shows, no extra styling */
-.settings-submenu {
-  display: none; /* Hidden by default */
-  flex-direction: column;
-  /* Removed padding/gap from container */
-  margin-top: -5px; /* Adjust vertical spacing slightly */
-  margin-bottom: 5px;
-}
-.settings-submenu.active {
-  display: flex; /* Shown when active class is added by JS */
-}
-
-/* Sub-items: Make them look like normal buttons but indented */
-.settings-submenu .sub-item {
-  /* Inherits most styles from .sidebar-btn (like font, color, hover) */
-  font-size: 0.95em; /* Slightly smaller text for hierarchy */
-  /* --- THIS IS THE KEY --- */
-  padding-left: 35px; /* Increase left padding for indentation */
-                        /* Adjust this value (e.g., 40px) if alignment isn't perfect */
-
-  /* Make vertical padding slightly less than main items if desired */
-  padding-top: 12px;
-  padding-bottom: 12px;
-
-  /* Removed the background-color and border-left from previous version */
-}
+  border-radi
