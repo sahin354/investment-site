@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adani Corporation - Make Payment</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .payment-card {
+            background: #fff;
+            padding: 20px;
+            margin: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .amount-display {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .payment-method {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .payment-method img {
+            height: 30px;
+        }
+        .manual-tip {
+            font-size: 0.9em;
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .copy-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .copy-group input {
+            background: #f4f4f4;
+        }
+        .copy-btn {
+            padding: 0 20px;
+            width: auto;
+            flex-shrink: 0;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+    <div class="sidebar-actions">
+      <a href="contact.html" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</a>
+      <a href="#" target="_blank" class="sidebar-btn"><span>💬</span> Telegram Channel</a>
+      <button class="sidebar-btn" id="settingsToggleBtn">
+        <div class="sidebar-btn-content"><span>⚙️</span> Settings</div>
+        <span class="chevron">›</span>
+      </button>
+      <div class="settings-submenu" id="settingsSubmenu">
+        <a href="terms.html" class="sidebar-btn sub-item"><span>📄</span> Terms & Conditions</a>
+        <a href="privacy-policy.html" class="sidebar-btn sub-item"><span>🔒</span> Privacy Policy</a>
+        <a href="refund.html" class="sidebar-btn sub-item"><span>💳</span> Refund Policy</a>
+      </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    Payment
+  </header>
+  
+  <main class="page-container">
+    <div class="payment-card">
+        <div>Amount Payable</div>
+        <div class="amount-display" id="payableAmount">₹...</div>
+
+        <h4>Choose a payment method to pay</h4>
+        <div class="payment-method">
+            <img src="https://i.imgur.com/v8p7m5k.png" alt="Paytm">
+            <span>Paytm</span>
+            <i class="fas fa-hand-pointer"></i>
+        </div>
+        <div class="payment-method">
+            <img src="https://i.imgur.com/k2t1zOU.png" alt="PhonePE">
+            <span>PhonePE</span>
+            <i class="fas fa-qrcode"></i>
+        </div>
+        <div class="payment-method">
+            <img src="https://i.imgur.com/IUP05sD.png" alt="GooglePay">
+            <span>GooglePay</span>
+            <i class="fas fa-hand-pointer"></i>
+        </div>
+        <div class="payment-method">
+            <span>Scan QR Code</span>
+            <i class="fas fa-qrcode"></i>
+        </div>
+    </div>
+
+    <div class="payment-card">
+        <h4>Manual transfer</h4>
+        
+        <div class="manual-tip">Tip: Dont save the UPI, get new UPI every time.</div>
+
+        <label>1. Copy the below given UPI</label>
+        <div class="copy-group">
+            <input type="text" id="amountToCopy" readonly>
+            <button id="copyAmountBtn" class="copy-btn">Copy</button>
+        </div>
+        <div class="copy-group">
+            <input type="text" id="upiToCopy" readonly placeholder="Loading UPI ID...">
+            <button id="copyUpiBtn" class="copy-btn">Copy</button>
+        </div>
+
+        <form id="utrForm">
+            <label>2. Need to enter your 12 Ref No (UTR)</label>
+            <div class="input-group">
+                <input type="number" id="utrNumber" placeholder="Input 12-digit here" required minlength="12" maxlength="12">
+            </div>
+            <div class="manual-tip" style="background: #f0f9ff; color: #3498db; font-size: 0.8em;">
+                Tip: After payment succeed, you copy UTR or Ref NO. and pastehere.
+            </div>
+            <button type="submit" id="submitUtrBtn" class="submit-btn">Submit Ref Number</button>
+        </form>
+    </div>
+  </main>
+  
+  <div class="bottom-nav-spacer"></div>
+  <footer class="bottom-nav">
+    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    <a href="recharge.html" class="active"><i class="fas fa-bolt"></i> Recharge</a>
+    <a href="refer.html"><i class="fas fa-user-friends"></i> Refer</a>
+    <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
+  </footer>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="common.js"></script>
+  <script src="script-payment.js"></script> </body>
+</html>
