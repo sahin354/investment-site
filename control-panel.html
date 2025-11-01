@@ -44,6 +44,9 @@
         <div class="control-tabs">
             <button class="control-tab active" data-tab="users">User Management</button>
             <button class="control-tab" data-tab="balance">Financial Control</button>
+            
+            <button class="control-tab" data-tab="payments">Payment Requests</button>
+            
             <button class="control-tab" data-tab="plans">Plan Settings</button>
             <button class="control-tab" data-tab="settings">System Config</button>
         </div>
@@ -68,6 +71,25 @@
             <button id="updateBalanceButton" class="submit-btn">Execute Transaction</button>
         </div>
 
+        <div id="paymentsTab" class="tab-content">
+            <h3>⌛ Pending Payment Requests</h3>
+            <div style="overflow-x: auto;">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User Email</th>
+                            <th>Amount (₹)</th>
+                            <th>UTR / Ref No.</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentRequestsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
         <div id="plansTab" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>📊 Investment Plan Settings</h3>
@@ -79,6 +101,17 @@
 
         <div id="settingsTab" class="tab-content">
             <h3>⚙️ System Configuration</h3>
+            
+            <div class="form-group">
+              <label for="paymentUpiId">Payment UPI ID (e.g., your-upi@okhdfc)</label>
+              <input type="text" id="paymentUpiId" placeholder="Enter UPI ID to show to users">
+            </div>
+            <div class="form-group">
+              <label for="paymentAccountInfo">Bank Account Info (Optional)</label>
+              <textarea id="paymentAccountInfo" placeholder="e.g., A/C No: 12345, IFSC: 6789"></textarea>
+            </div>
+            <hr style="margin: 20px 0;">
+            
             <div class="form-group"><label for="commission1">Referral Commission - Level 1 (%)</label><input type="number" id="commission1" value="21" min="0" max="100"></div>
             <div class="form-group"><label for="commission2">Referral Commission - Level 2 (%)</label><input type="number" id="commission2" value="3" min="0" max="100"></div>
             <div class="form-group"><label for="commission3">Referral Commission - Level 3 (%)</label><input type="number" id="commission3" value="1" min="0" max="100"></div>
@@ -115,7 +148,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="firebaseConfig.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script> <script src="firebaseConfig.js"></script>
     <script src="script-control.js"></script>
+    
+    <script src="script-payment-approval.js"></script>
 </body>
 </html>
