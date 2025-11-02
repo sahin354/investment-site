@@ -19,6 +19,13 @@
             font-size: 2.5em;
             font-weight: 700;
             color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .timer-display {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #e74c3c;
             margin-bottom: 20px;
         }
         .payment-method {
@@ -30,6 +37,8 @@
             border-radius: 8px;
             margin-bottom: 10px;
             font-size: 1.1em;
+            color: #333;
+            text-decoration: none;
         }
         .payment-method img {
             height: 30px;
@@ -61,6 +70,14 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        #qrCodeContainer {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        #qrCodeLoader {
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -90,26 +107,32 @@
     <div class="payment-card">
         <div>Amount Payable</div>
         <div class="amount-display" id="payableAmount">₹...</div>
+        <div class="timer-display" id="countdownTimer">Time left: 10:00</div>
 
         <h4>Choose a payment method to pay</h4>
-        <div class="payment-method">
+        <a id="paytmLink" href="#" class="payment-method">
             <img src="https://i.imgur.com/v8p7m5k.png" alt="Paytm">
             <span>Paytm</span>
             <i class="fas fa-hand-pointer"></i>
-        </div>
-        <div class="payment-method">
+        </a>
+        <a id="phonepeLink" href="#" class="payment-method">
             <img src="https://i.imgur.com/k2t1zOU.png" alt="PhonePE">
             <span>PhonePE</span>
-            <i class="fas fa-qrcode"></i>
-        </div>
-        <div class="payment-method">
+            <i class="fas fa-hand-pointer"></i>
+        </a>
+        <a id="gpayLink" href="#" class="payment-method">
             <img src="https://i.imgur.com/IUP05sD.png" alt="GooglePay">
             <span>GooglePay</span>
             <i class="fas fa-hand-pointer"></i>
-        </div>
-        <div class="payment-method">
+        </a>
+        
+        <div class="payment-method" id="scanQrToggle">
             <span>Scan QR Code</span>
             <i class="fas fa-qrcode"></i>
+        </div>
+        <div id="qrCodeContainer" style="display: none;">
+            <img id="qrCodeImage" src="" alt="QR Code">
+            <div id="qrCodeLoader">Loading QR Code...</div>
         </div>
     </div>
 
@@ -155,4 +178,5 @@
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
   <script src="script-payment.js"></script> </body>
-</html>
+        </html>
+        
