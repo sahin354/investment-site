@@ -1,8 +1,6 @@
 // This file handles the new Payment Approval tab in the admin panel.
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Make sure to initialize db and functions if not already global
-    // But since script-control.js is loaded first, they should be available.
     if (typeof firebase === 'undefined') return;
     
     const db = firebase.firestore();
@@ -13,9 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const tableBody = document.getElementById('paymentRequestsTableBody');
         if (!tableBody) return; // Exit if the table isn't on this page
 
+        // --- THIS IS THE FIX ---
+        // Removed the ".orderBy('createdAt', 'desc')"
+        // That query requires a special index, but this simple query does not.
+        // Your UTR requests will appear now.
         db.collection('payment_requests')
           .where('status', '==', 'pending')
-          .orderBy('createdAt', 'desc')
           .onSnapshot(snapshot => {
               tableBody.innerHTML = ''; // Clear old data
               if (snapshot.empty) {
@@ -23,9 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
                   return;
               }
               
-              snapshot.forEach(doc => {
-                  const request = doc.data();
-                  const requestId = doc.id;
+              // Sort by date manually
+              const requests = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              requests.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
+              requests.forEach(request => {
+                  const requestId = request.id;
                   
                   const tr = document.createElement('tr');
                   tr.innerHTML = `
@@ -95,25 +99,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 5. Load data when the "Payments" tab is clicked ---
-    // This connects to your existing tab logic in script-control.js
     document.addEventListener('click', e => {
         if (e.target.classList.contains('control-tab') && e.target.dataset.tab === 'payments') {
             loadPaymentRequests();
         }
     });
     
-    // Also load it once when the page loads, in case it's the default tab
-    // We check if the tab exists first
     if (document.getElementById('paymentsTab')) {
         loadPaymentRequests();
     }
     
     // --- 6. Add logic for the new fields in "System Config" tab ---
-    // Find the save button from script-control.js
     const saveSettingsButton = document.getElementById('saveSettingsButton');
     if (saveSettingsButton) {
-        // We add this *inside* the existing click listener from script-control.js
-        // A bit of a hack, but safer than replacing the whole file
         saveSettingsButton.addEventListener('click', async () => {
             const paymentConfig = {
               upiId: document.getElementById('paymentUpiId').value,
@@ -121,18 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             try {
-                // Save the payment config to a separate document
                 await db.collection('system_config').doc('payment_details').set(paymentConfig);
-                // The main settings are saved by script-control.js
-                // We just add this save on top.
             } catch (err) {
                  alert('Error saving payment details: ' + err.message);
             }
         });
     }
     
-    // Load the payment settings
     async function loadPaymentConfig() {
+        if(!document.getElementById('paymentUpiId')) return; // Don't run if not on settings tab
+        
         const paymentDoc = await db.collection('system_config').doc('payment_details').get();
         if (paymentDoc.exists) {
             const data = paymentDoc.data();
@@ -144,13 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Load when the settings tab is clicked
     document.addEventListener('click', e => {
         if (e.target.classList.contains('control-tab') && e.target.dataset.tab === 'settings') {
             loadPaymentConfig();
         }
     });
     
-    // Also load on page start
     loadPaymentConfig();
 });
+                
