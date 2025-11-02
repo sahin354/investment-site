@@ -20,32 +20,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadPaymentPage() {
+        // --- THIS IS THE "REFRESH FIX" ---
         // 1. Get amount and timer from localStorage
         rechargeAmount = localStorage.getItem('rechargeAmount');
         paymentEndTime = localStorage.getItem('paymentEndTime');
+        
+        // 2. IMMEDIATELY delete them.
+        // This makes the page a one-time link.
+        localStorage.removeItem('rechargeAmount');
+        localStorage.removeItem('paymentEndTime');
+        // --- END OF "REFRESH FIX" ---
 
+        // 3. Check if the data was missing (e.g., user refreshed)
         if (!rechargeAmount || !paymentEndTime) {
-            alert('Session expired. Redirecting to recharge page.');
-            window.location.href = 'recharge.html';
+            if(timerInterval) clearInterval(timerInterval);
+            timerElement.textContent = "SESSION EXPIRED";
+            alert('This payment session has expired or is invalid. Please try again.');
+            document.body.innerHTML = "<h1>Session Expired. Please close this tab and try again.</h1>";
             return;
         }
 
-        // 2. Start the countdown timer
+        // 4. Start the countdown timer
         startTimer(paymentEndTime);
 
-        // 3. Set amount fields
+        // 5. Set amount fields
         const amountNum = parseFloat(rechargeAmount);
         payableAmount.textContent = `₹ ${amountNum.toFixed(2)}`;
         amountField.value = amountNum.toFixed(2);
 
-        // 4. Load UPI details and create links
+        // 6. Load UPI details and create links
         loadPaymentDetails();
 
-        // 5. Add listeners
+        // 7. Add listeners
         setupListeners();
     }
 
-    // --- NEW: Countdown Timer ---
+    // --- Countdown Timer ---
     function startTimer(endTime) {
         timerInterval = setInterval(() => {
             const now = Date.now();
@@ -55,8 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(timerInterval);
                 timerElement.textContent = "Time Expired";
                 alert('Payment session expired. Please try again.');
-                localStorage.removeItem('rechargeAmount');
-                localStorage.removeItem('paymentEndTime');
                 window.location.href = 'recharge.html';
                 return;
             }
@@ -75,12 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (doc.exists && doc.data().upiId) {
                 upiId = doc.data().upiId;
                 upiField.value = upiId;
-
-                // --- NEW: Create UPI Deep Link ---
+                
+                // Create UPI Deep Link
                 createUpiLinks(upiId, rechargeAmount, currentUser.email);
 
             } else {
                 upiField.value = 'Error: Admin has not set a UPI ID.';
+                alert('Error: Payment UPI ID is not set. Please contact support.');
             }
         } catch (err) {
             console.error("Error loading payment details:", err);
@@ -88,34 +97,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- NEW: Create UPI Deep Links ---
+    // --- Create UPI Deep Links ---
     function createUpiLinks(upiAddress, amount, userEmail) {
-        // This is the standard UPI Intent URL
-        // pa = Payee Address (your UPI)
-        // pn = Payee Name
-        // am = Amount
-        // cu = Currency (INR)
-        // tn = Transaction Note
+        
+        // --- IMPORTANT WARNING ---
+        // This will ONLY work on a MOBILE PHONE with the apps installed.
+        // It will NOT work on a desktop computer.
+        
         const note = encodeURIComponent(`Recharge for ${userEmail}`);
         const payeeName = encodeURIComponent("Adani Corporation"); // Your company name
         
         const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`;
 
-        // Set the link for all payment buttons
         document.getElementById('paytmLink').href = upiLink;
         document.getElementById('phonepeLink').href = upiLink;
         document.getElementById('gpayLink').href = upiLink;
 
-        // --- NEW: Generate QR Code ---
-        // We use a free API to generate the QR code from the UPI link
+        // --- Generate QR Code ---
         const qrCodeImage = document.getElementById('qrCodeImage');
         const qrCodeLoader = document.getElementById('qrCodeLoader');
         const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
         
         qrCodeImage.src = qrApi;
         qrCodeImage.onload = () => {
-            qrCodeLoader.style.display = 'none'; // Hide loader
-            qrCodeImage.style.display = 'block'; // Show image
+            qrCodeLoader.style.display = 'none'; 
+            qrCodeImage.style.display = 'block';
         }
     }
 
@@ -162,8 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 alert('Request submitted! Please wait for admin approval (1-2 hours).');
-                localStorage.removeItem('rechargeAmount');
-                localStorage.removeItem('paymentEndTime');
+                // We don't need to clear localStorage, it's already done.
                 window.location.href = 'mine.html';
 
             } catch (err) {
@@ -171,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('An error occurred. Please try again.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Ref Number';
-                startTimer(paymentEndTime); // Restart timer if submit fails
+                // Don't restart timer, session is already expired
             }
         });
     }
@@ -182,4 +187,3 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Copied to clipboard!');
     }
 });
-                
