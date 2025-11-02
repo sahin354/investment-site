@@ -43,24 +43,27 @@
       <div>Current Balance</div>
       <div id="currentBalance" class="balance-amount-small">₹0.00</div>
     </div>
-    <div class="card">
-      <h3>Recharge Amount</h3>
-      <div class="input-container">
-        <span>₹</span>
-        <input type="number" id="rechargeAmount" placeholder="0" min="0" value="0">
-      </div>
-      <div class="quick-amounts-label">Quick Select</div>
-      <div class="quick-amounts">
-        <button class="quick-amount-btn" data-amount="100">₹100</button>
-        <button class="quick-amount-btn" data-amount="500">₹500</button>
-        <button class="quick-amount-btn" data-amount="1000">₹1000</button>
-        <button class="quick-amount-btn" data-amount="2000">₹2000</button>
-        <button class="quick-amount-btn" data-amount="5000">₹5000</button>
-        <button class="quick-amount-btn" data-amount="10000">₹10000</button>
-      </div>
-      <button id="proceedRecharge" class="submit-btn">Proceed to Recharge</button>
-    </div>
-  </main>
+
+    <form id="rechargeForm" action="payment.html" target="_blank">
+        <div class="card">
+          <h3>Recharge Amount</h3>
+          <div class="input-container">
+            <span>₹</span>
+            <input type="number" id="rechargeAmount" placeholder="0" min="0" value="0">
+          </div>
+          <div class="quick-amounts-label">Quick Select</div>
+          <div class="quick-amounts">
+            <button type="button" class="quick-amount-btn" data-amount="100">₹100</button>
+            <button type="button" class="quick-amount-btn" data-amount="500">₹500</button>
+            <button type="button" class="quick-amount-btn" data-amount="1000">₹1000</button>
+            <button type="button" class="quick-amount-btn" data-amount="2000">₹2000</button>
+            <button type="button" class="quick-amount-btn" data-amount="5000">₹5000</button>
+            <button type="button" class="quick-amount-btn" data-amount="10000">₹10000</button>
+          </div>
+          <button type="submit" id="proceedRecharge" class="submit-btn">Proceed to Recharge</button>
+        </div>
+    </form>
+    </main>
   <div class="bottom-nav-spacer"></div>
   
   <footer class="bottom-nav">
@@ -75,8 +78,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <script src="firebaseConfig.js"></script>
   <script src="common.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="script-recharge.js"></script>
 </body>
-</html>
+                </html>
+                
