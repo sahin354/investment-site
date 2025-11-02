@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function initializeRechargePage(user) {
-        // Load current balance (this function is from your common.js)
-        // If it's not in common.js, you can add it here.
+        // Load current balance
         loadCurrentBalance(user.uid);
         
         // Setup event listeners
@@ -65,8 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                // Store the amount in localStorage to pass it to the next page
+                // --- NEW CODE ---
+                // Store the amount in localStorage
                 localStorage.setItem('rechargeAmount', amount);
+                
+                // Set a 10-minute timer
+                const paymentEndTime = Date.now() + (10 * 60 * 1000);
+                localStorage.setItem('paymentEndTime', paymentEndTime);
+                // --- END NEW CODE ---
                 
                 // Redirect to the new payment page
                 window.location.href = 'payment.html';
