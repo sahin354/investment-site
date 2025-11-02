@@ -21,17 +21,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function loadPaymentPage() {
         // --- THIS IS THE "REFRESH FIX" ---
-        // 1. Get amount and timer from localStorage
         rechargeAmount = localStorage.getItem('rechargeAmount');
         paymentEndTime = localStorage.getItem('paymentEndTime');
-        
-        // 2. IMMEDIATELY delete them.
-        // This makes the page a one-time link.
         localStorage.removeItem('rechargeAmount');
         localStorage.removeItem('paymentEndTime');
         // --- END OF "REFRESH FIX" ---
 
-        // 3. Check if the data was missing (e.g., user refreshed)
         if (!rechargeAmount || !paymentEndTime) {
             if(timerInterval) clearInterval(timerInterval);
             timerElement.textContent = "SESSION EXPIRED";
@@ -40,22 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // 4. Start the countdown timer
         startTimer(paymentEndTime);
 
-        // 5. Set amount fields
         const amountNum = parseFloat(rechargeAmount);
         payableAmount.textContent = `₹ ${amountNum.toFixed(2)}`;
         amountField.value = amountNum.toFixed(2);
 
-        // 6. Load UPI details and create links
         loadPaymentDetails();
-
-        // 7. Add listeners
         setupListeners();
     }
 
-    // --- Countdown Timer ---
     function startTimer(endTime) {
         timerInterval = setInterval(() => {
             const now = Date.now();
@@ -65,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(timerInterval);
                 timerElement.textContent = "Time Expired";
                 alert('Payment session expired. Please try again.');
-                window.location.href = 'recharge.html';
+                window.location.href = 'recharge.html'; // Go back to recharge
                 return;
             }
 
@@ -85,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 upiField.value = upiId;
                 
                 // Create UPI Deep Link
-                createUpiLinks(upiId, rechargeAmount, currentUser.email);
+                createUpiLinks(upiId, rechargeAmount); // Pass only 2 items
 
             } else {
                 upiField.value = 'Error: Admin has not set a UPI ID.';
@@ -98,16 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Create UPI Deep Links ---
-    function createUpiLinks(upiAddress, amount, userEmail) {
+    function createUpiLinks(upiAddress, amount) {
         
-        // --- IMPORTANT WARNING ---
-        // This will ONLY work on a MOBILE PHONE with the apps installed.
-        // It will NOT work on a desktop computer.
-        
-        const note = encodeURIComponent(`Recharge for ${userEmail}`);
+        // --- THIS IS THE FIX ---
+        // We are REMOVING the "tn" (transaction note) field.
+        // This is less suspicious to the payment apps.
         const payeeName = encodeURIComponent("Adani Corporation"); // Your company name
         
-        const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`;
+        // The new, simpler link:
+        const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
+        // --- END OF FIX ---
 
         document.getElementById('paytmLink').href = upiLink;
         document.getElementById('phonepeLink').href = upiLink;
@@ -116,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // --- Generate QR Code ---
         const qrCodeImage = document.getElementById('qrCodeImage');
         const qrCodeLoader = document.getElementById('qrCodeLoader');
+        // The QR code also uses the new, simpler link
         const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
         
         qrCodeImage.src = qrApi;
@@ -157,7 +147,6 @@ document.addEventListener('DOMContentLoaded', function() {
             clearInterval(timerInterval); // Stop the timer
 
             try {
-                // Create a "pending" request for the admin
                 await firebase.firestore().collection('payment_requests').add({
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
@@ -168,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 alert('Request submitted! Please wait for admin approval (1-2 hours).');
-                // We don't need to clear localStorage, it's already done.
                 window.location.href = 'mine.html';
 
             } catch (err) {
@@ -176,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('An error occurred. Please try again.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Ref Number';
-                // Don't restart timer, session is already expired
             }
         });
     }
@@ -187,3 +174,4 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Copied to clipboard!');
     }
 });
+        
