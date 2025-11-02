@@ -11,10 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function initializeRechargePage(user) {
-        // Load current balance
         loadCurrentBalance(user.uid);
-        
-        // Setup event listeners
         setupRechargeListeners();
     }
 
@@ -24,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
         userDoc.onSnapshot((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
-                const balanceElement = document.getElementById('currentBalance'); // In recharge.html
+                const balanceElement = document.getElementById('currentBalance'); 
                 if (balanceElement && userData.balance !== undefined) {
                     balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
                 }
-                const rechargeBalance = document.getElementById('currentBalanceAmount'); // In common.js
+                const rechargeBalance = document.getElementById('currentBalanceAmount');
                 if (rechargeBalance && userData.balance !== undefined) {
                     rechargeBalance.textContent = `₹${userData.balance.toFixed(2)}`;
                 }
@@ -51,30 +48,29 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Proceed to recharge button
-        const proceedBtn = document.getElementById('proceedRecharge');
-        if (proceedBtn) {
-            proceedBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+        // --- NEW CODE: Listen to the FORM submit ---
+        const rechargeForm = document.getElementById('rechargeForm');
+        if (rechargeForm) {
+            rechargeForm.addEventListener('submit', function(e) {
                 
                 const amount = parseFloat(document.getElementById('rechargeAmount').value);
                 
                 if (!amount || amount <= 0) {
                     alert('Please enter a valid recharge amount');
+                    // Stop the form from submitting and opening a new tab
+                    e.preventDefault(); 
                     return;
                 }
                 
-                // --- NEW CODE ---
-                // Store the amount in localStorage
+                // --- Save data to localStorage ---
+                // The new tab will read this data
                 localStorage.setItem('rechargeAmount', amount);
                 
-                // Set a 10-minute timer
-                const paymentEndTime = Date.now() + (10 * 60 * 1000);
+                const paymentEndTime = Date.now() + (10 * 60 * 1000); // 10 minutes
                 localStorage.setItem('paymentEndTime', paymentEndTime);
-                // --- END NEW CODE ---
                 
-                // Redirect to the new payment page
-                window.location.href = 'payment.html';
+                // We DO NOT call e.preventDefault() here.
+                // We let the form submit, which opens payment.html in a new tab.
             });
         }
     }
