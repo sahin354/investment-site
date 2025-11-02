@@ -20,12 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadPaymentPage() {
-        // --- THIS IS THE "REFRESH FIX" ---
         rechargeAmount = localStorage.getItem('rechargeAmount');
         paymentEndTime = localStorage.getItem('paymentEndTime');
         localStorage.removeItem('rechargeAmount');
         localStorage.removeItem('paymentEndTime');
-        // --- END OF "REFRESH FIX" ---
 
         if (!rechargeAmount || !paymentEndTime) {
             if(timerInterval) clearInterval(timerInterval);
@@ -73,8 +71,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 upiId = doc.data().upiId;
                 upiField.value = upiId;
                 
-                // Create UPI Deep Link
-                createUpiLinks(upiId, rechargeAmount); 
+                // Generate QR Code
+                generateQrCode(upiId, rechargeAmount); 
 
             } else {
                 upiField.value = 'Error: Admin has not set a UPI ID.';
@@ -86,26 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- Create UPI Deep Links ---
-    function createUpiLinks(upiAddress, amount) {
-        
-        // --- THIS IS THE "RISK POLICY" FIX ---
-        // We are REMOVING the "am" (amount) field.
-        // This is less suspicious to the payment apps.
-        // The user must now enter the amount manually.
+    function generateQrCode(upiAddress, amount) {
         const payeeName = encodeURIComponent("Adani Corporation"); // Your company name
-        
-        // The new, simpler link:
-        const upiLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&cu=INR`;
-        // --- END OF FIX ---
-
-        document.getElementById('paytmLink').href = upiLink;
-        document.getElementById('phonepeLink').href = upiLink;
-        document.getElementById('gpayLink').href = upiLink;
-
-        // --- Generate QR Code ---
-        // The QR code MUST include the amount, so we use a different link for it.
         const qrLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
+        
         const qrCodeImage = document.getElementById('qrCodeImage');
         const qrCodeLoader = document.getElementById('qrCodeLoader');
         const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrLink)}`;
@@ -133,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             qrContainer.style.display = qrContainer.style.display === 'none' ? 'block' : 'none';
         });
 
-        // --- NEW: Payment Failed Link ---
+        // Payment Failed Link
         document.getElementById('paymentFailedLink').addEventListener('click', (e) => {
             e.preventDefault();
             if (confirm("Are you sure you want to cancel this payment?")) {
@@ -186,3 +168,4 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Copied to clipboard!');
     }
 });
+                
