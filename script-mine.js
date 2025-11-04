@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Setup real-time balance updates
         setupRealTimeBalance(user.uid);
         
-        // --- NEW: Load transaction history ---
+        // Load transaction history
         loadTransactionHistory(user.uid);
     }
 
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Renamed this function for clarity
     function setupRealTimeBalance(userId) {
         const userDoc = firebase.firestore().collection('users').doc(userId);
         
@@ -59,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners(user) {
-        // Recharge Button - FIXED
+        // Recharge Button
         const rechargeBtn = document.getElementById('rechargeBtn');
         if (rechargeBtn) {
             rechargeBtn.addEventListener('click', function(e) {
@@ -91,20 +90,27 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Other option items
+        // --- UPDATED: Other option items ---
         const optionItems = document.querySelectorAll('.option-item');
         optionItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('This feature is coming soon!');
-            });
+            
+            // Check if this is the special transaction button
+            if (item.id === 'transactionHistoryBtn') {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Scroll to the transaction card
+                    document.getElementById('transactionCard').scrollIntoView({ behavior: 'smooth' });
+                });
+            } else {
+                // All other buttons get "coming soon"
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('This feature is coming soon!');
+                });
+            }
         });
     }
 
-    /**
-     * --- NEW: loadTransactionHistory Function ---
-     * Loads the last 10 transactions for the user.
-     */
     function loadTransactionHistory(userId) {
         const listContainer = document.getElementById('transactionList');
         const db = firebase.firestore();
@@ -126,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const amount = tx.amount;
                 const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
                 
-                // --- This is the new HTML for a transaction item ---
                 const txHTML = `
                     <div class="transaction-item">
                         <div class="transaction-details">
@@ -148,4 +153,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-                           
+            
