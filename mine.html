@@ -58,8 +58,17 @@
     </div>
     <div class="card options-list-card">
       <a href="#" class="option-item"><div class="option-icon">🏦</div><span>Bank Account Details</span><div class="option-chevron">&gt;</div></a>
-      <a href="#" class="option-item"><div class="option-icon">📜</div><span>Transaction History</span><div class="option-chevron">&gt;</div></a>
+      
+      <a href="#" class="option-item" id="transactionHistoryBtn"><div class="option-icon">📜</div><span>Transaction History</span><div class="option-chevron">&gt;</div></a>
+      
       <a href="#" class="option-item"><div class="option-icon">🔒</div><span>Change Password</span><div class="option-chevron">&gt;</div></a>
+    </div>
+
+    <div class="card transactions-card" id="transactionCard">
+        <h3>Recent Transactions</h3>
+        <div id="transactionList">
+            <p>Loading transactions...</p>
+        </div>
     </div>
     <div class="card logout-card">
         <button id="logoutBtn" class="logout-btn">Log Out</button>
