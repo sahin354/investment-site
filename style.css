@@ -675,3 +675,121 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   /* Removed the background-color and border-left from previous version */
 }
 /* <-- THE MISSING BRACKET IS NOW ADDED, AND THE EXTRA ONE IS GONE */
+
+/* === STYLES FOR PURCHASED PLANS (index.html) === */
+
+.purchased-plan-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  margin: 15px 0;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+}
+.purchased-plan-card .plan-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f1f1;
+  padding: 15px 20px;
+}
+.purchased-plan-card .plan-card-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #1a237e;
+}
+.purchased-plan-card .plan-status {
+  font-weight: bold;
+  font-size: 0.9em;
+}
+.purchased-plan-card .plan-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 15px 20px;
+}
+.plan-progress {
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #f1f1f1;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color, #1e3c72);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+
+/* === STYLES FOR TRANSACTION LIST (mine.html) === */
+.transactions-card h3 {
+  font-size: 1.2em;
+  color: var(--text-dark, #1a202c);
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--border-color, #eef2f7);
+  padding-bottom: 10px;
+}
+#transactionList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.transaction-item:last-child {
+  border-bottom: none;
+}
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+}
+.transaction-type {
+  font-weight: 600;
+  font-size: 1em;
+  color: #333;
+}
+.transaction-info {
+  font-size: 0.9em;
+  color: #777;
+  margin-top: 2px;
+}
+.transaction-amount {
+  font-weight: bold;
+  font-size: 1.1em;
+  text-align: right;
+}
+.transaction-amount.positive {
+  color: #28a745;
+}
+.transaction-amount.negative {
+  color: #dc3545;
+}
+.transaction-date {
+  display: block;
+  font-size: 0.8em;
+  color: #999;
+  font-weight: normal;
+  margin-top: 2px;
+}
