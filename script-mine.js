@@ -55,7 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Function to open the modal
         const openModal = () => {
-            modalContainer.style.display = 'block';
+            // --- THIS IS THE FIX ---
+            // Changed from 'block' to 'flex' to apply the layout
+            modalContainer.style.display = 'flex'; 
             modalOverlay.style.display = 'block';
             document.body.classList.add('modal-open');
             // Load history every time it's opened
@@ -105,18 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modalOverlay.addEventListener('click', closeModal);
     }
 
-    /**
-     * --- UPDATED: loadTransactionHistory Function ---
-     * This now loads data into the modal and sorts in JS.
-     * This FIXES the "empty list" problem without needing a console.
-     */
     function loadTransactionHistory(userId) {
         const listContainer = document.getElementById('txModalContent');
         listContainer.innerHTML = '<p>Loading transactions...</p>';
         const db = firebase.firestore();
         
-        // --- THIS IS THE FIX ---
-        // Removed .orderBy() to avoid needing an index
         const txQuery = db.collection('transactions')
                           .where('userId', '==', userId);
                           
@@ -128,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             listContainer.innerHTML = ''; // Clear loading message
 
-            // --- NEW: Sort the results manually in JavaScript ---
             const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
             docs.sort((a, b) => {
                 const dateA = a.timestamp ? a.timestamp.seconds : 0;
