@@ -15,11 +15,10 @@ function initializeApp(user) {
     setupTabs();
     loadInvestmentPlans();
     
-    // --- NEW: Load purchased plans for the user ---
+    // --- Load purchased plans for the user ---
     loadPurchasedPlans(user.uid);
     
-    // --- NEW: Add click listener for 'Buy Now' buttons ---
-    // Use event delegation on the <main> element
+    // --- Add click listener for 'Buy Now' buttons ---
     const mainElement = document.querySelector('main');
     mainElement.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('buy-button')) {
@@ -44,17 +43,10 @@ function setupTabs() {
             
             const tabId = button.dataset.tab;
             document.getElementById(tabId).classList.add('active');
-            
-            // Note: We no longer load plans here.
-            // They are all loaded at init with onSnapshot for real-time updates.
         });
     });
 }
 
-/**
- * --- NEW: buyPlan Function ---
- * Uses a transaction to safely purchase a plan.
- */
 async function buyPlan(planId, userId) {
     if (!confirm('Are you sure you want to buy this plan?')) {
         return;
@@ -76,17 +68,14 @@ async function buyPlan(planId, userId) {
             const user = userDoc.data();
             const cost = plan.minAmount;
 
-            // 1. Check balance
             if (user.balance < cost) {
                 throw new Error("Insufficient balance.");
             }
 
-            // 2. Deduct cost from user's balance
             transaction.update(userRef, {
                 balance: firebase.firestore.FieldValue.increment(-cost)
             });
 
-            // 3. Create a new record in 'userInvestments'
             const investmentRef = db.collection('userInvestments').doc();
             const dailyIncome = (plan.minAmount * plan.dailyReturnPercent) / 100;
             const now = new Date();
@@ -96,7 +85,6 @@ async function buyPlan(planId, userId) {
                 planId: planId,
                 planName: plan.name,
                 startDate: firebase.firestore.FieldValue.serverTimestamp(),
-                // Set first payout 24 hours from now
                 nextPayout: new Date(now.getTime() + 24 * 60 * 60 * 1000), 
                 totalDays: plan.durationDays,
                 completedDays: 0,
@@ -105,7 +93,6 @@ async function buyPlan(planId, userId) {
                 isActive: true
             });
 
-            // 4. Create a transaction log
             const txRef = db.collection('transactions').doc();
             transaction.set(txRef, {
                 userId: userId,
@@ -126,17 +113,19 @@ async function buyPlan(planId, userId) {
 
 
 /**
- * --- NEW: loadPurchasedPlans Function ---
- * Loads all plans the user has bought into the 'Purchased' tab.
+ * --- UPDATED: loadPurchasedPlans Function ---
+ * This now fetches with just 'where' and sorts the results in JavaScript.
+ * This FIXES the "empty list" problem without needing a console.
  */
 function loadPurchasedPlans(userId) {
     const purchasedContainer = document.getElementById('purchased');
     purchasedContainer.innerHTML = '<p>Loading purchased plans...</p>';
     
     const db = firebase.firestore();
+    // --- THIS IS THE FIX ---
+    // Removed .orderBy() to avoid needing an index
     const investmentsRef = db.collection('userInvestments')
-                             .where('userId', '==', userId)
-                             .orderBy('startDate', 'desc');
+                             .where('userId', '==', userId);
 
     investmentsRef.onSnapshot((querySnapshot) => {
         if (querySnapshot.empty) {
@@ -145,14 +134,20 @@ function loadPurchasedPlans(userId) {
         }
 
         purchasedContainer.innerHTML = ''; // Clear container
-        querySnapshot.forEach((doc) => {
-            const investment = doc.data();
-            
+
+        // --- NEW: Sort the results manually in JavaScript ---
+        const docs = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        docs.sort((a, b) => {
+            const dateA = a.startDate ? a.startDate.seconds : 0;
+            const dateB = b.startDate ? b.startDate.seconds : 0;
+            return dateB - dateA; // Sort descending (newest first)
+        });
+
+        docs.forEach((investment) => {
             const daysRemaining = investment.totalDays - investment.completedDays;
             const status = investment.isActive ? 'Active' : 'Completed';
             const statusColor = investment.isActive ? 'green' : 'gray';
 
-            // --- This is the new HTML for a purchased plan card ---
             const planCardHTML = `
                 <div class="purchased-plan-card">
                     <div class="plan-card-header">
@@ -221,7 +216,6 @@ function loadInvestmentPlans() {
               const plan = doc.data();
               const planId = doc.id;
 
-              // --- UPDATED HTML STRUCTURE ---
               const planCardHTML = `
                   <div class="plan-card ${plan.isVIP ? 'vip' : ''}" data-plan-id="${planId}">
                       <div class="plan-card-header">
@@ -237,7 +231,7 @@ function loadInvestmentPlans() {
                               <span class="plan-label">Daily Income</span>
                               <span class="plan-value">₹${((plan.minAmount * plan.dailyReturnPercent) / 100).toFixed(2)}</span>
                           </div>
-                          <div class="plan-detail">
+                          <div class="plan-label">
                               <span class="plan-label">Cycle</span>
                               <span class="plan-value">${plan.durationDays} Days</span>
                           </div>
@@ -273,5 +267,4 @@ function loadInvestmentPlans() {
           primaryContainer.innerHTML = "<p style='color:red;'>Could not load investment plans.</p>";
           vipContainer.innerHTML = "<p style='color:red;'>Could not load VIP plans.</p>";
       });
-        }
-        
+}
