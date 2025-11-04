@@ -794,30 +794,122 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   margin-top: 2px;
 }
 
-/* === STYLES FOR transactions.html === */
-.header-back-btn {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: white;
-  text-decoration: none;
-  font-size: 1.2em;
+/* === NEW MODAL STYLES (POP-UP) === */
+
+/* Prevents scrolling the page when modal is open */
+body.modal-open {
+  overflow: hidden;
 }
 
-.transaction-page {
-  padding: 15px;
-}
-
-/* Make transaction list have no extra padding */
-.transaction-page #transactionList {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 0 15px;
-  box-shadow: var(--card-shadow);
-  margin-bottom: 20px;
-}
-
-.transaction-page #loadMoreBtn {
+/* The dark background overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+/* The modal box itself */
+.modal-container {
+  display: none;
+  position: fixed;
+  /* This positions it in the area you highlighted */
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  width: 90%;
+  max-width: 500px;
+  /* This is the max-height you wanted */
+  height: 60%; 
+  
+  background: #ffffff;
+  border-radius: 16px;
+  z-index: 1001;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  
+  /* Use flexbox to organize header/content */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: var(--text-dark);
+}
+
+#txModalCloseBtn {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-content {
+  /* This makes the list scrollable */
+  overflow-y: auto;
+  flex-grow: 1;
+  padding: 0 20px;
+}
+
+/* Re-use transaction styles from before */
+.modal-content .transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.modal-content .transaction-item:last-child {
+  border-bottom: none;
+}
+.modal-content .transaction-details {
+  display: flex;
+  flex-direction: column;
+}
+.modal-content .transaction-type {
+  font-weight: 600;
+  font-size: 1em;
+  color: #333;
+}
+.modal-content .transaction-info {
+  font-size: 0.9em;
+  color: #777;
+  margin-top: 2px;
+}
+.modal-content .transaction-amount {
+  font-weight: bold;
+  font-size: 1.1em;
+  text-align: right;
+  flex-shrink: 0; /* Prevents text from wrapping */
+  margin-left: 10px;
+}
+.modal-content .transaction-amount.positive {
+  color: #28a745;
+}
+.modal-content .transaction-amount.negative {
+  color: #dc3545;
+}
+.modal-content .transaction-date {
+  display: block;
+  font-size: 0.8em;
+  color: #999;
+  font-weight: normal;
+  margin-top: 2px;
 }
