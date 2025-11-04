@@ -21,9 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Setup real-time balance updates
         setupRealTimeBalance(user.uid);
-        
-        // Load transaction history
-        loadTransactionHistory(user.uid);
     }
 
     function updateProfileInfo(user) {
@@ -90,67 +87,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // --- UPDATED: Other option items ---
+        // Other option items
         const optionItems = document.querySelectorAll('.option-item');
         optionItems.forEach(item => {
-            
-            // Check if this is the special transaction button
-            if (item.id === 'transactionHistoryBtn') {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // Scroll to the transaction card
-                    document.getElementById('transactionCard').scrollIntoView({ behavior: 'smooth' });
-                });
-            } else {
-                // All other buttons get "coming soon"
+            // Check if the item has a real link
+            const link = item.getAttribute('href');
+            if (link === '#') {
+                // Only add "coming soon" to items that are still '#'
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
                     alert('This feature is coming soon!');
                 });
             }
+            // Items with real links (like transactions.html) will just work
         });
     }
-
-    function loadTransactionHistory(userId) {
-        const listContainer = document.getElementById('transactionList');
-        const db = firebase.firestore();
-        
-        const txQuery = db.collection('transactions')
-                          .where('userId', '==', userId)
-                          .orderBy('timestamp', 'desc')
-                          .limit(10);
-                          
-        txQuery.onSnapshot((snapshot) => {
-            if (snapshot.empty) {
-                listContainer.innerHTML = '<p>No transactions found.</p>';
-                return;
-            }
-            
-            listContainer.innerHTML = ''; // Clear loading message
-            snapshot.forEach(doc => {
-                const tx = doc.data();
-                const amount = tx.amount;
-                const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
-                
-                const txHTML = `
-                    <div class="transaction-item">
-                        <div class="transaction-details">
-                            <span class="transaction-type">${tx.type}</span>
-                            <span class="transaction-info">${tx.details}</span>
-                        </div>
-                        <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
-                            ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
-                            <span class="transaction-date">${date}</span>
-                        </div>
-                    </div>
-                `;
-                listContainer.innerHTML += txHTML;
-            });
-            
-        }, (error) => {
-            console.error("Error loading transactions:", error);
-            listContainer.innerHTML = '<p style="color:red;">Error loading history.</p>';
-        });
-    }
+    
+    // --- The loadTransactionHistory() function is GONE ---
+    // It is no longer needed on this page.
 });
-            
