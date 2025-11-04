@@ -793,3 +793,31 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   font-weight: normal;
   margin-top: 2px;
 }
+
+/* === STYLES FOR transactions.html === */
+.header-back-btn {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  text-decoration: none;
+  font-size: 1.2em;
+}
+
+.transaction-page {
+  padding: 15px;
+}
+
+/* Make transaction list have no extra padding */
+.transaction-page #transactionList {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 0 15px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 20px;
+}
+
+.transaction-page #loadMoreBtn {
+  width: 100%;
+}
