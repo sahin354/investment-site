@@ -1,25 +1,20 @@
 // Mine Page JavaScript
 document.addEventListener('DOMContentLoaded', function() {
+    let currentUser;
+
     // Check authentication
     firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
-            console.log('User not authenticated, redirecting to login');
             window.location.href = 'login.html';
             return;
         }
-        
-        console.log('User authenticated:', user.uid);
+        currentUser = user;
         initializeMinePage(user);
     });
 
     function initializeMinePage(user) {
-        // Update user info
         updateProfileInfo(user);
-        
-        // Setup event listeners
         setupEventListeners(user);
-        
-        // Setup real-time balance updates
         setupRealTimeBalance(user.uid);
     }
 
@@ -45,64 +40,124 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (balanceElement && userData.balance !== undefined) {
                     balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
-                    console.log('Balance updated in real-time:', userData.balance);
                 }
             }
         }, (error) => {
             console.error('Real-time balance update error:', error);
-            document.getElementById('profileBalance').textContent = '₹0.00';
         });
     }
 
     function setupEventListeners(user) {
-        // Recharge Button
-        const rechargeBtn = document.getElementById('rechargeBtn');
-        if (rechargeBtn) {
-            rechargeBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = 'recharge.html';
-            });
-        }
+        // --- Modal Elements ---
+        const modalContainer = document.getElementById('txModalContainer');
+        const modalOverlay = document.getElementById('txModalOverlay');
+        const modalContent = document.getElementById('txModalContent');
 
-        // Withdraw Button
-        const withdrawBtn = document.getElementById('withdrawBtn');
-        if (withdrawBtn) {
-            withdrawBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Withdraw functionality will be available soon!');
-            });
-        }
+        // Function to open the modal
+        const openModal = () => {
+            modalContainer.style.display = 'block';
+            modalOverlay.style.display = 'block';
+            document.body.classList.add('modal-open');
+            // Load history every time it's opened
+            loadTransactionHistory(user.uid); 
+        };
 
-        // Logout Button
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                firebase.auth().signOut().then(() => {
-                    console.log('User signed out');
-                    window.location.href = 'login.html';
-                }).catch((error) => {
-                    console.error('Sign out error:', error);
-                });
-            });
-        }
+        // Function to close the modal
+        const closeModal = () => {
+            modalContainer.style.display = 'none';
+            modalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        };
 
-        // Other option items
-        const optionItems = document.querySelectorAll('.option-item');
-        optionItems.forEach(item => {
-            // Check if the item has a real link
-            const link = item.getAttribute('href');
-            if (link === '#') {
-                // Only add "coming soon" to items that are still '#'
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    alert('This feature is coming soon!');
-                });
+        // --- Page Buttons ---
+        document.getElementById('rechargeBtn').addEventListener('click', () => {
+            window.location.href = 'recharge.html';
+        });
+
+        document.getElementById('withdrawBtn').addEventListener('click', () => {
+            alert('Withdraw functionality will be available soon!');
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        });
+
+        // --- Option Buttons ---
+        document.getElementById('bankDetailsBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('This feature is coming soon!');
+        });
+         document.getElementById('changePasswordBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('This feature is coming soon!');
+        });
+
+        // Transaction button opens the modal
+        document.getElementById('transactionHistoryBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+
+        // Modal close buttons
+        document.getElementById('txModalCloseBtn').addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+    }
+
+    /**
+     * --- UPDATED: loadTransactionHistory Function ---
+     * This now loads data into the modal and sorts in JS.
+     * This FIXES the "empty list" problem without needing a console.
+     */
+    function loadTransactionHistory(userId) {
+        const listContainer = document.getElementById('txModalContent');
+        listContainer.innerHTML = '<p>Loading transactions...</p>';
+        const db = firebase.firestore();
+        
+        // --- THIS IS THE FIX ---
+        // Removed .orderBy() to avoid needing an index
+        const txQuery = db.collection('transactions')
+                          .where('userId', '==', userId);
+                          
+        txQuery.onSnapshot((snapshot) => {
+            if (snapshot.empty) {
+                listContainer.innerHTML = '<p>No transactions found.</p>';
+                return;
             }
-            // Items with real links (like transactions.html) will just work
+            
+            listContainer.innerHTML = ''; // Clear loading message
+
+            // --- NEW: Sort the results manually in JavaScript ---
+            const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            docs.sort((a, b) => {
+                const dateA = a.timestamp ? a.timestamp.seconds : 0;
+                const dateB = b.timestamp ? b.timestamp.seconds : 0;
+                return dateB - dateA; // Sort descending (newest first)
+            });
+
+            docs.forEach((tx) => {
+                const amount = tx.amount;
+                const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
+                
+                const txHTML = `
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <span class="transaction-type">${tx.type}</span>
+                            <span class="transaction-info">${tx.details}</span>
+                        </div>
+                        <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                            ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
+                            <span class="transaction-date">${date}</span>
+                        </div>
+                    </div>
+                `;
+                listContainer.innerHTML += txHTML;
+            });
+            
+        }, (error) => {
+            console.error("Error loading transactions:", error);
+            listContainer.innerHTML = '<p style="color:red;">Error loading history.</p>';
         });
     }
-    
-    // --- The loadTransactionHistory() function is GONE ---
-    // It is no longer needed on this page.
 });
