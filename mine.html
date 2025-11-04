@@ -6,7 +6,8 @@
   <title>Adani Corporation - My Account</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head><body>
+</head>
+<body class="mine-page">
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <aside id="sideMenu" class="side-menu">
     <div class="sidebar-header">
@@ -37,9 +38,8 @@
     <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
     My Account
   </header>
-</div>
-  <main class="page-container mine-page">
-  </div>
+
+  <main class="page-container">
     <div class="card profile-header-card">
       <div class="profile-avatar">👤</div>
       <div class="profile-info">
@@ -56,11 +56,17 @@
       </div>
     </div>
     <div class="card options-list-card">
-      <a href="#" class="option-item"><div class="option-icon">🏦</div><span>Bank Account Details</span><div class="option-chevron">&gt;</div></a>
+      <a href="#" class="option-item" id="bankDetailsBtn">
+        <div class="option-icon">🏦</div><span>Bank Account Details</span><div class="option-chevron">&gt;</div>
+      </a>
       
-      <a href="transactions.html" class="option-item"><div class="option-icon">📜</div><span>Transaction History</span><div class="option-chevron">&gt;</div></a>
+      <a href="#" class="option-item" id="transactionHistoryBtn">
+        <div class="option-icon">📜</div><span>Transaction History</span><div class="option-chevron">&gt;</div>
+      </a>
       
-      <a href="#" class="option-item"><div class="option-icon">🔒</div><span>Change Password</span><div class="option-chevron">&gt;</div></a>
+      <a href="#" class="option-item" id="changePasswordBtn">
+        <div class="option-icon">🔒</div><span>Change Password</span><div class="option-chevron">&gt;</div>
+      </a>
     </div>
 
     <div class="card logout-card">
@@ -75,6 +81,17 @@
     <a href="refer.html"><i class="fas fa-user-friends"></i> Refer</a>
     <a href="mine.html" class="active"><i class="fas fa-user"></i> Mine</a>
   </footer>
+
+  <div class="modal-overlay" id="txModalOverlay"></div>
+  <div class="modal-container" id="txModalContainer">
+      <div class="modal-header">
+          <h3>Transaction History</h3>
+          <button id="txModalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-content" id="txModalContent">
+          <p>Loading transactions...</p>
+      </div>
+  </div>
   
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -83,5 +100,4 @@
   <script src="common.js"></script>
   <script src="script-mine.js"></script>
 </body>
-  </html>
-          
+</html>
