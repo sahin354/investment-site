@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update user info
         updateProfileInfo(user);
         
-        // Load user data from Firestore
-        loadUserBalance(user.uid);
-        
         // Setup event listeners
         setupEventListeners(user);
         
-        // Setup real-time updates
-        setupRealTimeUpdates(user.uid);
+        // Setup real-time balance updates
+        setupRealTimeBalance(user.uid);
+        
+        // --- NEW: Load transaction history ---
+        loadTransactionHistory(user.uid);
     }
 
     function updateProfileInfo(user) {
@@ -38,22 +38,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function loadUserBalance(userId) {
+    // Renamed this function for clarity
+    function setupRealTimeBalance(userId) {
         const userDoc = firebase.firestore().collection('users').doc(userId);
         
-        userDoc.get().then((doc) => {
+        userDoc.onSnapshot((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
                 const balanceElement = document.getElementById('profileBalance');
                 
                 if (balanceElement && userData.balance !== undefined) {
                     balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
-                } else {
-                    balanceElement.textContent = '₹0.00';
+                    console.log('Balance updated in real-time:', userData.balance);
                 }
             }
-        }).catch((error) => {
-            console.error('Error loading balance:', error);
+        }, (error) => {
+            console.error('Real-time balance update error:', error);
             document.getElementById('profileBalance').textContent = '₹0.00';
         });
     }
@@ -64,17 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (rechargeBtn) {
             rechargeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log('Recharge button clicked');
-                
-                // Double check authentication
-                const currentUser = firebase.auth().currentUser;
-                if (!currentUser) {
-                    alert('Session expired. Please login again.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                
-                console.log('Redirecting to recharge page');
                 window.location.href = 'recharge.html';
             });
         }
@@ -112,21 +101,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function setupRealTimeUpdates(userId) {
-        const userDoc = firebase.firestore().collection('users').doc(userId);
+    /**
+     * --- NEW: loadTransactionHistory Function ---
+     * Loads the last 10 transactions for the user.
+     */
+    function loadTransactionHistory(userId) {
+        const listContainer = document.getElementById('transactionList');
+        const db = firebase.firestore();
         
-        userDoc.onSnapshot((doc) => {
-            if (doc.exists) {
-                const userData = doc.data();
-                const balanceElement = document.getElementById('profileBalance');
-                
-                if (balanceElement && userData.balance !== undefined) {
-                    balanceElement.textContent = `₹${userData.balance.toFixed(2)}`;
-                    console.log('Balance updated in real-time:', userData.balance);
-                }
+        const txQuery = db.collection('transactions')
+                          .where('userId', '==', userId)
+                          .orderBy('timestamp', 'desc')
+                          .limit(10);
+                          
+        txQuery.onSnapshot((snapshot) => {
+            if (snapshot.empty) {
+                listContainer.innerHTML = '<p>No transactions found.</p>';
+                return;
             }
+            
+            listContainer.innerHTML = ''; // Clear loading message
+            snapshot.forEach(doc => {
+                const tx = doc.data();
+                const amount = tx.amount;
+                const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
+                
+                // --- This is the new HTML for a transaction item ---
+                const txHTML = `
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <span class="transaction-type">${tx.type}</span>
+                            <span class="transaction-info">${tx.details}</span>
+                        </div>
+                        <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                            ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
+                            <span class="transaction-date">${date}</span>
+                        </div>
+                    </div>
+                `;
+                listContainer.innerHTML += txHTML;
+            });
+            
         }, (error) => {
-            console.error('Real-time update error:', error);
+            console.error("Error loading transactions:", error);
+            listContainer.innerHTML = '<p style="color:red;">Error loading history.</p>';
         });
     }
 });
+                           
