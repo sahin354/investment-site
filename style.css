@@ -861,11 +861,28 @@ body.modal-open {
   line-height: 1;
 }
 
-.modal-content {
-  /* This makes the list scrollable */
-  overflow-y: auto;
-  flex-grow: 1;
-  padding: 0 20px;
+/* The modal box itself */
+.modal-container {
+  display: none; /* HIDE BY DEFAULT */
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  height: 60%; 
+  background: #ffffff;
+  border-radius: 16px;
+  z-index: 1001;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  
+  /* This line was causing the bug and is now REMOVED: */
+  /* display: flex; */ 
+  
+  /* This line is fine and should stay: */
+  flex-direction: column;
+}
+20px;
 }
 
 /* Re-use transaction styles from before */
