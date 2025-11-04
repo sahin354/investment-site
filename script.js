@@ -90,7 +90,9 @@ async function buyPlan(planId, userId) {
                 completedDays: 0,
                 dailyIncome: dailyIncome,
                 totalEarned: 0,
-                isActive: true
+                isActive: true,
+                // --- FIX 2A: Save the isVIP flag during purchase ---
+                isVIP: plan.isVIP 
             });
 
             const txRef = db.collection('transactions').doc();
@@ -111,19 +113,11 @@ async function buyPlan(planId, userId) {
     }
 }
 
-
-/**
- * --- UPDATED: loadPurchasedPlans Function ---
- * This now fetches with just 'where' and sorts the results in JavaScript.
- * This FIXES the "empty list" problem without needing a console.
- */
 function loadPurchasedPlans(userId) {
     const purchasedContainer = document.getElementById('purchased');
     purchasedContainer.innerHTML = '<p>Loading purchased plans...</p>';
     
     const db = firebase.firestore();
-    // --- THIS IS THE FIX ---
-    // Removed .orderBy() to avoid needing an index
     const investmentsRef = db.collection('userInvestments')
                              .where('userId', '==', userId);
 
@@ -135,7 +129,6 @@ function loadPurchasedPlans(userId) {
 
         purchasedContainer.innerHTML = ''; // Clear container
 
-        // --- NEW: Sort the results manually in JavaScript ---
         const docs = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
         docs.sort((a, b) => {
             const dateA = a.startDate ? a.startDate.seconds : 0;
@@ -148,10 +141,13 @@ function loadPurchasedPlans(userId) {
             const status = investment.isActive ? 'Active' : 'Completed';
             const statusColor = investment.isActive ? 'green' : 'gray';
 
+            // --- FIX 2B: Check for the isVIP flag and create the badge ---
+            const vipBadge = investment.isVIP ? '<span class="vip-badge">VIP</span>' : '';
+
             const planCardHTML = `
                 <div class="purchased-plan-card">
                     <div class="plan-card-header">
-                        <h3>${investment.planName}</h3>
+                        <h3>${investment.planName} ${vipBadge}</h3>
                         <span class="plan-status" style="color: ${statusColor};">● ${status}</span>
                     </div>
                     <div class="plan-card-body">
@@ -184,11 +180,7 @@ function loadPurchasedPlans(userId) {
     });
 }
 
-
 function loadInvestmentPlans() {
-    // This function remains the same, but I'm including it
-    // for completeness.
-    
     const primaryContainer = document.getElementById('primary');
     const vipContainer = document.getElementById('vip');
 
@@ -231,7 +223,7 @@ function loadInvestmentPlans() {
                               <span class="plan-label">Daily Income</span>
                               <span class="plan-value">₹${((plan.minAmount * plan.dailyReturnPercent) / 100).toFixed(2)}</span>
                           </div>
-                          <div class="plan-label">
+                          <div class="plan-detail">
                               <span class="plan-label">Cycle</span>
                               <span class="plan-value">${plan.durationDays} Days</span>
                           </div>
