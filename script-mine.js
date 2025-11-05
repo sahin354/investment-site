@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const txModalContainer = document.getElementById('txModalContainer');
         const txModalOverlay = document.getElementById('txModalOverlay');
 
-        // --- NEW: Bank Modal Elements ---
+        // --- Bank Modal Elements ---
         const bankModalContainer = document.getElementById('bankModalContainer');
         const bankModalOverlay = document.getElementById('bankModalOverlay');
         const bankDetailsForm = document.getElementById('bankDetailsForm');
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('modal-open');
         };
 
-        // --- NEW: Functions to open/close Bank modal ---
+        // --- Functions to open/close Bank modal ---
         const openBankModal = () => {
             bankModalContainer.style.display = 'flex'; 
             bankModalOverlay.style.display = 'block';
@@ -119,14 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('bankModalCloseBtn').addEventListener('click', closeBankModal);
         bankModalOverlay.addEventListener('click', closeBankModal);
 
-        // --- NEW: Handle Bank Details Form Submit ---
+        // --- Handle Bank Details Form Submit ---
         bankDetailsForm.addEventListener('submit', (e) => {
             e.preventDefault();
             saveBankDetails(user.uid);
         });
     }
     
-    // --- NEW: Function to load existing bank details ---
     function loadBankDetails(userId) {
         firebase.firestore().collection('users').doc(userId).get().then(doc => {
             if (doc.exists) {
@@ -140,9 +139,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- NEW: Function to save bank details ---
+    // --- === UPDATED: saveBankDetails Function === ---
     async function saveBankDetails(userId) {
         const saveBtn = document.getElementById('saveBankBtn');
+        const form = document.getElementById('bankDetailsForm');
+        
+        // --- 1. Use HTML5 validation ---
+        if (!form.checkValidity()) {
+            alert('Please fill all fields correctly.');
+            return;
+        }
+
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
 
@@ -152,14 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const ifsc = document.getElementById('bankIFSC').value;
         const upi = document.getElementById('bankUPI').value;
 
-        // Validation
-        if (!name || !account || !confirmAccount || !ifsc) {
-            alert('Please fill all mandatory fields.');
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Save Details';
-            return;
-        }
-
+        // --- 2. Check account match ---
         if (account !== confirmAccount) {
             alert('Bank account numbers do not match. Please check.');
             saveBtn.disabled = false;
@@ -168,26 +168,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
+            // --- 3. Save all data (including new UPI field) ---
             await firebase.firestore().collection('users').doc(userId).update({
                 bankRealName: name,
                 bankAccount: account,
                 bankIFSC: ifsc,
-                bankUPI: upi
+                bankUPI: upi // This is now mandatory
             });
             
             alert('Bank details saved successfully!');
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Save Details';
-            // Close the modal on success
-            document.getElementById('bankModalCloseBtn').click(); 
+            document.getElementById('bankModalCloseBtn').click(); // Close modal
 
         } catch (error) {
             console.error("Error saving bank details: ", error);
             alert('Failed to save details. Please try again.');
+        } finally {
+            // Re-enable button
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save Details';
         }
     }
+    // --- === END OF UPDATED FUNCTION === ---
 
 
     function getTransactionIcon(type) {
@@ -253,4 +254,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-            
