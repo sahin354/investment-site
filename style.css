@@ -1041,6 +1041,7 @@ body.modal-open {
 .user-details-grid div {
     font-size: 0.95em;
     color: #333;
+    word-wrap: break-word; /* Prevents long text from breaking layout */
 }
 
 .user-details-grid div strong {
