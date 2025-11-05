@@ -93,6 +93,20 @@ function setupAllEventListeners() {
     window.onclick = event => {
         if (event.target == planModal) planModal.style.display = "none";
     };
+    
+    // --- NEW: User Details Modal Listeners ---
+    const userDetailsModal = document.getElementById('userDetailsModal');
+    document.getElementById('closeUserDetailsModal').addEventListener('click', () => {
+        userDetailsModal.style.display = 'none';
+    });
+    
+    // Use event delegation for clicking on a user row
+    document.getElementById('usersTableBody').addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('user-link')) {
+            const userId = e.target.dataset.userid;
+            openUserDetailsModal(userId);
+        }
+    });
 
     console.log('✅ All event listeners setup complete.');
 }
@@ -107,10 +121,10 @@ function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to perman
 
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
-usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
+function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
+usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
 
-// --- === THIS IS THE UPDATED FUNCTION === ---
+// --- === THIS IS THE UPDATED renderUsersTable FUNCTION === ---
 function renderUsersTable() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
@@ -121,7 +135,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
         return;
     }
     
@@ -130,17 +144,15 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
-        // --- NEW CELLS ADDED FOR BANK DETAILS ---
+        // --- Bank details are REMOVED from here ---
         tr.innerHTML = `
             <td>${user.id.substring(0, 8)}...</td>
-            <td>${user.email || 'N/A'}</td>
+            <td class="user-link" data-userid="${user.id}" style="color: blue; cursor: pointer; text-decoration: underline;">
+                ${user.email || 'N/A'}
+            </td>
             <td>₹${(user.balance || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
-            <td>${user.bankRealName || 'N/A'}</td>
-            <td>${user.bankAccount || 'N/A'}</td>
-            <td>${user.bankIFSC || 'N/A'}</td>
-            <td>${user.bankUPI || 'N/A'}</td>
             <td>
                 <button class="action-btn block-btn" data-userid="${user.id}" data-is-blocked="${isBlocked}">
                     ${isBlocked ? 'Unblock' : 'Block'}
@@ -150,9 +162,10 @@ function renderUsersTable() {
         tbody.appendChild(tr);
     });
     
-    // Re-attach listener for block buttons
+    // Re-attach listener for block buttons (moved from setupEventListeners)
     tbody.querySelectorAll('.block-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Stop it from opening the modal
             const userId = this.dataset.userid;
             const isBlocked = this.dataset.isBlocked === 'true';
             toggleUserBlock(userId, !isBlocked);
@@ -228,4 +241,89 @@ function updateUserBalance() {
 
 function saveSystemSettings(){console.log('💾 Saving system settings...');const settings={commission1:parseFloat(document.getElementById('commission1').value),commission2:parseFloat(document.getElementById('commission2').value),commission3:parseFloat(document.getElementById('commission3').value),minWithdrawal:parseFloat(document.getElementById('minWithdrawal').value),maxWithdrawal:parseFloat(document.getElementById('maxWithdrawal').value)};firebase.firestore().collection('systemSettings').doc('config').set(settings,{merge:true}).then(()=>alert('✅ System settings saved successfully!')).catch(error=>{console.error('❌ Error saving settings:',error);alert('Error saving settings.')})}
 function logoutControl(){console.log('🔒 Logging out...');if(confirm('Are you sure you want to secure logout?')){firebase.auth().signOut().then(()=>window.location.href='system-control.html').catch(error=>console.error('❌ Logout error:',error))}}
+
+
+// --- === NEW FUNCTIONS FOR USER DETAILS MODAL === ---
+
+async function openUserDetailsModal(userId) {
+    const modal = document.getElementById('userDetailsModal');
+    const title = document.getElementById('userDetailsTitle');
+    const detailsContent = document.getElementById('userDetailsContent');
     
+    title.textContent = 'Loading User Details...';
+    detailsContent.innerHTML = '<p>Loading...</p>';
+    modal.style.display = 'block';
+
+    try {
+        const userDoc = await firebase.firestore().collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            title.textContent = 'Error';
+            detailsContent.innerHTML = '<p>User not found.</p>';
+            return;
+        }
+
+        const user = userDoc.data();
+        title.textContent = `Details for ${user.email}`;
+        
+        // Populate Bank Details
+        detailsContent.innerHTML = `
+            <h4>Bank Account Details</h4>
+            <div class="user-details-grid">
+                <div><strong>Name:</strong> ${user.bankRealName || 'N/A'}</div>
+                <div><strong>Account:</strong> ${user.bankAccount || 'N/A'}</div>
+                <div><strong>IFSC:</strong> ${user.bankIFSC || 'N/A'}</div>
+                <div><strong>UPI:</strong> ${user.bankUPI || 'N/A'}</div>
+            </div>
+        `;
+
+        // Load transactions
+        loadUserTransactions(userId);
+
+    } catch (error) {
+        console.error("Error opening user details:", error);
+        title.textContent = 'Error';
+        detailsContent.innerHTML = `<p>Error: ${error.message}</p>`;
+    }
+}
+
+// (Helper function copied from script-mine.js)
+function getTransactionIcon(type) {
+    const cleanType = type.toLowerCase();
+    
+    if (cleanType.includes('invest')) return '💼'; 
+    if (cleanType.includes('earning')) return '📈'; 
+    if (cleanType.includes('deposit')) return '📥'; 
+    if (cleanType.includes('withdrawal')) return '📤';
+    if (cleanType.includes('adjust')) return '🔧'; 
+    return '📄'; 
+}
+
+async function loadUserTransactions(userId) {
+    const listContainer = document.getElementById('userTransactionList');
+    listContainer.innerHTML = '<p>Loading transactions...</p>';
+    const db = firebase.firestore();
+    
+    // Using .get() and sorting in JS to avoid index issues
+    const txQuery = db.collection('transactions').where('userId', '==', userId);
+                          
+    try {
+        const snapshot = await txQuery.get();
+        
+        if (snapshot.empty) {
+            listContainer.innerHTML = '<p>No transactions found.</p>';
+            return;
+        }
+        
+        listContainer.innerHTML = ''; 
+
+        const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+        docs.sort((a, b) => {
+            const dateA = a.timestamp ? a.timestamp.seconds : 0;
+            const dateB = b.timestamp ? b.timestamp.seconds : 0;
+            return dateB - dateA; 
+        });
+
+        docs.forEach((tx) => {
+            const amount = tx.amount;
+            const date = tx.timestamp ? tx.timestamp.toDate().toLocaleDateString() : 'Just now';
+            const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeStrin
