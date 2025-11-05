@@ -1002,3 +1002,17 @@ body.modal-open {
   border-color: #e74c3c; /* Red border for invalid fields */
   box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
 }
+
+/* === NEW STYLE FOR LOCKED BANK FORM === */
+
+.form-locked-info {
+  display: none; /* Hidden by default */
+  text-align: center;
+  padding: 10px;
+  background: #fdf2f2;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  color: #e74c3c;
+  margin-top: 15px;
+  font-size: 0.9em;
+}
