@@ -33,15 +33,6 @@ function checkAdminAuth() {
             } else {
                 console.log('🔐 No authenticated user, redirecting to login...');
             }
-            // This was 'system-control.html', but your login file is 'system-control.html'
-            // The user's uploaded file `system-control.html` handles login.
-            // The file `control-panel.html` is the dashboard.
-            // This logic seems to be from `script-control.js` which is for `control-panel.html`.
-            // The check `window.location.href = 'system-control.html';` is likely correct
-            // to send unauthorized users *back* to the login page.
-            
-            // Re-checking... Yes, `script-control.js` is loaded by `control-panel.html`.
-            // So if auth fails, it redirects to `system-control.html` (the login page). This is correct.
             window.location.href = 'system-control.html';
         }
     }, error => {
@@ -77,7 +68,7 @@ function setupAllEventListeners() {
 
     // Buttons
     document.getElementById('logoutButton').addEventListener('click', logoutControl);
-    document.getElementById('updateBalanceButton').addEventListener('click', updateUserBalance); // This is the one we are fixing
+    document.getElementById('updateBalanceButton').addEventListener('click', updateUserBalance); 
     document.getElementById('saveSettingsButton').addEventListener('click', saveSystemSettings);
     document.getElementById('searchUser').addEventListener('input', renderUsersTable);
 
@@ -126,16 +117,16 @@ function updateUserBalance() {
     const userId = document.getElementById('userSelect').value;
     const action = document.getElementById('balanceAction').value;
     const amount = parseFloat(document.getElementById('balanceAmount').value);
-    const reason = document.getElementById('balanceReason').value || 'Admin Update'; // Get reason
+    const reason = document.getElementById('balanceReason').value || 'Gift'; // Changed default reason
 
     if (!userId || !amount || amount <= 0) {
         alert('Please select a user and enter a valid positive amount.');
         return;
     }
 
-    const db = firebase.firestore(); // Get db reference
+    const db = firebase.firestore(); 
     const userRef = db.collection('users').doc(userId);
-    const txRef = db.collection('transactions').doc(); // Create new tx doc ref
+    const txRef = db.collection('transactions').doc(); 
 
     firebase.firestore().runTransaction(transaction => {
         return transaction.get(userRef).then(userDoc => {
@@ -150,16 +141,15 @@ function updateUserBalance() {
             if (action === 'add') {
                 newBalance = currentBalance + amount;
                 txAmount = amount; // Positive
-                txType = 'Deposit';
+                txType = 'Deposit'; // <-- This is the type
             } else if (action === 'subtract') {
                 newBalance = currentBalance - amount;
                 txAmount = -amount; // Negative
-                txType = 'Withdrawal';
+                txType = 'Withdrawal'; // <-- This is the type
             } else if (action === 'set') {
                 newBalance = amount;
-                // Calculate the difference for the transaction log
                 txAmount = amount - currentBalance; 
-                txType = 'Adjustment';
+                txType = 'Adjustment'; // <-- This is the type
             }
 
             if (newBalance < 0) throw new Error("Balance cannot be negative.");
@@ -170,8 +160,10 @@ function updateUserBalance() {
             // 2. Create transaction log
             transaction.set(txRef, {
                 userId: userId,
-                userEmail: userData.email, // Store email for admin convenience
-                type: `Admin: ${txType}`,
+                userEmail: userData.email,
+                // --- THIS IS THE FIX ---
+                // Removed the "Admin:" prefix
+                type: txType, 
                 amount: txAmount,
                 details: reason,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -190,4 +182,4 @@ function updateUserBalance() {
 
 function saveSystemSettings(){console.log('💾 Saving system settings...');const settings={commission1:parseFloat(document.getElementById('commission1').value),commission2:parseFloat(document.getElementById('commission2').value),commission3:parseFloat(document.getElementById('commission3').value),minWithdrawal:parseFloat(document.getElementById('minWithdrawal').value),maxWithdrawal:parseFloat(document.getElementById('maxWithdrawal').value)};firebase.firestore().collection('systemSettings').doc('config').set(settings,{merge:true}).then(()=>alert('✅ System settings saved successfully!')).catch(error=>{console.error('❌ Error saving settings:',error);alert('Error saving settings.')})}
 function logoutControl(){console.log('🔒 Logging out...');if(confirm('Are you sure you want to secure logout?')){firebase.auth().signOut().then(()=>window.location.href='system-control.html').catch(error=>console.error('❌ Logout error:',error))}}
-    
+                                                                                                                                                                                                     
