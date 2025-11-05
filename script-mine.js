@@ -48,22 +48,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners(user) {
-        // --- Modal Elements ---
-        const modalContainer = document.getElementById('txModalContainer');
-        const modalOverlay = document.getElementById('txModalOverlay');
+        // --- Transaction Modal Elements ---
+        const txModalContainer = document.getElementById('txModalContainer');
+        const txModalOverlay = document.getElementById('txModalOverlay');
 
-        // Function to open the modal
-        const openModal = () => {
-            modalContainer.style.display = 'flex'; 
-            modalOverlay.style.display = 'block';
+        // --- NEW: Bank Modal Elements ---
+        const bankModalContainer = document.getElementById('bankModalContainer');
+        const bankModalOverlay = document.getElementById('bankModalOverlay');
+        const bankDetailsForm = document.getElementById('bankDetailsForm');
+
+        // Function to open the Transaction modal
+        const openTxModal = () => {
+            txModalContainer.style.display = 'flex'; 
+            txModalOverlay.style.display = 'block';
             document.body.classList.add('modal-open');
             loadTransactionHistory(user.uid); 
         };
 
-        // Function to close the modal
-        const closeModal = () => {
-            modalContainer.style.display = 'none';
-            modalOverlay.style.display = 'none';
+        // Function to close the Transaction modal
+        const closeTxModal = () => {
+            txModalContainer.style.display = 'none';
+            txModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        };
+
+        // --- NEW: Functions to open/close Bank modal ---
+        const openBankModal = () => {
+            bankModalContainer.style.display = 'flex'; 
+            bankModalOverlay.style.display = 'block';
+            document.body.classList.add('modal-open');
+            loadBankDetails(user.uid); // Load existing data
+        };
+
+        const closeBankModal = () => {
+            bankModalContainer.style.display = 'none';
+            bankModalOverlay.style.display = 'none';
             document.body.classList.remove('modal-open');
         };
 
@@ -71,11 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('rechargeBtn').addEventListener('click', () => {
             window.location.href = 'recharge.html';
         });
-
         document.getElementById('withdrawBtn').addEventListener('click', () => {
             alert('Withdraw functionality will be available soon!');
         });
-
         document.getElementById('logoutBtn').addEventListener('click', () => {
             firebase.auth().signOut().then(() => {
                 window.location.href = 'login.html';
@@ -85,51 +102,105 @@ document.addEventListener('DOMContentLoaded', function() {
         // --- Option Buttons ---
         document.getElementById('bankDetailsBtn').addEventListener('click', (e) => {
             e.preventDefault();
-            alert('This feature is coming soon!');
+            openBankModal(); // Open bank modal
         });
          document.getElementById('changePasswordBtn').addEventListener('click', (e) => {
             e.preventDefault();
             alert('This feature is coming soon!');
         });
-
-        // Transaction button opens the modal
         document.getElementById('transactionHistoryBtn').addEventListener('click', (e) => {
             e.preventDefault();
-            openModal();
+            openTxModal(); // Open transaction modal
         });
 
-        // Modal close buttons
-        document.getElementById('txModalCloseBtn').addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', closeModal);
+        // --- Modal Close Buttons ---
+        document.getElementById('txModalCloseBtn').addEventListener('click', closeTxModal);
+        txModalOverlay.addEventListener('click', closeTxModal);
+        document.getElementById('bankModalCloseBtn').addEventListener('click', closeBankModal);
+        bankModalOverlay.addEventListener('click', closeBankModal);
+
+        // --- NEW: Handle Bank Details Form Submit ---
+        bankDetailsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveBankDetails(user.uid);
+        });
     }
     
-    // --- === NEW HELPER FUNCTION FOR ICONS === ---
+    // --- NEW: Function to load existing bank details ---
+    function loadBankDetails(userId) {
+        firebase.firestore().collection('users').doc(userId).get().then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById('bankRealName').value = userData.bankRealName || '';
+                document.getElementById('bankAccount').value = userData.bankAccount || '';
+                document.getElementById('bankConfirmAccount').value = userData.bankAccount || '';
+                document.getElementById('bankIFSC').value = userData.bankIFSC || '';
+                document.getElementById('bankUPI').value = userData.bankUPI || '';
+            }
+        });
+    }
+
+    // --- NEW: Function to save bank details ---
+    async function saveBankDetails(userId) {
+        const saveBtn = document.getElementById('saveBankBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        const name = document.getElementById('bankRealName').value;
+        const account = document.getElementById('bankAccount').value;
+        const confirmAccount = document.getElementById('bankConfirmAccount').value;
+        const ifsc = document.getElementById('bankIFSC').value;
+        const upi = document.getElementById('bankUPI').value;
+
+        // Validation
+        if (!name || !account || !confirmAccount || !ifsc) {
+            alert('Please fill all mandatory fields.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Details';
+            return;
+        }
+
+        if (account !== confirmAccount) {
+            alert('Bank account numbers do not match. Please check.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Details';
+            return;
+        }
+
+        try {
+            await firebase.firestore().collection('users').doc(userId).update({
+                bankRealName: name,
+                bankAccount: account,
+                bankIFSC: ifsc,
+                bankUPI: upi
+            });
+            
+            alert('Bank details saved successfully!');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Details';
+            // Close the modal on success
+            document.getElementById('bankModalCloseBtn').click(); 
+
+        } catch (error) {
+            console.error("Error saving bank details: ", error);
+            alert('Failed to save details. Please try again.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Details';
+        }
+    }
+
+
     function getTransactionIcon(type) {
         const cleanType = type.toLowerCase();
         
-        if (cleanType.includes('invest')) {
-            return '💼'; // Briefcase
-        }
-        if (cleanType.includes('earning')) {
-            return '📈'; // Chart
-        }
-        if (cleanType.includes('deposit') || cleanType.includes('add')) {
-            return '📥'; // Inbox
-        }
-        if (cleanType.includes('withdrawal') || cleanType.includes('subtract')) {
-            return '📤'; // Outbox
-        }
-        if (cleanType.includes('adjust')) {
-            return '🔧'; // Wrench
-        }
-        return '📄'; // Default
+        if (cleanType.includes('invest')) return '💼'; 
+        if (cleanType.includes('earning')) return '📈'; 
+        if (cleanType.includes('deposit')) return '📥'; 
+        if (cleanType.includes('withdrawal')) return '📤';
+        if (cleanType.includes('adjust')) return '🔧'; 
+        return '📄'; 
     }
 
-
-    /**
-     * --- UPDATED: loadTransactionHistory Function ---
-     * This now generates the new modern HTML with icons
-     */
     function loadTransactionHistory(userId) {
         const listContainer = document.getElementById('txModalContent');
         listContainer.innerHTML = '<p>Loading transactions...</p>';
@@ -144,22 +215,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            listContainer.innerHTML = ''; // Clear loading message
+            listContainer.innerHTML = ''; 
 
             const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
             docs.sort((a, b) => {
                 const dateA = a.timestamp ? a.timestamp.seconds : 0;
                 const dateB = b.timestamp ? b.timestamp.seconds : 0;
-                return dateB - dateA; // Sort descending (newest first)
+                return dateB - dateA; 
             });
 
             docs.forEach((tx) => {
                 const amount = tx.amount;
-                // Format date and time separately
                 const date = tx.timestamp ? tx.timestamp.toDate().toLocaleDateString() : 'Just now';
                 const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
-                // --- === THIS IS THE NEW MODERN HTML === ---
                 const txHTML = `
                     <div class="transaction-item modern">
                         <div class="transaction-icon">
@@ -184,4 +253,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-                
+            
