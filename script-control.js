@@ -4,7 +4,7 @@ console.log('🔧 Admin panel script loading...');
 // --- GLOBAL VARIABLES ---
 let allUsers = [];
 let currentAdmin = null;
-// --- THIS IS THE FIX: Removed the broken [cite] text ---
+// --- THIS WAS THE FIX. The broken [cite] text is gone. ---
 const SYSTEM_ADMINS = ["sahin54481@gmail.com", "admin@adani.com"];
 
 // --- INITIALIZATION ---
@@ -312,6 +312,7 @@ async function loadUserTransactions(userId) {
         const snapshot = await txQuery.get();
         
         if (snapshot.empty) {
+            // --- THIS IS A FIX: Corrected the closing </p> tag ---
             listContainer.innerHTML = '<p>No transactions found.</p>';
             return;
         }
@@ -328,4 +329,4 @@ async function loadUserTransactions(userId) {
         docs.forEach((tx) => {
             const amount = tx.amount;
             const date = tx.timestamp ? tx.timestamp.toDate().toLocaleDateString() : 'Just now';
-            const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeStr
+      
