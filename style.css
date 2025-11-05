@@ -961,3 +961,44 @@ body.modal-open {
   font-size: 0.9em;
   margin-bottom: 5px;
 }
+
+/* === STYLES FOR NEW BANK MODAL === */
+
+.modal-content form {
+  padding: 0 10px 10px 10px;
+}
+
+.modal-content form .input-group {
+  margin-bottom: 15px;
+}
+
+.modal-content form .input-group label {
+  font-size: 0.9em;
+  margin-bottom: 5px;
+  color: var(--text-light, #555);
+}
+
+/* === NEW: Styles for Icon Inputs === */
+.input-group.icon-input {
+  position: relative;
+}
+
+.input-group.icon-input .input-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(2px); /* Adjust for label height */
+  font-size: 1.2em;
+  color: #aaa;
+  z-index: 2;
+}
+
+.input-group.icon-input input {
+  padding-left: 45px !important; /* Make space for the icon */
+}
+
+/* === NEW: Professional Validation === */
+.modal-content input:invalid {
+  border-color: #e74c3c; /* Red border for invalid fields */
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
+}
