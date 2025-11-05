@@ -93,6 +93,39 @@
       </div>
   </div>
   
+  <div class="modal-overlay" id="bankModalOverlay"></div>
+  <div class="modal-container" id="bankModalContainer">
+      <div class="modal-header">
+          <h3>Bank Account Details</h3>
+          <button id="bankModalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-content" id="bankModalContent">
+          <form id="bankDetailsForm">
+              <div class="input-group">
+                  <label for="bankRealName">Your Real Name (Mandatory)</label>
+                  <input type="text" id="bankRealName" placeholder="Enter your full name" required>
+              </div>
+              <div class="input-group">
+                  <label for="bankAccount">Bank Account No. (Mandatory)</label>
+                  <input type="number" id="bankAccount" placeholder="Enter account number" required>
+              </div>
+              <div class="input-group">
+                  <label for="bankConfirmAccount">Confirm Account No. (Mandatory)</label>
+                  <input type="number" id="bankConfirmAccount" placeholder="Confirm account number" required>
+              </div>
+              <div class="input-group">
+                  <label for="bankIFSC">IFSC Code (Mandatory)</label>
+                  <input type="text" id="bankIFSC" placeholder="Enter bank IFSC code" required>
+              </div>
+              <div class="input-group">
+                  <label for="bankUPI">UPI ID (Optional)</label>
+                  <input type="text" id="bankUPI" placeholder="Enter your UPI ID">
+              </div>
+              <button type="submit" class="submit-btn" id="saveBankBtn">Save Details</button>
+          </form>
+      </div>
+  </div>
+  
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
