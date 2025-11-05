@@ -51,16 +51,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // --- Modal Elements ---
         const modalContainer = document.getElementById('txModalContainer');
         const modalOverlay = document.getElementById('txModalOverlay');
-        const modalContent = document.getElementById('txModalContent');
 
         // Function to open the modal
         const openModal = () => {
-            // --- THIS IS THE FIX ---
-            // Changed from 'block' to 'flex' to apply the layout
             modalContainer.style.display = 'flex'; 
             modalOverlay.style.display = 'block';
             document.body.classList.add('modal-open');
-            // Load history every time it's opened
             loadTransactionHistory(user.uid); 
         };
 
@@ -106,7 +102,34 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('txModalCloseBtn').addEventListener('click', closeModal);
         modalOverlay.addEventListener('click', closeModal);
     }
+    
+    // --- === NEW HELPER FUNCTION FOR ICONS === ---
+    function getTransactionIcon(type) {
+        const cleanType = type.toLowerCase();
+        
+        if (cleanType.includes('invest')) {
+            return '💼'; // Briefcase
+        }
+        if (cleanType.includes('earning')) {
+            return '📈'; // Chart
+        }
+        if (cleanType.includes('deposit') || cleanType.includes('add')) {
+            return '📥'; // Inbox
+        }
+        if (cleanType.includes('withdrawal') || cleanType.includes('subtract')) {
+            return '📤'; // Outbox
+        }
+        if (cleanType.includes('adjust')) {
+            return '🔧'; // Wrench
+        }
+        return '📄'; // Default
+    }
 
+
+    /**
+     * --- UPDATED: loadTransactionHistory Function ---
+     * This now generates the new modern HTML with icons
+     */
     function loadTransactionHistory(userId) {
         const listContainer = document.getElementById('txModalContent');
         listContainer.innerHTML = '<p>Loading transactions...</p>';
@@ -132,17 +155,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             docs.forEach((tx) => {
                 const amount = tx.amount;
-                const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
-                
+                // Format date and time separately
+                const date = tx.timestamp ? tx.timestamp.toDate().toLocaleDateString() : 'Just now';
+                const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                // --- === THIS IS THE NEW MODERN HTML === ---
                 const txHTML = `
-                    <div class="transaction-item">
+                    <div class="transaction-item modern">
+                        <div class="transaction-icon">
+                            ${getTransactionIcon(tx.type)}
+                        </div>
                         <div class="transaction-details">
                             <span class="transaction-type">${tx.type}</span>
                             <span class="transaction-info">${tx.details}</span>
                         </div>
                         <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
                             ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
-                            <span class="transaction-date">${date}</span>
+                            <span class="transaction-date">${date} ${time}</span>
                         </div>
                     </div>
                 `;
@@ -155,3 +184,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+                
