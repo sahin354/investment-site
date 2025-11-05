@@ -102,8 +102,10 @@ function setupAllEventListeners() {
     
     // Use event delegation for clicking on a user row
     document.getElementById('usersTableBody').addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('user-link')) {
-            const userId = e.target.dataset.userid;
+        // Find the closest parent <td> or <a> with the class 'user-link'
+        const userLink = e.target.closest('.user-link');
+        if (userLink) {
+            const userId = userLink.dataset.userid;
             openUserDetailsModal(userId);
         }
     });
@@ -121,8 +123,8 @@ function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to perman
 
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
-usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
+function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>';
+usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})}
 
 // --- === THIS IS THE UPDATED renderUsersTable FUNCTION === ---
 function renderUsersTable() {
@@ -135,7 +137,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
         return;
     }
     
@@ -144,7 +146,6 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
-        // --- Bank details are REMOVED from here ---
         tr.innerHTML = `
             <td>${user.id.substring(0, 8)}...</td>
             <td class="user-link" data-userid="${user.id}" style="color: blue; cursor: pointer; text-decoration: underline;">
@@ -162,7 +163,7 @@ function renderUsersTable() {
         tbody.appendChild(tr);
     });
     
-    // Re-attach listener for block buttons (moved from setupEventListeners)
+    // Re-attach listener for block buttons
     tbody.querySelectorAll('.block-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation(); // Stop it from opening the modal
@@ -310,7 +311,7 @@ async function loadUserTransactions(userId) {
         const snapshot = await txQuery.get();
         
         if (snapshot.empty) {
-            listContainer.innerHTML = '<p>No transactions found.</p>';
+            listContainer.innerHTML = '<p>No transactions found.</Wp>';
             return;
         }
         
@@ -326,4 +327,6 @@ async function loadUserTransactions(userId) {
         docs.forEach((tx) => {
             const amount = tx.amount;
             const date = tx.timestamp ? tx.timestamp.toDate().toLocaleDateString() : 'Just now';
-            const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeStrin
+            const time = tx.timestamp ? tx.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+   
