@@ -82,6 +82,7 @@
     <a href="mine.html" class="active"><i class="fas fa-user"></i> Mine</a>
   </footer>
 
+  <!-- === TRANSACTION MODAL (POP-UP) === -->
   <div class="modal-overlay" id="txModalOverlay"></div>
   <div class="modal-container" id="txModalContainer">
       <div class="modal-header">
@@ -93,6 +94,7 @@
       </div>
   </div>
   
+  <!-- === UPDATED BANK DETAILS MODAL (POP-UP) === -->
   <div class="modal-overlay" id="bankModalOverlay"></div>
   <div class="modal-container" id="bankModalContainer">
       <div class="modal-header">
@@ -100,29 +102,43 @@
           <button id="bankModalCloseBtn">&times;</button>
       </div>
       <div class="modal-content" id="bankModalContent">
-          <form id="bankDetailsForm">
-              <div class="input-group">
-                  <label for="bankRealName">Your Real Name (Mandatory)</label>
-                  <input type="text" id="bankRealName" placeholder="Enter your full name" required>
+          
+          <form id="bankDetailsForm" novalidate>
+              <!-- "novalidate" lets our JS handle the error messages -->
+              
+              <div class="input-group icon-input">
+                  <label for="bankRealName">Your Real Name</label>
+                  <span class="input-icon">👤</span>
+                  <input type="text" id="bankRealName" placeholder="Enter your full name" required minlength="3">
               </div>
-              <div class="input-group">
-                  <label for="bankAccount">Bank Account No. (Mandatory)</label>
-                  <input type="number" id="bankAccount" placeholder="Enter account number" required>
+              
+              <div class="input-group icon-input">
+                  <label for="bankAccount">Bank Account No.</label>
+                  <span class="input-icon">🏦</span>
+                  <input type="text" id="bankAccount" placeholder="Min. 9 digits" required pattern="[0-9]{9,18}">
               </div>
-              <div class="input-group">
-                  <label for="bankConfirmAccount">Confirm Account No. (Mandatory)</label>
-                  <input type="number" id="bankConfirmAccount" placeholder="Confirm account number" required>
+              
+              <div class="input-group icon-input">
+                  <label for="bankConfirmAccount">Confirm Account No.</label>
+                  <span class="input-icon">🏦</span>
+                  <input type="text" id="bankConfirmAccount" placeholder="Re-enter account number" required pattern="[0-9]{9,18}">
               </div>
-              <div class="input-group">
-                  <label for="bankIFSC">IFSC Code (Mandatory)</label>
-                  <input type="text" id="bankIFSC" placeholder="Enter bank IFSC code" required>
+              
+              <div class="input-group icon-input">
+                  <label for="bankIFSC">IFSC Code</label>
+                  <span class="input-icon">💳</span>
+                  <input type="text" id="bankIFSC" placeholder="E.g., SBIN0001234" required pattern="[A-Za-z]{4}0[A-Z0-9]{6}">
               </div>
-              <div class="input-group">
-                  <label for="bankUPI">UPI ID (Optional)</label>
-                  <input type="text" id="bankUPI" placeholder="Enter your UPI ID">
+              
+              <div class="input-group icon-input">
+                  <label for="bankUPI">UPI ID</label>
+                  <span class="input-icon">🌐</span>
+                  <input type="text" id="bankUPI" placeholder="E.g., user@bank" required pattern="[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}">
               </div>
+              
               <button type="submit" class="submit-btn" id="saveBankBtn">Save Details</button>
           </form>
+          
       </div>
   </div>
   
@@ -133,4 +149,5 @@
   <script src="common.js"></script>
   <script src="script-mine.js"></script>
 </body>
-</html>
+    </html>
+                    
