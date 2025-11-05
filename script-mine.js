@@ -126,15 +126,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // --- === NEW: Helper functions to lock/unlock form === ---
+    function lockBankForm() {
+        document.getElementById('bankRealName').disabled = true;
+        document.getElementById('bankAccount').disabled = true;
+        document.getElementById('bankConfirmAccount').disabled = true;
+        document.getElementById('bankIFSC').disabled = true;
+        document.getElementById('bankUPI').disabled = true;
+        
+        document.getElementById('saveBankBtn').style.display = 'none';
+        document.getElementById('bankDetailsLockedInfo').style.display = 'block';
+    }
+    
+    function unlockBankForm() {
+        document.getElementById('bankRealName').disabled = false;
+        document.getElementById('bankAccount').disabled = false;
+        document.getElementById('bankConfirmAccount').disabled = false;
+        document.getElementById('bankIFSC').disabled = false;
+        document.getElementById('bankUPI').disabled = false;
+        
+        document.getElementById('saveBankBtn').style.display = 'block';
+        document.getElementById('bankDetailsLockedInfo').style.display = 'none';
+    }
+
+    // --- === UPDATED: loadBankDetails Function === ---
     function loadBankDetails(userId) {
         firebase.firestore().collection('users').doc(userId).get().then(doc => {
             if (doc.exists) {
                 const userData = doc.data();
+                // Check if bank details are already saved
+                const hasBankDetails = userData.bankRealName && userData.bankRealName.length > 0;
+
+                // Populate fields
                 document.getElementById('bankRealName').value = userData.bankRealName || '';
                 document.getElementById('bankAccount').value = userData.bankAccount || '';
-                document.getElementById('bankConfirmAccount').value = userData.bankAccount || '';
+                document.getElementById('bankConfirmAccount').value = userData.bankAccount || ''; // Pre-fill confirm
                 document.getElementById('bankIFSC').value = userData.bankIFSC || '';
                 document.getElementById('bankUPI').value = userData.bankUPI || '';
+
+                // Lock or unlock the form based on whether details exist
+                if (hasBankDetails) {
+                    lockBankForm();
+                } else {
+                    unlockBankForm();
+                }
+            } else {
+                // User doc doesn't exist, so form is unlocked
+                unlockBankForm();
             }
         });
     }
@@ -156,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('bankRealName').value;
         const account = document.getElementById('bankAccount').value;
         const confirmAccount = document.getElementById('bankConfirmAccount').value;
-        const ifsc = document.getElementById('bankIFSC').value;
+        const ifsc = document.getElementById('bankIFSC').value.toUpperCase(); // Force uppercase
         const upi = document.getElementById('bankUPI').value;
 
         // --- 2. Check account match ---
@@ -168,15 +206,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // --- 3. Save all data (including new UPI field) ---
+            // --- 3. Save all data ---
             await firebase.firestore().collection('users').doc(userId).update({
                 bankRealName: name,
                 bankAccount: account,
                 bankIFSC: ifsc,
-                bankUPI: upi // This is now mandatory
+                bankUPI: upi
             });
             
             alert('Bank details saved successfully!');
+            lockBankForm(); // Lock the form immediately after saving
             document.getElementById('bankModalCloseBtn').click(); // Close modal
 
         } catch (error) {
@@ -254,3 +293,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+                
