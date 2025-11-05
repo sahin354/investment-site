@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     referralCode: `REF${Date.now().toString().slice(-7)}`,
                     referredBy: referredByCode,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    isBlocked: false // <-- NEW: Set default isBlocked flag
+                    isBlocked: false // <-- Set default isBlocked flag
                 });
                 
                 window.location.href = 'verify-email.html';
@@ -109,20 +109,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 1. Attempt to sign in
                 const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
                 
-                // --- === THIS IS THE NEW BLOCKER LOGIC === ---
-                
                 // 2. Get user's Firestore document
                 const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
                 
+                // 3. Check if user document exists and has 'isBlocked: true'
                 if (userDoc.exists && userDoc.data().isBlocked === true) {
-                    // 3. If blocked, sign out immediately and show alert
                     await auth.signOut();
                     alert("Your account is blocked due to suspicious activity. Please contact HR.");
                     return; 
                 }
                 
-                // --- === END OF NEW LOGIC === ---
-
                 // 4. If not blocked, proceed with email verification check
                 if (userCredential.user.emailVerified) {
                     window.location.href = 'index.html';
@@ -151,3 +147,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+                        
