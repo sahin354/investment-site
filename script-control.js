@@ -117,7 +117,11 @@ function updateUserBalance() {
     const userId = document.getElementById('userSelect').value;
     const action = document.getElementById('balanceAction').value;
     const amount = parseFloat(document.getElementById('balanceAmount').value);
-    const reason = document.getElementById('balanceReason').value || 'Gift'; // Changed default reason
+    
+    // --- THIS IS THE FIX ---
+    // This line no longer defaults to 'Gift'.
+    // It will be an empty string "" if you leave the box blank.
+    const reason = document.getElementById('balanceReason').value; 
 
     if (!userId || !amount || amount <= 0) {
         alert('Please select a user and enter a valid positive amount.');
@@ -141,15 +145,15 @@ function updateUserBalance() {
             if (action === 'add') {
                 newBalance = currentBalance + amount;
                 txAmount = amount; // Positive
-                txType = 'Deposit'; // <-- This is the type
+                txType = 'Deposit';
             } else if (action === 'subtract') {
                 newBalance = currentBalance - amount;
                 txAmount = -amount; // Negative
-                txType = 'Withdrawal'; // <-- This is the type
+                txType = 'Withdrawal';
             } else if (action === 'set') {
                 newBalance = amount;
                 txAmount = amount - currentBalance; 
-                txType = 'Adjustment'; // <-- This is the type
+                txType = 'Adjustment';
             }
 
             if (newBalance < 0) throw new Error("Balance cannot be negative.");
@@ -161,11 +165,9 @@ function updateUserBalance() {
             transaction.set(txRef, {
                 userId: userId,
                 userEmail: userData.email,
-                // --- THIS IS THE FIX ---
-                // Removed the "Admin:" prefix
                 type: txType, 
                 amount: txAmount,
-                details: reason,
+                details: reason, // This will be the note you typed, or ""
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         });
@@ -182,4 +184,4 @@ function updateUserBalance() {
 
 function saveSystemSettings(){console.log('💾 Saving system settings...');const settings={commission1:parseFloat(document.getElementById('commission1').value),commission2:parseFloat(document.getElementById('commission2').value),commission3:parseFloat(document.getElementById('commission3').value),minWithdrawal:parseFloat(document.getElementById('minWithdrawal').value),maxWithdrawal:parseFloat(document.getElementById('maxWithdrawal').value)};firebase.firestore().collection('systemSettings').doc('config').set(settings,{merge:true}).then(()=>alert('✅ System settings saved successfully!')).catch(error=>{console.error('❌ Error saving settings:',error);alert('Error saving settings.')})}
 function logoutControl(){console.log('🔒 Logging out...');if(confirm('Are you sure you want to secure logout?')){firebase.auth().signOut().then(()=>window.location.href='system-control.html').catch(error=>console.error('❌ Logout error:',error))}}
-                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
