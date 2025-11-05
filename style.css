@@ -946,3 +946,18 @@ body.modal-open {
   font-weight: bold;
   margin-left: 10px; /* Space between title and badge */
 }
+
+/* === STYLES FOR NEW BANK MODAL === */
+
+.modal-content form {
+  padding: 0 10px 10px 10px;
+}
+
+.modal-content form .input-group {
+  margin-bottom: 15px;
+}
+
+.modal-content form .input-group label {
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
