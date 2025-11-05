@@ -56,7 +56,20 @@
             <div class="form-group"><input type="text" id="searchUser" placeholder="Search users by email or ID..."></div>
             <div style="overflow-x: auto;">
                 <table class="user-table">
-                    <thead><tr><th>User ID</th><th>Email</th><th>Balance</th><th>Join Date</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Email</th>
+                            <th>Balance</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Bank Name</th>
+                            <th>Account No.</th>
+                            <th>IFSC</th>
+                            <th>UPI</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                     <tbody id="usersTableBody"></tbody>
                 </table>
             </div>
@@ -67,7 +80,7 @@
             <div class="form-group"><label for="userSelect">Select User Account</label><select id="userSelect"><option value="">Select user account...</option></select></div>
             <div class="form-group"><label for="balanceAction">Transaction Type</label><select id="balanceAction"><option value="add">Add Funds</option><option value="subtract">Deduct Funds</option><option value="set">Set Balance</option></select></div>
             <div class="form-group"><label for="balanceAmount">Amount (₹)</label><input type="number" id="balanceAmount" placeholder="Enter amount"></div>
-            <div class="form-group"><label for="balanceReason">Transaction Note</label><textarea id="balanceReason" placeholder="Reason for this transaction"></textarea></div>
+            <div class="form-group"><label for="balanceReason">Transaction Note</label><textarea id="balanceReason" placeholder="Reason for this transaction (e.g., Bonus, Refund)"></textarea></div>
             <button id="updateBalanceButton" class="submit-btn">Execute Transaction</button>
         </div>
 
@@ -153,4 +166,5 @@
     
     <script src="script-payment-approval.js"></script>
 </body>
-</html>
+    </html>
+    
