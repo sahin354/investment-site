@@ -82,7 +82,6 @@
     <a href="mine.html" class="active"><i class="fas fa-user"></i> Mine</a>
   </footer>
 
-  <!-- === TRANSACTION MODAL (POP-UP) === -->
   <div class="modal-overlay" id="txModalOverlay"></div>
   <div class="modal-container" id="txModalContainer">
       <div class="modal-header">
@@ -94,7 +93,6 @@
       </div>
   </div>
   
-  <!-- === UPDATED BANK DETAILS MODAL (POP-UP) === -->
   <div class="modal-overlay" id="bankModalOverlay"></div>
   <div class="modal-container" id="bankModalContainer">
       <div class="modal-header">
@@ -104,8 +102,6 @@
       <div class="modal-content" id="bankModalContent">
           
           <form id="bankDetailsForm" novalidate>
-              <!-- "novalidate" lets our JS handle the error messages -->
-              
               <div class="input-group icon-input">
                   <label for="bankRealName">Your Real Name</label>
                   <span class="input-icon">👤</span>
@@ -134,6 +130,10 @@
                   <label for="bankUPI">UPI ID</label>
                   <span class="input-icon">🌐</span>
                   <input type="text" id="bankUPI" placeholder="E.g., user@bank" required pattern="[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}">
+              </div>
+              
+              <div id="bankDetailsLockedInfo" class="form-locked-info">
+                  Bank details are locked. If you want to change bank details please contact HR.
               </div>
               
               <button type="submit" class="submit-btn" id="saveBankBtn">Save Details</button>
