@@ -1016,3 +1016,98 @@ body.modal-open {
   margin-top: 15px;
   font-size: 0.9em;
 }
+
+/* === NEW STYLES FOR ADMIN USER DETAILS MODAL === */
+
+#userDetailsModal .modal-content {
+    /* Styles for the bank details grid */
+    padding-bottom: 20px;
+}
+
+#userDetailsContent {
+    padding: 0 10px;
+}
+
+.user-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.user-details-grid div {
+    font-size: 0.95em;
+    color: #333;
+}
+
+.user-details-grid div strong {
+    color: #000;
+    display: inline-block;
+    width: 80px;
+}
+
+/* --- Styles for transaction list inside admin modal --- */
+#userTransactionList {
+    padding: 0 10px;
+}
+
+#userTransactionList .transaction-item.modern {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+#userTransactionList .transaction-item.modern:last-child {
+    border-bottom: none;
+}
+#userTransactionList .transaction-icon {
+    font-size: 1.8em;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; 
+}
+#userTransactionList .transaction-details {
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; 
+}
+#userTransactionList .transaction-type {
+    font-weight: 600;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 2px;
+}
+#userTransactionList .transaction-info {
+    font-size: 0.9em;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#userTransactionList .transaction-amount {
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: right;
+    flex-shrink: 0; 
+    margin-left: 10px;
+}
+#userTransactionList .transaction-amount.positive {
+    color: #28a745;
+}
+#userTransactionList .transaction-amount.negative {
+    color: #dc3545;
+}
+#userTransactionList .transaction-date {
+    display: block;
+    font-size: 0.8em;
+    color: #999;
+    font-weight: normal;
+    margin-top: 2px;
+}
