@@ -71,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 upiId = doc.data().upiId;
                 upiField.value = upiId;
                 
-                // Generate QR Code
                 generateQrCode(upiId, rechargeAmount); 
 
             } else {
@@ -85,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateQrCode(upiAddress, amount) {
-        const payeeName = encodeURIComponent("Adani Corporation"); // Your company name
+        const payeeName = encodeURIComponent("Adani Corporation");
         const qrLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
         
         const qrCodeImage = document.getElementById('qrCodeImage');
@@ -121,11 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm("Are you sure you want to cancel this payment?")) {
                 clearInterval(timerInterval);
                 alert("Payment cancelled.");
-                window.close(); // Closes this tab
+                window.close();
             }
         });
 
-        // UTR Form submission
+        // --- === UTR Form submission (THIS IS THE UPDATED PART) === ---
         document.getElementById('utrForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const utr = document.getElementById('utrNumber').value;
@@ -138,19 +137,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
-            clearInterval(timerInterval); // Stop the timer
+            clearInterval(timerInterval);
+
+            const db = firebase.firestore();
+            const batch = db.batch();
 
             try {
-                await firebase.firestore().collection('payment_requests').add({
+                // 1. Create the Transaction doc first to get its ID
+                const txRef = db.collection('transactions').doc();
+                const txId = txRef.id;
+                
+                batch.set(txRef, {
+                    userId: currentUser.uid,
+                    type: 'Deposit',
+                    amount: parseFloat(rechargeAmount),
+                    details: `Deposit Request (UTR: ${utr})`,
+                    status: 'Pending', // <-- As requested
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // 2. Create the Admin's Payment Request doc
+                const reqRef = db.collection('payment_requests').doc();
+                batch.set(reqRef, {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
                     amount: parseFloat(rechargeAmount),
                     utr: utr,
                     status: 'pending', 
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    transactionId: txId // <-- Link the two documents
                 });
+    
+                // 3. Commit both writes at once
+                await batch.commit();
 
-                alert('Request submitted! Please wait for admin approval (1-2 hours).');
+                alert('Request submitted! Your transaction history will show "Pending" until approved (1-2 hours).');
                 window.close(); // Close this tab on success
 
             } catch (err) {
@@ -168,4 +189,4 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Copied to clipboard!');
     }
 });
-                
+            
