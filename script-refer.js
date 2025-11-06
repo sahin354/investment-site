@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const db = firebase.firestore();
+  let currentUserData = null; // Store current user's data
+  let allReferrals = []; // Store the list of referred friends
+
   // --- 1. Main Tab Controls (Invite / My Earnings) ---
   const mainTabButtons = document.querySelectorAll(
     ".refer-main-tabs .tab-button"
@@ -9,18 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", (e) => {
       e.preventDefault();
       const targetTab = button.getAttribute("data-tab"); // e.g., "invite"
-
-      // Update button active state
       mainTabButtons.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
-
-      // Show target content
       mainTabContents.forEach((content) => {
-        if (content.id === targetTab) {
-          content.classList.add("active");
-        } else {
-          content.classList.remove("active");
-        }
+        content.id === targetTab
+          ? content.classList.add("active")
+          : content.classList.remove("active");
       });
     });
   });
@@ -35,25 +33,18 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", (e) => {
       e.preventDefault();
       const targetTab = button.getAttribute("data-friend-tab"); // e.g., "all"
-
-      // Update button active state
       friendTabButtons.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
-
-      // Show target content
       friendTabContents.forEach((content) => {
-        if (content.id === targetTab) {
-          content.classList.add("active");
-        } else {
-          content.classList.remove("active");
-        }
+        content.id === targetTab
+          ? content.classList.add("active")
+          : content.classList.remove("active");
       });
     });
   });
 
   // --- 3. Toast Notification Function ---
   const toast = document.getElementById("toastNotification");
-
   function showToast(message, isError = false) {
     toast.textContent = message;
     toast.className = "toast"; // Reset classes
@@ -61,40 +52,80 @@ document.addEventListener("DOMContentLoaded", () => {
       toast.classList.add("error");
     }
     toast.classList.add("show");
-
-    // Hide after 3 seconds
     setTimeout(() => {
       toast.classList.remove("show");
     }, 3000);
   }
 
-  // --- 4. Copy Referral Link ---
-  const copyBtn = document.getElementById("copyReferralBtn");
-  const linkText = document.getElementById("referralLinkText").textContent;
-
-  copyBtn.addEventListener("click", () => {
-    navigator.clipboard
-      .writeText(linkText)
-      .then(() => {
-        showToast("Referral link copied!");
-        copyBtn.textContent = "Copied!";
-        copyBtn.classList.add("copied");
-        setTimeout(() => {
-          copyBtn.textContent = "Copy";
-          copyBtn.classList.remove("copied");
-        }, 2000);
-      })
-      .catch((err) => {
-        showToast("Failed to copy link.", true);
-        console.error("Failed to copy: ", err);
-      });
+  // --- 4. Authentication and Data Loading ---
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is logged in, fetch their data
+      loadUserData(user.uid);
+    } else {
+      // User is not logged in, handled by common.js
+      console.log("User not logged in.");
+    }
   });
 
-  // --- 5. (NEW) Load Referrals Functionality ---
+  async function loadUserData(userId) {
+    try {
+      const userDoc = await db.collection("users").doc(userId).get();
+      if (!userDoc.exists) {
+        throw new Error("User data not found");
+      }
+      currentUserData = userDoc.data();
+      
+      // Once we have user data, we can build the referral link and load friends
+      initializeReferralLink(currentUserData.referralCode);
+      loadReferrals(currentUserData.referralCode);
+      
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      showToast("Error loading your data.", true);
+    }
+  }
+
+  // --- 5. Initialize and Copy Referral Link ---
+  const copyBtn = document.getElementById("copyReferralBtn");
+  const linkTextElement = document.getElementById("referralLinkText");
+
+  function initializeReferralLink(referralCode) {
+    if (!referralCode) {
+      linkTextElement.textContent = "Error: No referral code found.";
+      copyBtn.disabled = true;
+      return;
+    }
+    
+    // This is the base URL from your original HTML file
+    const baseURL = "https://sahin354.github.io/inv/register.html";
+    const fullLink = `${baseURL}?ref=${referralCode}`;
+    
+    linkTextElement.textContent = fullLink;
+
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard
+        .writeText(fullLink)
+        .then(() => {
+          showToast("Referral link copied!");
+          copyBtn.textContent = "Copied!";
+          copyBtn.classList.add("copied");
+          setTimeout(() => {
+            copyBtn.textContent = "Copy";
+            copyBtn.classList.remove("copied");
+          }, 2000);
+        })
+        .catch((err) => {
+          showToast("Failed to copy link.", true);
+          console.error("Failed to copy: ", err);
+        });
+    });
+  }
+
+  // --- 6. Load "All" and "Joined" Referrals ---
   const allListContainer = document.getElementById("allFriendList");
   const joinedListContainer = document.getElementById("joinedFriendList");
 
-  // HTML for empty lists (using your CSS classes)
   const allEmptyHTML = `
     <div class="empty-state">
       <i class="fas fa-user-plus"></i>
@@ -106,11 +137,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <p>None of your friends have joined (recharged) yet.</p>
     </div>`;
 
-  /**
-   * Creates the simple HTML for a single friend card.
-   * This matches your request for "name and phone only".
-   */
   function createFriendCardHTML(friend) {
+    // We get the name from the data to use in the search filter
     return `
       <div class="friend-item" data-name="${friend.name.toLowerCase()}">
           <div class="friend-info">
@@ -121,32 +149,20 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /**
-   * Fetches data from your API and builds the two lists.
-   */
-  async function loadReferrals() {
+  async function loadReferrals(referralCode) {
     try {
-      // ** IMPORTANT **
-      // This API endpoint MUST exist on your backend.
-      // It must return JSON like:
-      // [ { "name": "John Doe", "phone": "123456", "has_recharged": true },
-      //   { "name": "Jane Smith", "phone": "654321", "has_recharged": false } ]
-      const response = await fetch("/api/me/referrals"); // <--- YOUR API URL HERE
+      allListContainer.innerHTML = `<div class="loading-state">Loading...</div>`;
+      joinedListContainer.innerHTML = `<div class="loading-state">Loading...</div>`;
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      const snapshot = await db.collection("users")
+        .where("referredBy", "==", referralCode)
+        .get();
+        
+      allReferrals = snapshot.docs.map(doc => doc.data());
 
-      const allReferrals = await response.json();
-
-      // Clear loading message
+      // Clear loading messages
       allListContainer.innerHTML = "";
       joinedListContainer.innerHTML = "";
-
-      // Filter to find "Joined" friends (who have recharged)
-      const joinedReferrals = allReferrals.filter(
-        (friend) => friend.has_recharged === true
-      );
 
       // --- Populate "All Referrals" List ---
       if (allReferrals.length === 0) {
@@ -158,6 +174,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // --- Populate "Joined" List ---
+      // This works because we modified script-payment-approval.js
+      const joinedReferrals = allReferrals.filter(
+        (friend) => friend.totalRechargeAmount > 0
+      );
+      
       if (joinedReferrals.length === 0) {
         joinedListContainer.innerHTML = joinedEmptyHTML;
       } else {
@@ -165,21 +186,20 @@ document.addEventListener("DOMContentLoaded", () => {
           joinedListContainer.innerHTML += createFriendCardHTML(friend);
         });
       }
+      
     } catch (error) {
       console.error("Failed to load referrals:", error);
       const errorMsg = `<div class="empty-state"><p>Error loading friends.</p></div>`;
       allListContainer.innerHTML = errorMsg;
       joinedListContainer.innerHTML = errorMsg;
+      showToast("Could not load referral list.", true);
     }
   }
 
-  // --- 6. (NEW) Search Functionality ---
+  // --- 7. Search Functionality (Unchanged from your file) ---
   const searchInput = document.getElementById("searchFriends");
-
   searchInput.addEventListener("input", (e) => {
     const searchTerm = e.target.value.toLowerCase();
-
-    // Find which tab content is currently active
     const activeTabPane = document.querySelector(".friends-tab-content.active");
     if (!activeTabPane) return;
 
@@ -187,36 +207,37 @@ document.addEventListener("DOMContentLoaded", () => {
     let foundOne = false;
 
     friends.forEach((friend) => {
-      const name = friend.dataset.name || ""; // Get name from data-name attribute
+      const name = friend.dataset.name || "";
       if (name.includes(searchTerm)) {
-        friend.style.display = "flex"; // Show if matches
+        friend.style.display = "flex";
         foundOne = true;
       } else {
-        friend.style.display = "none"; // Hide if no match
+        friend.style.display = "none";
       }
     });
-
-    // Optional: Show a "not found" message
-    const emptyState = activeTabPane.querySelector(".empty-state");
-    if (emptyState) emptyState.style.display = "none"; // Hide empty state while searching
-
-    // (This part is extra, you can remove if not needed)
+    
+    // Handle "No results" message
     let noResultsMsg = activeTabPane.querySelector(".no-results");
-    if (!foundOne && friends.length > 0) {
-      if (!noResultsMsg) {
-        noResultsMsg = document.createElement("div");
-        noResultsMsg.className = "empty-state no-results";
-        noResultsMsg.innerHTML = `<p>No friends found matching "${searchTerm}".</p>`;
-        activeTabPane.appendChild(noResultsMsg);
-      }
-      noResultsMsg.style.display = "block";
-    } else if (noResultsMsg) {
-      noResultsMsg.style.display = "none";
+    if (!noResultsMsg) {
+      noResultsMsg = document.createElement("div");
+      noResultsMsg.className = "empty-state no-results";
+      noResultsMsg.style.display = "none"; // Hide by default
+      activeTabPane.appendChild(noResultsMsg);
     }
-    // If search is empty, show empty state again if it was there
-    if (searchTerm === "" && emptyState) emptyState.style.display = "block";
+    
+    if (!foundOne && friends.length > 0) {
+        noResultsMsg.innerHTML = `<p>No friends found matching "${searchTerm}".</p>`;
+        noResultsMsg.style.display = "block";
+    } else {
+        noResultsMsg.style.display = "none";
+    }
+    
+    // Show/hide the main empty state
+    const emptyState = activeTabPane.querySelector(".empty-state:not(.no-results)");
+    if(emptyState) {
+        emptyState.style.display = (searchTerm === "" && friends.length === 0) ? "block" : "none";
+    }
+    
   });
-
-  // --- Load the friend lists when the page starts ---
-  loadReferrals();
 });
+                                       
