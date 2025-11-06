@@ -38,29 +38,51 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupRechargeListeners() {
         // Quick amount buttons
         const quickAmountBtns = document.querySelectorAll('.quick-amount-btn');
+        const amountInput = document.getElementById('rechargeAmount'); // Get the input field
+        
         quickAmountBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 const amount = this.getAttribute('data-amount');
-                document.getElementById('rechargeAmount').value = amount;
+                amountInput.value = amount; // Set the input field's value
                 
                 quickAmountBtns.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
             });
         });
+        
+        // Remove active class from buttons if user types manually
+        amountInput.addEventListener('input', () => {
+             quickAmountBtns.forEach(b => b.classList.remove('active'));
+        });
 
-        // --- NEW CODE: Listen to the FORM submit ---
+        // --- UPDATED: Listen to the FORM submit ---
         const rechargeForm = document.getElementById('rechargeForm');
         if (rechargeForm) {
             rechargeForm.addEventListener('submit', function(e) {
                 
-                const amount = parseFloat(document.getElementById('rechargeAmount').value);
+                const amount = parseFloat(amountInput.value);
                 
-                if (!amount || amount <= 0) {
-                    alert('Please enter a valid recharge amount');
-                    // Stop the form from submitting and opening a new tab
-                    e.preventDefault(); 
+                // --- NEW VALIDATION BLOCK ---
+                if (isNaN(amount) || amount <= 0) {
+                    alert('Please enter a valid recharge amount.');
+                    e.preventDefault(); // Stop the form from submitting
                     return;
                 }
+                
+                if (amount < 120) {
+                    // Show red alert
+                    alert('Minimum deposit amount is ₹120.');
+                    e.preventDefault(); // Stop the form from submitting
+                    return;
+                }
+                
+                if (amount > 50000) {
+                    // Show red alert
+                    alert('Maximum deposit amount is ₹50000.');
+                    e.preventDefault(); // Stop the form from submitting
+                    return;
+                }
+                // --- END OF NEW VALIDATION BLOCK ---
                 
                 // --- Save data to localStorage ---
                 // The new tab will read this data
