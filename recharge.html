@@ -6,6 +6,26 @@
     <title>Adani Corporation - Recharge</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .recharge-note {
+            padding: 15px 20px;
+            line-height: 1.6;
+        }
+        .recharge-note h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--text-dark, #1a202c);
+        }
+        .recharge-note ol {
+            padding-left: 20px;
+            margin: 0;
+            font-size: 0.9em;
+            color: var(--text-light, #555);
+        }
+        .recharge-note li {
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -49,7 +69,7 @@
           <h3>Recharge Amount</h3>
           <div class="input-container">
             <span>₹</span>
-            <input type="number" id="rechargeAmount" placeholder="0" min="0" value="0">
+            <input type="number" id="rechargeAmount" placeholder="120" min="120" max="50000" value="">
           </div>
           <div class="quick-amounts-label">Quick Select</div>
           <div class="quick-amounts">
@@ -63,6 +83,16 @@
           <button type="submit" id="proceedRecharge" class="submit-btn">Proceed to Recharge</button>
         </div>
     </form>
+    
+    <div class="card recharge-note">
+        <h4>Important Notes</h4>
+        <ol>
+            <li>Minimum deposit is ₹120 and maximum is ₹50000.</li>
+            <li>When recharging, please double-check the UPI ID. If you enter the wrong UPI ID, it is not our responsibility.</li>
+            <li>When recharge is complete, you must check the UTR number and submit it.</li>
+            <li>Sending a screenshot of the payment to HR is mandatory.</li>
+        </ol>
+    </div>
     </main>
   <div class="bottom-nav-spacer"></div>
   
@@ -80,5 +110,5 @@
   <script src="common.js"></script>
   <script src="script-recharge.js"></script>
 </body>
-                </html>
-                
+    </html>
+    
