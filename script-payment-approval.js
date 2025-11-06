@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const functions = firebase.functions();
 
-    // --- 1. Load Deposit Requests ---
+    // --- 1. Load Deposit Requests (UPDATED) ---
     function loadDepositRequests() {
         const tableBody = document.getElementById('paymentRequestsTableBody');
         if (!tableBody) return; 
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         db.collection('payment_requests')
           .where('status', '==', 'pending')
           .onSnapshot(snapshot => {
-              tableBody.innerHTML = '';
+              tableBody.innerHTML = ''; // Clear old data
               if (snapshot.empty) {
                   tableBody.innerHTML = '<tr><td colspan="5">No pending deposit requests.</td></tr>';
                   return;
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
               requests.forEach(request => {
                   const requestId = request.id;
                   const date = request.createdAt ? new Date(request.createdAt.seconds * 1000).toLocaleString() : 'N/A';
-                  const txId = request.transactionId || '';
                   
                   const tr = document.createElement('tr');
                   tr.innerHTML = `
@@ -35,14 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
                       <td>₹${request.amount}</td>
                       <td>${request.utr}</td>
                       <td>
-                          <button class="action-btn edit-btn approve-deposit-btn" 
+                          <button classROC-c="action-btn edit-btn approve-deposit-btn" 
                                   data-id="${requestId}" 
                                   data-user="${request.userId}" 
                                   data-amount="${request.amount}" 
-                                  data-txid="${txId}">
+                                  data-utr="${request.utr}">
                               Approve
                           </button>
-                          <button class="action-btn delete-btn reject-deposit-btn" data-id="${requestId}" data-txid="${txId}">Reject</button>
+                          <button class="action-btn delete-btn reject-deposit-btn" data-id="${requestId}">Reject</button>
                       </td>
                   `;
                   tableBody.appendChild(tr);
@@ -50,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 2. Load Withdrawal Requests (Unchanged) ---
+    // --- 2. NEW: Load Withdrawal Requests (Unchanged) ---
     function loadWithdrawalRequests() {
         const tableBody = document.getElementById('withdrawalRequestsTableBody');
         if (!tableBody) return;
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 3. Add Listeners for ALL buttons (Unchanged) ---
+    // --- 3. Add Listeners for ALL buttons (Deposit listener is UPDATED) ---
     document.body.addEventListener('click', async (e) => {
         // --- Deposit Approve ---
         if (e.target.classList.contains('approve-deposit-btn')) {
@@ -99,22 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const requestId = e.target.dataset.id;
             const userId = e.target.dataset.user;
             const amount = parseFloat(e.target.dataset.amount);
-            const txId = e.target.dataset.txid;
+            const utr = e.target.dataset.utr; // <-- Get the new UTR data
             
-            if (!txId) {
-                alert('Error: This request is missing a Transaction ID. Cannot process.');
-                return;
-            }
-            
-            await approveDepositPayment(requestId, userId, amount, txId);
+            // Pass all data to the updated function
+            await approveDepositPayment(requestId, userId, amount, utr);
         }
         
         // --- Deposit Reject ---
         if (e.target.classList.contains('reject-deposit-btn')) {
             if (!confirm('Are you sure you want to reject this payment?')) return;
             const requestId = e.target.dataset.id;
-            const txId = e.target.dataset.txid;
-            await rejectDepositPayment(requestId, txId);
+            await rejectDepositPayment(requestId);
         }
         
         // --- Withdrawal Approve (Unchanged) ---
@@ -139,25 +133,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 4. Function to Approve a Deposit (*** THIS IS THE MAIN FIX ***) ---
-    async function approveDepositPayment(requestId, userId, amount, txId) {
+    // Replaced the Cloud Function call with a direct (and secure) batch write
+    async function approveDepositPayment(requestId, userId, amount, utr) {
         const batch = db.batch();
         
         // 1. Mark the request as 'approved'
         const reqRef = db.collection('payment_requests').doc(requestId);
         batch.update(reqRef, { status: 'approved' });
         
-        // 2. Give the user their money AND UPDATE RECHARGE AMOUNT
+        // 2. Give the user their money
         const userRef = db.collection('users').doc(userId);
         batch.update(userRef, {
-            balance: firebase.firestore.FieldValue.increment(amount),
-            totalRechargeAmount: firebase.firestore.FieldValue.increment(amount) // <-- THIS LINE MAKES THE "JOINED" LIST WORK
+            balance: firebase.firestore.FieldValue.increment(amount)
         });
         
-        // 3. Update the user's existing transaction log
-        const txRef = db.collection('transactions').doc(txId);
-        batch.update(txRef, {
+        // 3. Create a transaction log for the user
+        const txRef = db.collection('transactions').doc();
+        batch.set(txRef, {
+            userId: userId,
+            type: 'Deposit',
+            amount: amount,
+            details: `Deposit approved (Ref: ${utr})`,
             status: 'Success',
-            details: 'Deposit Successful'
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
         try {
@@ -170,16 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 5. Function to Reject the deposit payment (Unchanged) ---
-    async function rejectDepositPayment(requestId, txId) {
-        const batch = db.batch();
-        const reqRef = db.collection('payment_requests').doc(requestId);
-        batch.update(reqRef, { status: 'rejected' });
-        if (txId) {
-            const txRef = db.collection('transactions').doc(txId);
-            batch.update(txRef, { status: 'Rejected', details: 'Deposit Rejected' });
-        }
+    async function rejectDepositPayment(requestId) {
         try {
-            await batch.commit();
+            await db.collection('payment_requests').doc(requestId).update({
+                status: 'rejected'
+            });
             alert('Payment rejected.');
         } catch (err) {
             console.error("Error rejecting payment:", err);
@@ -190,10 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 6. Function to Approve a Withdrawal (Unchanged) ---
     async function approveWithdrawal(requestId, txId) {
         const batch = db.batch();
+        
         const reqRef = db.collection('withdrawal_requests').doc(requestId);
         batch.update(reqRef, { status: 'Success' });
+        
         const txRef = db.collection('transactions').doc(txId);
         batch.update(txRef, { status: 'Success', details: 'Withdrawal Successful' });
+        
         try {
             await batch.commit();
             alert('Withdrawal approved!');
@@ -206,22 +202,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 7. Function to Reject a Withdrawal (Unchanged) ---
     async function rejectWithdrawal(requestId, txId, userId, amount) {
         const batch = db.batch();
+        
         const reqRef = db.collection('withdrawal_requests').doc(requestId);
         batch.update(reqRef, { status: 'Rejected' });
+        
         const txRef = db.collection('transactions').doc(txId);
         batch.update(txRef, { status: 'Rejected', details: 'Withdrawal Rejected' });
+        
         const userRef = db.collection('users').doc(userId);
         batch.update(userRef, {
             balance: firebase.firestore.FieldValue.increment(amount)
         });
+        
         try {
             await batch.commit();
             alert('Withdrawal rejected and funds returned to user.');
-        } catch (err)CSS
+        } catch (err) {
             console.error('Error rejecting withdrawal:', err);
             alert('Error: ' + err.message);
         }
     }
+
 
     // --- 8. Tab/Sub-tab logic (Unchanged) ---
     document.addEventListener('click', e => {
@@ -229,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadDepositRequests();
             loadWithdrawalRequests();
         }
+        
         if (e.target.classList.contains('payment-sub-tab')) {
             const tabName = e.target.dataset.tab;
             document.querySelectorAll('.payment-sub-tab').forEach(btn => btn.classList.remove('active'));
@@ -251,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
               upiId: document.getElementById('paymentUpiId').value,
               accountInfo: document.getElementById('paymentAccountInfo').value
             };
+            
             try {
                 await db.collection('system_config').doc('payment_details').set(paymentConfig, { merge: true });
             } catch (err) {
@@ -261,11 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadPaymentConfig() {
         if(!document.getElementById('paymentUpiId')) return;
+        
         const paymentDoc = await db.collection('system_config').doc('payment_details').get();
         if (paymentDoc.exists) {
             const data = paymentDoc.data();
             const upiField = document.getElementById('paymentUpiId');
             const bankField = document.getElementById('paymentAccountInfo');
+            
             if (upiField) upiField.value = data.upiId || '';
             if (bankField) bankField.value = data.accountInfo || '';
         }
@@ -279,4 +284,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadPaymentConfig();
 });
-                              
+                      
