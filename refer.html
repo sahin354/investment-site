@@ -37,6 +37,8 @@
     Refer & Earn
   </header>
   
+  <div id="toastNotification" class="toast"></div>
+  
   <main>
     <div class="refer-page-container">
       <div class="tabs refer-main-tabs">
@@ -49,15 +51,15 @@
           <div class="earnings-grid">
             <div class="earnings-item">
               <div class="earnings-label">Total Reward</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="totalReward">₹0.00</div>
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Available to Redeem</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="availableReward">₹0.00</div>
             </div>
             <div class="earnings-item">
               <div class="earnings-label">Locked Reward</div>
-              <div class="earnings-amount">₹0.00</div>
+              <div class="earnings-amount" id="lockedReward">₹0.00</div>
             </div>
           </div>
           <div class="divider"></div>
@@ -69,7 +71,7 @@
         <div class="card invite-header-card">
           <h3>Invite Friends, Earn Rewards!</h3>
           <div class="referral-link-box">
-            <span id="referralLinkText">https://sahin354.github.io/inv/register.html?ref=123456</span>
+            <span id="referralLinkText">Loading your link...</span>
             <button id="copyReferralBtn" class="copy-btn-inset">Copy</button>
           </div>
           <div class="commission-list">
@@ -93,31 +95,33 @@
             </div>
           </div>
         </div>
-      </section>
-
-      <div class="card friends-card">
-        <h3>Friends</h3>
-        <div class="search-input-wrapper">
-          <i class="fas fa-search"></i>
-          <input type="text" id="searchFriends" placeholder="Search friends by name">
-        </div>
-
-        <div class="friends-sub-tabs">
-          <a href="#" class="friends-sub-tab-button active" data-friend-tab="all">All</a>
-          <a href="#" class="friends-sub-tab-button" data-friend-tab="joined">Joined</a>
-        </div>
         
-        <div id="all" class="friends-tab-content active">
-          <div class="friend-list scrollable-friend-list" id="allFriendList">
-            <div class="loading-state">Loading...</div>
+        <div class="card friends-card">
+          <h3>Friends</h3>
+          <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchFriends" placeholder="Search friends by name">
+          </div>
+
+          <div class="friends-sub-tabs">
+            <a href="#" class="friends-sub-tab-button active" data-friend-tab="all">All</a>
+            <a href="#" class="friends-sub-tab-button" data-friend-tab="joined">Joined</a>
+          </div>
+          
+          <div id="all" class="friends-tab-content active">
+            <div class="friend-list scrollable-friend-list" id="allFriendList">
+              <div class="loading-state">Loading...</div>
+            </div>
+          </div>
+          
+          <div id="joined" class="friends-tab-content">
+            <div class="friend-list scrollable-friend-list" id="joinedFriendList">
+              <div class="loading-state">Loading...</div>
+            </div>
           </div>
         </div>
-        
-        <div id="joined" class="friends-tab-content">
-          <div class="friend-list scrollable-friend-list" id="joinedFriendList">
-            </div>
-        </div>
-      </div>
+        </section>
+
     </div>
   </main>
 
@@ -137,4 +141,3 @@
   <script src="script-refer.js"></script>
 </body>
 </html>
-
