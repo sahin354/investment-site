@@ -25,6 +25,14 @@
         .modal-header h2 { margin: 0; }
         .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* --- NEW: Payment Sub-Tabs --- */
+        .payment-sub-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .payment-sub-tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 1.1em; color: #777; }
+        .payment-sub-tab.active { color: var(--primary-color); font-weight: bold; border-bottom: 2px solid var(--primary-color); }
+        .payment-tab-content { display: none; }
+        .payment-tab-content.active { display: block; }
+        
     </style>
 </head>
 <body>
@@ -61,6 +69,10 @@
                             <th>Balance</th>
                             <th>Join Date</th>
                             <th>Status</th>
+                            <th>Bank Name</th>
+                            <th>Bank Account</th>
+                            <th>IFSC</th>
+                            <th>UPI</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -79,24 +91,55 @@
         </div>
 
         <div id="paymentsTab" class="tab-content">
-            <h3>⌛ Pending Payment Requests</h3>
-            <div style="overflow-x: auto;">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>User Email</th>
-                            <th>Amount (₹)</th>
-                            <th>UTR / Ref No.</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paymentRequestsTableBody">
-                        </tbody>
-                </table>
+            <h3>⌛ Payment Requests</h3>
+            
+            <div class="payment-sub-tabs">
+                <button class="payment-sub-tab active" data-tab="deposits">Deposit Requests</button>
+                <button class="payment-sub-tab" data-tab="withdrawals">Withdrawal Requests</button>
+            </div>
+            
+            <div id="depositsContent" class="payment-tab-content active">
+                <h4>Pending Deposits</h4>
+                <div style="overflow-x: auto;">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User Email</th>
+                                <th>Amount (₹)</th>
+                                <th>UTR / Ref No.</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentRequestsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="withdrawalsContent" class="payment-tab-content">
+                <h4>Pending Withdrawals</h4>
+                <div style="overflow-x: auto;">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User Email</th>
+                                <th>Request (₹)</th>
+                                <th>TDS (18%)</th>
+                                <th>Final Payout (₹)</th>
+                                <th>Bank Name</th>
+                                <th>Account No.</th>
+                                <th>IFSC</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawalRequestsTableBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
         <div id="plansTab" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>📊 Investment Plan Settings</h3>
@@ -174,10 +217,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script> <script src="firebaseConfig.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+    <script src="firebaseConfig.js"></script>
     <script src="script-control.js"></script>
     
     <script src="script-payment-approval.js"></script>
 </body>
-                    </html>
-                                                   
+</html>
