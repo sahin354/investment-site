@@ -217,10 +217,19 @@ body.sidebar-open .side-menu {
 */
 
 /* --- Main Content Styles --- */
+/* This is the new default style for MOBILE */
 main {
   padding: 15px;
-  max-width: 500px;
-  margin: 0 auto;
+  /* max-width and margin are removed so it's full-width */
+}
+
+/* This new section adds the desktop layout */
+@media (min-width: 768px) {
+  main {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .card {
