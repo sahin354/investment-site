@@ -218,14 +218,18 @@ body.sidebar-open .side-menu {
 
 /* --- Main Content Styles --- */
 /* This is the new default style for MOBILE */
+/* --- Main Content Styles --- */
+
+/* 1. This is the new style for MOBILE (full-width) */
 main {
   padding: 15px;
-  /* max-width and margin are removed so it's full-width */
+  /* We remove max-width and margin so it fills the screen */
 }
 
-/* This new section adds the desktop layout */
+/* 2. This new media query adds the DESKTOP layout */
 @media (min-width: 768px) {
   main {
+    /* This centers the content on wide screens */
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
