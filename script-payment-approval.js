@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const functions = firebase.functions();
 
-    // --- 1. Load Deposit Requests (UPDATED) ---
+    // --- 1. Load Deposit Requests ---
     function loadDepositRequests() {
         const tableBody = document.getElementById('paymentRequestsTableBody');
         if (!tableBody) return; 
@@ -26,9 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
               requests.forEach(request => {
                   const requestId = request.id;
                   const date = request.createdAt ? new Date(request.createdAt.seconds * 1000).toLocaleString() : 'N/A';
-                  
-                  // We need to pass the transactionId to the approve button
-                  const txId = request.transactionId || ''; // Get the linked transaction ID
+                  const txId = request.transactionId || '';
                   
                   const tr = document.createElement('tr');
                   tr.innerHTML = `
@@ -92,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 3. Add Listeners for ALL buttons (Deposit listener is UPDATED) ---
+    // --- 3. Add Listeners for ALL buttons (Unchanged) ---
     document.body.addEventListener('click', async (e) => {
         // --- Deposit Approve ---
         if (e.target.classList.contains('approve-deposit-btn')) {
@@ -101,21 +99,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const requestId = e.target.dataset.id;
             const userId = e.target.dataset.user;
             const amount = parseFloat(e.target.dataset.amount);
-            const txId = e.target.dataset.txid; // <-- Get the new transaction ID
+            const txId = e.target.dataset.txid;
             
             if (!txId) {
                 alert('Error: This request is missing a Transaction ID. Cannot process.');
                 return;
             }
             
-            await approveDepositPayment(requestId, userId, amount, txId); // <-- Pass txId
+            await approveDepositPayment(requestId, userId, amount, txId);
         }
         
         // --- Deposit Reject ---
         if (e.target.classList.contains('reject-deposit-btn')) {
             if (!confirm('Are you sure you want to reject this payment?')) return;
             const requestId = e.target.dataset.id;
-            const txId = e.target.dataset.txid; // <-- Get the new transaction ID
+            const txId = e.target.dataset.txid;
             await rejectDepositPayment(requestId, txId);
         }
         
@@ -148,14 +146,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const reqRef = db.collection('payment_requests').doc(requestId);
         batch.update(reqRef, { status: 'approved' });
         
-        // 2. Give the user their money
+        // 2. Give the user their money AND UPDATE RECHARGE AMOUNT
         const userRef = db.collection('users').doc(userId);
         batch.update(userRef, {
-            balance: firebase.firestore.FieldValue.increment(amount)
+            balance: firebase.firestore.FieldValue.increment(amount),
+            totalRechargeAmount: firebase.firestore.FieldValue.increment(amount) // <-- THIS LINE MAKES THE "JOINED" LIST WORK
         });
         
         // 3. Update the user's existing transaction log
-        const txRef = db.collection('transactions').doc(txId); // Use the passed-in txId
+        const txRef = db.collection('transactions').doc(txId);
         batch.update(txRef, {
             status: 'Success',
             details: 'Deposit Successful'
@@ -170,20 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. Function to Reject the deposit payment (UPDATED) ---
+    // --- 5. Function to Reject the deposit payment (Unchanged) ---
     async function rejectDepositPayment(requestId, txId) {
         const batch = db.batch();
-        
-        // 1. Mark request as rejected
         const reqRef = db.collection('payment_requests').doc(requestId);
         batch.update(reqRef, { status: 'rejected' });
-        
-        // 2. Mark user's transaction as rejected
-        if (txId) { // Only update if txId exists
+        if (txId) {
             const txRef = db.collection('transactions').doc(txId);
             batch.update(txRef, { status: 'Rejected', details: 'Deposit Rejected' });
         }
-        
         try {
             await batch.commit();
             alert('Payment rejected.');
@@ -223,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await batch.commit();
             alert('Withdrawal rejected and funds returned to user.');
-        } catch (err) {
+        } catch (err)CSS
             console.error('Error rejecting withdrawal:', err);
             alert('Error: ' + err.message);
         }
@@ -285,4 +279,4 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadPaymentConfig();
 });
-            
+                              
