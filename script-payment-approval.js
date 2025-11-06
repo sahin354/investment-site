@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const functions = firebase.functions();
 
-    // --- 1. Load Deposit Requests ---
+    // --- 1. Load Deposit Requests (UPDATED) ---
     function loadDepositRequests() {
         const tableBody = document.getElementById('paymentRequestsTableBody');
         if (!tableBody) return; 
@@ -34,7 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
                       <td>₹${request.amount}</td>
                       <td>${request.utr}</td>
                       <td>
-                          <button class="action-btn edit-btn approve-deposit-btn" data-id="${requestId}" data-user="${request.userId}" data-amount="${request.amount}">Approve</button>
+                          <button classROC-c="action-btn edit-btn approve-deposit-btn" 
+                                  data-id="${requestId}" 
+                                  data-user="${request.userId}" 
+                                  data-amount="${request.amount}" 
+                                  data-utr="${request.utr}">
+                              Approve
+                          </button>
                           <button class="action-btn delete-btn reject-deposit-btn" data-id="${requestId}">Reject</button>
                       </td>
                   `;
@@ -43,13 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 2. NEW: Load Withdrawal Requests ---
+    // --- 2. NEW: Load Withdrawal Requests (Unchanged) ---
     function loadWithdrawalRequests() {
         const tableBody = document.getElementById('withdrawalRequestsTableBody');
         if (!tableBody) return;
 
         db.collection('withdrawal_requests')
-          .where('status', '==', 'Pending') // Note: 'Pending' (capital P) from script-mine.js
+          .where('status', '==', 'Pending')
           .onSnapshot(snapshot => {
               tableBody.innerHTML = '';
               if (snapshot.empty) {
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 3. Add Listeners for ALL buttons (Deposits & Withdrawals) ---
+    // --- 3. Add Listeners for ALL buttons (Deposit listener is UPDATED) ---
     document.body.addEventListener('click', async (e) => {
         // --- Deposit Approve ---
         if (e.target.classList.contains('approve-deposit-btn')) {
@@ -92,8 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const requestId = e.target.dataset.id;
             const userId = e.target.dataset.user;
             const amount = parseFloat(e.target.dataset.amount);
+            const utr = e.target.dataset.utr; // <-- Get the new UTR data
             
-            await approveDepositPayment(requestId, userId, amount);
+            // Pass all data to the updated function
+            await approveDepositPayment(requestId, userId, amount, utr);
         }
         
         // --- Deposit Reject ---
@@ -103,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await rejectDepositPayment(requestId);
         }
         
-        // --- NEW: Withdrawal Approve ---
+        // --- Withdrawal Approve (Unchanged) ---
         if (e.target.classList.contains('approve-withdraw-btn')) {
             if (!confirm('Have you sent the money to this user? This will mark the transaction as successful.')) return;
             
@@ -112,28 +120,46 @@ document.addEventListener('DOMContentLoaded', () => {
             await approveWithdrawal(requestId, txId);
         }
         
-        // --- NEW: Withdrawal Reject ---
+        // --- Withdrawal Reject (Unchanged) ---
         if (e.target.classList.contains('reject-withdraw-btn')) {
             if (!confirm('Are you sure you want to reject this? This will return the funds to the user.')) return;
             
             const requestId = e.target.dataset.id;
             const txId = e.target.dataset.txid;
             const userId = e.target.dataset.user;
-            const amount = parseFloat(e.target.dataset.amount); // The original amount to refund
+            const amount = parseFloat(e.target.dataset.amount);
             await rejectWithdrawal(requestId, txId, userId, amount);
         }
     });
 
-    // --- 4. Function to call the secure Cloud Function (for Deposits) ---
-    async function approveDepositPayment(requestId, userId, amount) {
+    // --- 4. Function to Approve a Deposit (*** THIS IS THE MAIN FIX ***) ---
+    // Replaced the Cloud Function call with a direct (and secure) batch write
+    async function approveDepositPayment(requestId, userId, amount, utr) {
+        const batch = db.batch();
+        
+        // 1. Mark the request as 'approved'
+        const reqRef = db.collection('payment_requests').doc(requestId);
+        batch.update(reqRef, { status: 'approved' });
+        
+        // 2. Give the user their money
+        const userRef = db.collection('users').doc(userId);
+        batch.update(userRef, {
+            balance: firebase.firestore.FieldValue.increment(amount)
+        });
+        
+        // 3. Create a transaction log for the user
+        const txRef = db.collection('transactions').doc();
+        batch.set(txRef, {
+            userId: userId,
+            type: 'Deposit',
+            amount: amount,
+            details: `Deposit approved (Ref: ${utr})`,
+            status: 'Success',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         try {
-            // Note: This cloud function 'approveManualPayment' should already exist from your setup
-            const approveFunction = functions.httpsCallable('approveManualPayment');
-            await approveFunction({
-                requestId: requestId,
-                userId: userId,
-                amount: amount
-            });
+            await batch.commit();
             alert('Payment approved and balance updated!');
         } catch (err) {
             console.error("Error approving payment:", err);
@@ -141,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. Function to Reject the deposit payment ---
+    // --- 5. Function to Reject the deposit payment (Unchanged) ---
     async function rejectDepositPayment(requestId) {
         try {
             await db.collection('payment_requests').doc(requestId).update({
@@ -154,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- 6. NEW: Function to Approve a Withdrawal ---
+    // --- 6. Function to Approve a Withdrawal (Unchanged) ---
     async function approveWithdrawal(requestId, txId) {
         const batch = db.batch();
         
@@ -173,22 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 7. NEW: Function to Reject a Withdrawal (and refund user) ---
+    // --- 7. Function to Reject a Withdrawal (Unchanged) ---
     async function rejectWithdrawal(requestId, txId, userId, amount) {
         const batch = db.batch();
         
-        // 1. Mark request as rejected
         const reqRef = db.collection('withdrawal_requests').doc(requestId);
         batch.update(reqRef, { status: 'Rejected' });
         
-        // 2. Mark transaction as rejected
         const txRef = db.collection('transactions').doc(txId);
         batch.update(txRef, { status: 'Rejected', details: 'Withdrawal Rejected' });
         
-        // 3. Refund the user
         const userRef = db.collection('users').doc(userId);
         batch.update(userRef, {
-            balance: firebase.firestore.FieldValue.increment(amount) // 'amount' is positive
+            balance: firebase.firestore.FieldValue.increment(amount)
         });
         
         try {
@@ -201,35 +224,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- 8. Load data when the "Payments" tab is clicked & Sub-tab logic ---
+    // --- 8. Tab/Sub-tab logic (Unchanged) ---
     document.addEventListener('click', e => {
-        // Main Tab
         if (e.target.classList.contains('control-tab') && e.target.dataset.tab === 'payments') {
             loadDepositRequests();
             loadWithdrawalRequests();
         }
         
-        // Sub Tabs
         if (e.target.classList.contains('payment-sub-tab')) {
-            const tabName = e.target.dataset.tab; // 'deposits' or 'withdrawals'
-            
-            // Update button styles
+            const tabName = e.target.dataset.tab;
             document.querySelectorAll('.payment-sub-tab').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
-            
-            // Show/Hide content
             document.querySelectorAll('.payment-tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tabName + 'Content').classList.add('active');
         }
     });
     
-    // Initial load if tab is already active
     if (document.getElementById('paymentsTab') && document.getElementById('paymentsTab').classList.contains('active')) {
         loadDepositRequests();
         loadWithdrawalRequests();
     }
     
-    // --- 9. Config loading (unchanged) ---
+    // --- 9. Config loading (Unchanged) ---
     const saveSettingsButton = document.getElementById('saveSettingsButton');
     if (saveSettingsButton) {
         saveSettingsButton.addEventListener('click', async () => {
@@ -266,7 +282,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Initial load for config
     loadPaymentConfig();
 });
-        
