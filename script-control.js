@@ -52,6 +52,7 @@ function showControlPanel() {
 
 function setupAllEventListeners() {
     console.log('⚙️ Setting up event listeners...');
+    
     // Tab switching
     document.querySelectorAll('.control-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -102,19 +103,183 @@ function setupAllEventListeners() {
     console.log('✅ All event listeners setup complete.');
 }
 
-// --- PLAN MANAGEMENT FUNCTIONS (UNCHANGED) ---
-function loadPlans(){console.log('📈 Loading investment plans...');const plansContainer=document.getElementById('plansContainer');plansContainer.innerHTML='<p>Loading plans...</p>';const plansRef=firebase.firestore().collection('investmentPlans').orderBy('isVIP','desc').orderBy('minAmount','asc');plansRef.onSnapshot(snapshot=>{if(snapshot.empty){plansContainer.innerHTML='<p>No investment plans found. Click "Create New Plan" to add one.</p>';return}plansContainer.innerHTML='';snapshot.forEach(doc=>{const plan={id:doc.id,...doc.data()};const planCard=document.createElement('div');planCard.className=`plan-card ${plan.isVIP?'vip':''}`;planCard.innerHTML=`<div class="plan-header"><div class="plan-title">${plan.name} ${plan.isVIP?'<span class="vip-badge">VIP</span>':''}</div><span style="color: ${plan.isActive?'green':'gray'}; font-weight: bold;">${plan.isActive?'● Active':'● Inactive'}</span></div><div class="plan-details"><div><strong>INVESTMENT</strong>₹${plan.minAmount.toLocaleString()}</div><div><strong>DAILY EARN</strong>${plan.dailyReturnPercent}%</div><div><strong>DURATION</strong>${plan.durationDays} Days</div><div><strong>TOTAL EARN</strong>${plan.totalReturnPercent}%</div></div><div class="plan-actions"><button class="action-btn edit-btn" data-planid="${plan.id}">Edit</button><button class="action-btn block-btn" data-planid="${plan.id}" data-status="${plan.isActive}">${plan.isActive?'Deactivate':'Activate'}</button></div>`;plansContainer.appendChild(planCard)});plansContainer.querySelectorAll('.edit-btn').forEach(btn=>btn.addEventListener('click',e=>{const planId=e.target.closest('.edit-btn').dataset.planid;firebase.firestore().collection('investmentPlans').doc(planId).get().then(doc=>showPlanForm({id:doc.id,...doc.data()}))}));plansContainer.querySelectorAll('.block-btn').forEach(btn=>btn.addEventListener('click',e=>{const planId=e.target.closest('.block-btn').dataset.planid;const currentStatus=e.target.closest('.block-btn').dataset.status==='true';togglePlanStatus(planId,!currentStatus)}))},error=>{console.error("Error loading plans: ",error);plansContainer.innerHTML='<p style="color: red;">Could not load plans.</p>'})}
-function showPlanForm(plan=null){const modal=document.getElementById('planModal');const form=document.getElementById('planForm');form.reset();document.getElementById('planModalTitle').textContent=plan?'Edit Plan':'Create New Plan';document.getElementById('planId').value=plan?plan.id:'';if(plan){document.getElementById('planName').value=plan.name;document.getElementById('planMinAmount').value=plan.minAmount;document.getElementById('planDuration').value=plan.durationDays;document.getElementById('planDailyReturn').value=plan.dailyReturnPercent;document.getElementById('planTotalReturn').value=plan.totalReturnPercent;document.getElementById('planIsVIP').checked=plan.isVIP}const deleteBtn=document.getElementById('deletePlanBtn');deleteBtn.style.display=plan?'inline-block':'none';deleteBtn.onclick=()=>deletePlan(plan.id);modal.style.display='block'}
-function savePlan(e){e.preventDefault();const planId=document.getElementById('planId').value;const planData={name:document.getElementById('planName').value,minAmount:parseFloat(document.getElementById('planMinAmount').value),durationDays:parseInt(document.getElementById('planDuration').value),dailyReturnPercent:parseFloat(document.getElementById('planDailyReturn').value),totalReturnPercent:parseFloat(document.getElementById('planTotalReturn').value),isVIP:document.getElementById('planIsVIP').checked};let promise;if(planId){promise=firebase.firestore().collection('investmentPlans').doc(planId).update(planData)}else{planData.isActive=true;planData.createdAt=firebase.firestore.FieldValue.serverTimestamp();promise=firebase.firestore().collection('investmentPlans').add(planData)}promise.then(()=>{console.log('✅ Plan saved successfully');document.getElementById('planModal').style.display='none'}).catch(error=>{console.error('❌ Error saving plan:',error);alert('Error saving plan: '+error.message)})}
-function togglePlanStatus(planId,newStatus){const action=newStatus?'activate':'deactivate';if(!confirm(`Are you sure you want to ${action} this plan?`))return;firebase.firestore().collection('investmentPlans').doc(planId).update({isActive:newStatus}).then(()=>console.log(`✅ Plan ${action}d.`)).catch(error=>console.error(`❌ Error ${action}ing plan:`,error))}
-function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.'))return;firebase.firestore().collection('investmentPlans').doc(planId).delete().then(()=>{console.log('✅ Plan deleted.');document.getElementById('planModal').style.display='none'}).catch(error=>console.error('❌ Error deleting plan:',error))}
+// --- PLAN MANAGEMENT FUNCTIONS ---
+function loadPlans() {
+    console.log('📈 Loading investment plans...');
+    const plansContainer = document.getElementById('plansContainer');
+    plansContainer.innerHTML = '<p>Loading plans...</p>';
+    
+    const plansRef = firebase.firestore().collection('investmentPlans').orderBy('isVIP', 'desc').orderBy('minAmount', 'asc');
+    
+    plansRef.onSnapshot(snapshot => {
+        if (snapshot.empty) {
+            plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p>';
+            return;
+        }
+        
+        plansContainer.innerHTML = '';
+        snapshot.forEach(doc => {
+            const plan = { id: doc.id, ...doc.data() };
+            const planCard = document.createElement('div');
+            planCard.className = `plan-card ${plan.isVIP ? 'vip' : ''}`;
+            planCard.innerHTML = `
+                <div class="plan-header">
+                    <div class="plan-title">${plan.name} ${plan.isVIP ? '<span class="vip-badge">VIP</span>' : ''}</div>
+                    <span style="color: ${plan.isActive ? 'green' : 'gray'}; font-weight: bold;">${plan.isActive ? '● Active' : '● Inactive'}</span>
+                </div>
+                <div class="plan-details">
+                    <div><strong>INVESTMENT</strong>₹${plan.minAmount.toLocaleString()}</div>
+                    <div><strong>DAILY EARN</strong>${plan.dailyReturnPercent}%</div>
+                    <div><strong>DURATION</strong>${plan.durationDays} Days</div>
+                    <div><strong>TOTAL EARN</strong>${plan.totalReturnPercent}%</div>
+                </div>
+                <div class="plan-actions">
+                    <button class="action-btn edit-btn" data-planid="${plan.id}">Edit</button>
+                    <button class="action-btn block-btn" data-planid="${plan.id}" data-status="${plan.isActive}">
+                        ${plan.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                </div>
+            `;
+            plansContainer.appendChild(planCard);
+        });
+
+        // Add event listeners for edit buttons
+        plansContainer.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const planId = e.target.closest('.edit-btn').dataset.planid;
+                firebase.firestore().collection('investmentPlans').doc(planId).get().then(doc => {
+                    showPlanForm({ id: doc.id, ...doc.data() });
+                });
+            });
+        });
+
+        // Add event listeners for block buttons
+        plansContainer.querySelectorAll('.block-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const planId = e.target.closest('.block-btn').dataset.planid;
+                const currentStatus = e.target.closest('.block-btn').dataset.status === 'true';
+                togglePlanStatus(planId, !currentStatus);
+            });
+        });
+    }, error => {
+        console.error("Error loading plans: ", error);
+        plansContainer.innerHTML = '<p style="color: red;">Could not load plans.</p>';
+    });
+}
+
+function showPlanForm(plan = null) {
+    const modal = document.getElementById('planModal');
+    const form = document.getElementById('planForm');
+    form.reset();
+    
+    document.getElementById('planModalTitle').textContent = plan ? 'Edit Plan' : 'Create New Plan';
+    document.getElementById('planId').value = plan ? plan.id : '';
+    
+    if (plan) {
+        document.getElementById('planName').value = plan.name;
+        document.getElementById('planMinAmount').value = plan.minAmount;
+        document.getElementById('planDuration').value = plan.durationDays;
+        document.getElementById('planDailyReturn').value = plan.dailyReturnPercent;
+        document.getElementById('planTotalReturn').value = plan.totalReturnPercent;
+        document.getElementById('planIsVIP').checked = plan.isVIP;
+    }
+    
+    const deleteBtn = document.getElementById('deletePlanBtn');
+    deleteBtn.style.display = plan ? 'inline-block' : 'none';
+    deleteBtn.onclick = () => deletePlan(plan.id);
+    
+    modal.style.display = 'block';
+}
+
+function savePlan(e) {
+    e.preventDefault();
+    
+    const planId = document.getElementById('planId').value;
+    const planData = {
+        name: document.getElementById('planName').value,
+        minAmount: parseFloat(document.getElementById('planMinAmount').value),
+        durationDays: parseInt(document.getElementById('planDuration').value),
+        dailyReturnPercent: parseFloat(document.getElementById('planDailyReturn').value),
+        totalReturnPercent: parseFloat(document.getElementById('planTotalReturn').value),
+        isVIP: document.getElementById('planIsVIP').checked
+    };
+    
+    let promise;
+    if (planId) {
+        promise = firebase.firestore().collection('investmentPlans').doc(planId).update(planData);
+    } else {
+        planData.isActive = true;
+        planData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        promise = firebase.firestore().collection('investmentPlans').add(planData);
+    }
+    
+    promise.then(() => {
+        console.log('✅ Plan saved successfully');
+        document.getElementById('planModal').style.display = 'none';
+    }).catch(error => {
+        console.error('❌ Error saving plan:', error);
+        alert('Error saving plan: ' + error.message);
+    });
+}
+
+function togglePlanStatus(planId, newStatus) {
+    const action = newStatus ? 'activate' : 'deactivate';
+    if (!confirm(`Are you sure you want to ${action} this plan?`)) return;
+    
+    firebase.firestore().collection('investmentPlans').doc(planId).update({ isActive: newStatus })
+        .then(() => console.log(`✅ Plan ${action}d.`))
+        .catch(error => console.error(`❌ Error ${action}ing plan:`, error));
+}
+
+function deletePlan(planId) {
+    if (!confirm('DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.')) return;
+    
+    firebase.firestore().collection('investmentPlans').doc(planId).delete()
+        .then(() => {
+            console.log('✅ Plan deleted.');
+            document.getElementById('planModal').style.display = 'none';
+        })
+        .catch(error => console.error('❌ Error deleting plan:', error));
+}
 
 // --- DASHBOARD/USER FUNCTIONS ---
-function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
-usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
+function loadDashboardStats() {
+    console.log('📊 Loading dashboard stats...');
+    const usersRef = firebase.firestore().collection('users');
+    
+    usersRef.get().then(snapshot => {
+        const userCount = snapshot.size;
+        let totalBalance = 0;
+        
+        snapshot.forEach(doc => {
+            totalBalance += doc.data().balance || 0;
+        });
+        
+        document.getElementById('totalUsers').textContent = userCount;
+        document.getElementById('activeUsers').textContent = userCount;
+        document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
+        console.log('✅ Dashboard stats loaded.');
+    }).catch(error => {
+        console.error('❌ Error loading dashboard stats:', error);
+    });
+}
 
-// --- UPDATED FUNCTION: Render Users Table with Email Links ---
+function loadUsers() {
+    console.log('👥 Loading users...');
+    const usersRef = firebase.firestore().collection('users').orderBy('createdAt', 'desc');
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>';
+    
+    usersRef.get().then(snapshot => {
+        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderUsersTable();
+        console.log(`✅ Loaded ${allUsers.length} users.`);
+    }).catch(error => {
+        console.error('❌ Error loading users:', error);
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>';
+    });
+}
+
 function renderUsersTable() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
@@ -125,7 +290,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
         return;
     }
     
@@ -158,7 +323,7 @@ function renderUsersTable() {
         });
     });
     
-    // NEW: Add click listeners for email links
+    // Add click listeners for email links
     tbody.querySelectorAll('.user-email-link').forEach(link => {
         link.addEventListener('click', function() {
             const userId = this.dataset.userid;
@@ -167,8 +332,30 @@ function renderUsersTable() {
     });
 }
 
-function toggleUserBlock(userId,shouldBlock){const action=shouldBlock?'block':'unblock';if(!confirm(`Are you sure you want to ${action} this user?`))return;firebase.firestore().collection('users').doc(userId).update({isBlocked:shouldBlock}).then(()=>{alert(`User ${action}ed successfully!`);loadUsers()}).catch(error=>console.error(`❌ Error ${action}ing user:`,error))}
-function loadUserDropdown(){console.log('📋 Loading user dropdown...');const select=document.getElementById('userSelect');select.innerHTML='<option value="">Select a user...</option>';allUsers.sort((a,b)=>a.email.localeCompare(b.email)).forEach(user=>{const option=document.createElement('option');option.value=user.id;option.textContent=`${user.email} (Balance: ₹${(user.balance||0).toFixed(2)})`;select.appendChild(option)})}
+function toggleUserBlock(userId, shouldBlock) {
+    const action = shouldBlock ? 'block' : 'unblock';
+    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    
+    firebase.firestore().collection('users').doc(userId).update({ isBlocked: shouldBlock })
+        .then(() => {
+            alert(`User ${action}ed successfully!`);
+            loadUsers();
+        })
+        .catch(error => console.error(`❌ Error ${action}ing user:`, error));
+}
+
+function loadUserDropdown() {
+    console.log('📋 Loading user dropdown...');
+    const select = document.getElementById('userSelect');
+    select.innerHTML = '<option value="">Select a user...</option>';
+    
+    allUsers.sort((a, b) => a.email.localeCompare(b.email)).forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = `${user.email} (Balance: ₹${(user.balance || 0).toFixed(2)})`;
+        select.appendChild(option);
+    });
+}
 
 function updateUserBalance() {
     const userId = document.getElementById('userSelect').value;
@@ -290,46 +477,4 @@ function loadUserTransactions(userId) {
                 transactionItem.innerHTML = `
                     <div class="transaction-details">
                         <div class="transaction-type">${transaction.type || 'Transaction'}</div>
-                        <div class="transaction-info">${transaction.details || 'No details'}</div>
-                        <div class="transaction-date">${transactionDate}</div>
-                    </div>
-                    <div class="transaction-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}">
-                        ${transaction.amount >= 0 ? '+' : ''}₹${transaction.amount.toFixed(2)}
-                    </div>
-                `;
-                transactionList.appendChild(transactionItem);
-            });
-        })
-        .catch(error => {
-            console.error('❌ Error loading transactions:', error);
-            transactionList.innerHTML = '<p style="color: red;">Error loading transactions.</p>';
-        });
-}
-
-function saveUserBankDetails() {
-    const userId = document.getElementById('saveBankDetailsBtn').dataset.userid;
-    if (!userId) {
-        alert('No user selected.');
-        return;
-    }
-    
-    const bankData = {
-        bankRealName: document.getElementById('userBankRealName').value,
-        bankName: document.getElementById('userBankName').value,
-        bankAccount: document.getElementById('userBankAccount').value,
-        bankIFSC: document.getElementById('userBankIFSC').value,
-        bankUPI: document.getElementById('userBankUPI').value,
-        phone: document.getElementById('userPhone').value
-    };
-    
-    firebase.firestore().collection('users').doc(userId).update(bankData)
-        .then(() => {
-            alert('Bank details updated successfully!');
-            // Update local user data
-            const userIndex = allUsers.findIndex(u => u.id === userId);
-            if (userIndex !== -1) {
-                allUsers[userIndex] = { ...allUsers[userIndex], ...bankData };
-            }
-        })
-        .catch(error => {
-            console.error('❌ Error updating ba
+           
