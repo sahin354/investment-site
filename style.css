@@ -1569,3 +1569,17 @@ body.sidebar-open .side-menu { transform: translateX(0); }
   border: none;
   padding: 8px 15px;
   border-radi
+
+    /* === ADD THIS TO THE VERY END OF YOUR style.css FILE === */
+
+/* --- NEW: Style for clickable email in admin panel --- */
+.user-email-clickable {
+    cursor: pointer;
+    color: var(--primary-color, #1e3c72);
+    text-decoration: underline;
+    font-weight: 500;
+}
+.user-email-clickable:hover {
+    color: var(--secondary-color, #2a5298);
+}
+    
