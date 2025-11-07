@@ -5,6 +5,7 @@ console.log('🔧 Admin panel script loading...');
 let allUsers = [];
 let currentAdmin = null;
 const SYSTEM_ADMINS = ["sahin54481@gmail.com", "admin@adani.com"];
+const db = firebase.firestore(); // Define db globally for all functions
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -90,8 +91,16 @@ function setupAllEventListeners() {
     dailyReturnInput.addEventListener('input', calculateTotal);
     durationInput.addEventListener('input', calculateTotal);
 
+    // --- NEW: User Details Modal Listeners ---
+    const userModal = document.getElementById('userDetailsModal');
+    document.getElementById('closeUserDetailsModal').addEventListener('click', () => userModal.style.display = 'none');
+    document.getElementById('saveBankDetailsBtn').addEventListener('click', saveUserBankDetails);
+    document.getElementById('removeBankDetailsBtn').addEventListener('click', clearUserBankDetails);
+    document.getElementById('addManualCommissionBtn').addEventListener('click', addManualCommission);
+
     window.onclick = event => {
         if (event.target == planModal) planModal.style.display = "none";
+        if (event.target == userModal) userModal.style.display = "none"; // Close user modal too
     };
 
     console.log('✅ All event listeners setup complete.');
@@ -107,8 +116,8 @@ function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to perman
 
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
-usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
+function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
+usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
 
 // --- === THIS IS THE UPDATED FUNCTION === ---
 function renderUsersTable() {
@@ -121,7 +130,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
         return;
     }
     
@@ -130,17 +139,13 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
-        // --- NEW CELLS ADDED FOR BANK DETAILS ---
+        // --- Bank details are removed from here ---
         tr.innerHTML = `
-            <td>${user.id.substring(0, 8)}...</td>
-            <td>${user.email || 'N/A'}</td>
+            <td class="user-clickable-cell" data-userid="${user.id}">${user.id.substring(0, 8)}...</td>
+            <td class="user-clickable-cell" data-userid="${user.id}">${user.email || 'N/A'}</td>
             <td>₹${(user.balance || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
-            <td>${user.bankRealName || 'N/A'}</td>
-            <td>${user.bankAccount || 'N/A'}</td>
-            <td>${user.bankIFSC || 'N/A'}</td>
-            <td>${user.bankUPI || 'N/A'}</td>
             <td>
                 <button class="action-btn block-btn" data-userid="${user.id}" data-is-blocked="${isBlocked}">
                     ${isBlocked ? 'Unblock' : 'Block'}
@@ -156,6 +161,14 @@ function renderUsersTable() {
             const userId = this.dataset.userid;
             const isBlocked = this.dataset.isBlocked === 'true';
             toggleUserBlock(userId, !isBlocked);
+        });
+    });
+
+    // --- NEW: Add listener for clicking user cells ---
+    tbody.querySelectorAll('.user-clickable-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            const userId = this.dataset.userid;
+            showUserDetailsModal(userId);
         });
     });
 }
@@ -176,7 +189,7 @@ function updateUserBalance() {
         return;
     }
 
-    const db = firebase.firestore(); 
+    // This function is defined globally at the top
     const userRef = db.collection('users').doc(userId);
     const txRef = db.collection('transactions').doc(); 
 
@@ -228,4 +241,80 @@ function updateUserBalance() {
 
 function saveSystemSettings(){console.log('💾 Saving system settings...');const settings={commission1:parseFloat(document.getElementById('commission1').value),commission2:parseFloat(document.getElementById('commission2').value),commission3:parseFloat(document.getElementById('commission3').value),minWithdrawal:parseFloat(document.getElementById('minWithdrawal').value),maxWithdrawal:parseFloat(document.getElementById('maxWithdrawal').value)};firebase.firestore().collection('systemSettings').doc('config').set(settings,{merge:true}).then(()=>alert('✅ System settings saved successfully!')).catch(error=>{console.error('❌ Error saving settings:',error);alert('Error saving settings.')})}
 function logoutControl(){console.log('🔒 Logging out...');if(confirm('Are you sure you want to secure logout?')){firebase.auth().signOut().then(()=>window.location.href='system-control.html').catch(error=>console.error('❌ Logout error:',error))}}
-                      
+
+
+// ================================================================
+// --- NEW FUNCTIONS FOR USER DETAILS MODAL ---
+// ================================================================
+
+/**
+ * Opens the modal and populates it with user data
+ */
+function showUserDetailsModal(userId) {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) {
+        alert('Error: Could not find user data.');
+        return;
+    }
+
+    const modal = document.getElementById('userDetailsModal');
+    
+    // 1. Set titles and hidden IDs
+    document.getElementById('userDetailsTitle').textContent = `User Details: ${user.email || user.id}`;
+    document.getElementById('modalUserId').value = user.id;
+    document.getElementById('modalUserEmail').value = user.email;
+
+    // 2. Populate Bank Form
+    document.getElementById('modalBankForm').reset();
+    document.getElementById('modalBankRealName').value = user.bankRealName || '';
+    document.getElementById('modalBankUPI').value = user.bankUPI || '';
+    document.getElementById('modalBankAccount').value = user.bankAccount || '';
+    document.getElementById('modalBankIFSC').value = user.bankIFSC || '';
+    
+    // 3. Populate Commission Form
+    document.getElementById('modalCommissionForm').reset();
+
+    // 4. Load Transactions
+    loadUserTransactions(user.id);
+
+    // 5. Show Modal
+    modal.style.display = 'block';
+}
+
+/**
+ * Fetches and displays the last 20 transactions for a user
+ */
+async function loadUserTransactions(userId) {
+    const listContainer = document.getElementById('userTransactionList');
+    listContainer.innerHTML = '<div class="empty-state">Loading transactions...</div>';
+
+    try {
+        const snapshot = await db.collection('transactions')
+            .where('userId', '==', userId)
+            .orderBy('timestamp', 'desc')
+            .limit(20)
+            .get();
+
+        if (snapshot.empty) {
+            listContainer.innerHTML = '<div class="empty-state">No transactions found.</div>';
+            return;
+        }
+
+        listContainer.innerHTML = ''; // Clear loading
+        snapshot.forEach(doc => {
+            const tx = doc.data();
+            const amount = tx.amount;
+            const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'N/A';
+            
+            const txHTML = `
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <span class="transaction-type">${tx.type}</span>
+                        <span class="transaction-info">${tx.details || 'No details'}</span>
+                    </div>
+                    <div>
+                        <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                            ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
+                        </div>
+                        <div class="transaction-date">${date}</div>
+            
