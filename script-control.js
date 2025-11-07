@@ -41,6 +41,7 @@ function checkAdminAuth() {
     });
 }
 
+
 // --- MAIN PANEL LOGIC ---
 function showControlPanel() {
     console.log('🎯 Showing control panel and loading data...');
@@ -77,13 +78,6 @@ function setupAllEventListeners() {
     document.getElementById('closePlanModal').addEventListener('click', () => planModal.style.display = 'none');
     document.getElementById('planForm').addEventListener('submit', savePlan);
 
-    // User Details Modal Event Listeners
-    const userDetailsModal = document.getElementById('userDetailsModal');
-    if (userDetailsModal) {
-        document.getElementById('closeUserDetailsModal').addEventListener('click', () => userDetailsModal.style.display = 'none');
-        document.getElementById('saveBankDetailsBtn').addEventListener('click', saveUserBankDetails);
-    }
-
     // Auto-calculate total return
     const dailyReturnInput = document.getElementById('planDailyReturn');
     const durationInput = document.getElementById('planDuration');
@@ -98,10 +92,153 @@ function setupAllEventListeners() {
 
     window.onclick = event => {
         if (event.target == planModal) planModal.style.display = "none";
-        if (userDetailsModal && event.target == userDetailsModal) userDetailsModal.style.display = "none";
     };
 
+    // NEW: Setup user details modal
+    setupUserDetailsModal();
+
     console.log('✅ All event listeners setup complete.');
+}
+
+// --- NEW: User Details Modal Functions ---
+function setupUserDetailsModal() {
+    console.log('⚙️ Setting up user details modal...');
+    
+    const modal = document.getElementById('userDetailsModal');
+    const closeBtn = document.getElementById('closeUserDetailsModal');
+    const saveBtn = document.getElementById('saveBankDetailsBtn');
+    
+    // Close modal when clicking X
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Save bank details
+    saveBtn.addEventListener('click', saveUserBankDetails);
+    
+    console.log('✅ User details modal setup complete.');
+}
+
+function showUserDetails(userId) {
+    console.log('👤 Loading user details for:', userId);
+    
+    const modal = document.getElementById('userDetailsModal');
+    const title = document.getElementById('userDetailsTitle');
+    
+    // Find user data
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) {
+        alert('User data not found!');
+        return;
+    }
+    
+    // Update modal title
+    title.textContent = `User Details - ${user.email}`;
+    
+    // Load bank details into form
+    document.getElementById('userBankRealName').value = user.bankRealName || '';
+    document.getElementById('userBankName').value = user.bankName || '';
+    document.getElementById('userBankAccount').value = user.bankAccount || '';
+    document.getElementById('userBankIFSC').value = user.bankIFSC || '';
+    document.getElementById('userBankUPI').value = user.bankUPI || '';
+    document.getElementById('userPhone').value = user.phone || '';
+    
+    // Load transaction history
+    loadUserTransactionHistory(userId);
+    
+    // Store current user ID for saving
+    modal.setAttribute('data-current-user-id', userId);
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
+function loadUserTransactionHistory(userId) {
+    console.log('📊 Loading transaction history for user:', userId);
+    
+    const transactionList = document.getElementById('userTransactionList');
+    transactionList.innerHTML = '<p>Loading transactions...</p>';
+    
+    const db = firebase.firestore();
+    const transactionsRef = db.collection('transactions')
+        .where('userId', '==', userId)
+        .orderBy('timestamp', 'desc')
+        .limit(50);
+    
+    transactionsRef.get().then((snapshot) => {
+        if (snapshot.empty) {
+            transactionList.innerHTML = '<p>No transactions found.</p>';
+            return;
+        }
+        
+        transactionList.innerHTML = '';
+        snapshot.forEach(doc => {
+            const tx = doc.data();
+            const amount = tx.amount || 0;
+            const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Unknown date';
+            
+            const txHTML = `
+                <div class="transaction-item">
+                    <div class="transaction-details">
+                        <span class="transaction-type">${tx.type || 'Transaction'}</span>
+                        <span class="transaction-info">${tx.details || 'No details'}</span>
+                    </div>
+                    <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                        ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
+                        <span class="transaction-date">${date}</span>
+                    </div>
+                </div>
+            `;
+            transactionList.innerHTML += txHTML;
+        });
+        
+    }).catch(error => {
+        console.error('❌ Error loading transaction history:', error);
+        transactionList.innerHTML = '<p style="color: red;">Error loading transactions.</p>';
+    });
+}
+
+function saveUserBankDetails() {
+    const modal = document.getElementById('userDetailsModal');
+    const userId = modal.getAttribute('data-current-user-id');
+    
+    if (!userId) {
+        alert('No user selected!');
+        return;
+    }
+    
+    const bankData = {
+        bankRealName: document.getElementById('userBankRealName').value,
+        bankName: document.getElementById('userBankName').value,
+        bankAccount: document.getElementById('userBankAccount').value,
+        bankIFSC: document.getElementById('userBankIFSC').value,
+        bankUPI: document.getElementById('userBankUPI').value,
+        phone: document.getElementById('userPhone').value
+    };
+    
+    console.log('💾 Saving bank details for user:', userId, bankData);
+    
+    const db = firebase.firestore();
+    db.collection('users').doc(userId).update(bankData)
+        .then(() => {
+            alert('✅ Bank details saved successfully!');
+            // Update local user data
+            const userIndex = allUsers.findIndex(u => u.id === userId);
+            if (userIndex !== -1) {
+                allUsers[userIndex] = { ...allUsers[userIndex], ...bankData };
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error saving bank details:', error);
+            alert('❌ Error saving bank details: ' + error.message);
+        });
 }
 
 // --- PLAN MANAGEMENT FUNCTIONS (UNCHANGED) ---
@@ -111,11 +248,12 @@ function savePlan(e){e.preventDefault();const planId=document.getElementById('pl
 function togglePlanStatus(planId,newStatus){const action=newStatus?'activate':'deactivate';if(!confirm(`Are you sure you want to ${action} this plan?`))return;firebase.firestore().collection('investmentPlans').doc(planId).update({isActive:newStatus}).then(()=>console.log(`✅ Plan ${action}d.`)).catch(error=>console.error(`❌ Error ${action}ing plan:`,error))}
 function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.'))return;firebase.firestore().collection('investmentPlans').doc(planId).delete().then(()=>{console.log('✅ Plan deleted.');document.getElementById('planModal').style.display='none'}).catch(error=>console.error('❌ Error deleting plan:',error))}
 
+
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>';usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>'})}
+function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>';usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})}
 
-// --- KEEP YOUR EXISTING RENDER FUNCTION BUT ADD CLICKABLE EMAILS ---
+// --- UPDATED: renderUsersTable function ---
 function renderUsersTable() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
@@ -126,7 +264,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
         return;
     }
     
@@ -135,17 +273,16 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
-        // KEEP ALL 10 COLUMNS BUT MAKE EMAIL CLICKABLE
         tr.innerHTML = `
             <td>${user.id.substring(0, 8)}...</td>
-            <td><span class="user-email-link" data-userid="${user.id}">${user.email || 'N/A'}</span></td>
+            <td>
+                <a href="#" class="user-email-link" data-userid="${user.id}">
+                    ${user.email || 'N/A'}
+                </a>
+            </td>
             <td>₹${(user.balance || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
-            <td>${user.bankRealName || 'N/A'}</td>
-            <td>${user.bankAccount || 'N/A'}</td>
-            <td>${user.bankIFSC || 'N/A'}</td>
-            <td>${user.bankUPI || 'N/A'}</td>
             <td>
                 <button class="action-btn block-btn" data-userid="${user.id}" data-is-blocked="${isBlocked}">
                     ${isBlocked ? 'Unblock' : 'Block'}
@@ -155,7 +292,7 @@ function renderUsersTable() {
         tbody.appendChild(tr);
     });
     
-    // Re-attach listener for block buttons
+    // Re-attach listeners
     tbody.querySelectorAll('.block-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userid;
@@ -164,9 +301,10 @@ function renderUsersTable() {
         });
     });
     
-    // ADD CLICK LISTENERS FOR EMAIL LINKS
+    // Attach click listeners to email links
     tbody.querySelectorAll('.user-email-link').forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
             const userId = this.dataset.userid;
             showUserDetails(userId);
         });
@@ -219,117 +357,4 @@ function updateUserBalance() {
 
             transaction.update(userRef, { balance: newBalance });
             transaction.set(txRef, {
-                userId: userId,
-                userEmail: userData.email,
-                type: txType, 
-                amount: txAmount,
-                details: reason, 
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        });
-    }).then(() => {
-        alert('Balance updated and transaction logged!');
-        loadUsers();
-        loadDashboardStats();
-    }).catch(error => {
-        console.error('❌ Error updating balance:', error);
-        alert('Failed to update balance: ' + error.message);
-    });
-}
-
-// --- NEW: USER DETAILS MODAL FUNCTIONS ---
-function showUserDetails(userId) {
-    console.log('👤 Loading user details for:', userId);
-    const modal = document.getElementById('userDetailsModal');
-    const user = allUsers.find(u => u.id === userId);
-    
-    if (!user) {
-        alert('User data not found.');
-        return;
-    }
-    
-    // Set modal title
-    document.getElementById('userDetailsTitle').textContent = `User Details: ${user.email || 'Unknown'}`;
-    
-    // Set bank details
-    document.getElementById('userBankRealName').value = user.bankRealName || '';
-    document.getElementById('userBankName').value = user.bankName || '';
-    document.getElementById('userBankAccount').value = user.bankAccount || '';
-    document.getElementById('userBankIFSC').value = user.bankIFSC || '';
-    document.getElementById('userBankUPI').value = user.bankUPI || '';
-    document.getElementById('userPhone').value = user.phone || '';
-    
-    // Store current user ID for saving
-    document.getElementById('saveBankDetailsBtn').dataset.userid = userId;
-    
-    // Load transactions
-    loadUserTransactions(userId);
-    
-    // Show modal
-    modal.style.display = 'block';
-}
-
-function loadUserTransactions(userId) {
-    const transactionList = document.getElementById('userTransactionList');
-    transactionList.innerHTML = '<p>Loading transactions...</p>';
-    
-    firebase.firestore().collection('transactions')
-        .where('userId', '==', userId)
-        .orderBy('timestamp', 'desc')
-        .limit(50)
-        .get()
-        .then(snapshot => {
-            if (snapshot.empty) {
-                transactionList.innerHTML = '<p>No transactions found.</p>';
-                return;
-            }
-            
-            transactionList.innerHTML = '';
-            snapshot.forEach(doc => {
-                const transaction = doc.data();
-                const transactionDate = transaction.timestamp && transaction.timestamp.seconds 
-                    ? new Date(transaction.timestamp.seconds * 1000).toLocaleString() 
-                    : 'Unknown date';
-                
-                const transactionItem = document.createElement('div');
-                transactionItem.className = 'transaction-item';
-                transactionItem.innerHTML = `
-                    <div class="transaction-details">
-                        <div class="transaction-type">${transaction.type || 'Transaction'}</div>
-                        <div class="transaction-info">${transaction.details || 'No details'}</div>
-                        <div class="transaction-date">${transactionDate}</div>
-                    </div>
-                    <div class="transaction-amount ${transaction.amount >= 0 ? 'positive' : 'negative'}">
-                        ${transaction.amount >= 0 ? '+' : ''}₹${transaction.amount.toFixed(2)}
-                    </div>
-                `;
-                transactionList.appendChild(transactionItem);
-            });
-        })
-        .catch(error => {
-            console.error('❌ Error loading transactions:', error);
-            transactionList.innerHTML = '<p style="color: red;">Error loading transactions.</p>';
-        });
-}
-
-function saveUserBankDetails() {
-    const userId = document.getElementById('saveBankDetailsBtn').dataset.userid;
-    if (!userId) {
-        alert('No user selected.');
-        return;
-    }
-    
-    const bankData = {
-        bankRealName: document.getElementById('userBankRealName').value,
-        bankName: document.getElementById('userBankName').value,
-        bankAccount: document.getElementById('userBankAccount').value,
-        bankIFSC: document.getElementById('userBankIFSC').value,
-        bankUPI: document.getElementById('userBankUPI').value,
-        phone: document.getElementById('userPhone').value
-    };
-    
-    firebase.firestore().collection('users').doc(userId).update(bankData)
-        .then(() => {
-            alert('Bank details updated successfully!');
-            // Update local user data
-            const userInde
+     
