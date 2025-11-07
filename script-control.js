@@ -92,7 +92,26 @@ function setupAllEventListeners() {
 
     window.onclick = event => {
         if (event.target == planModal) planModal.style.display = "none";
+        // --- NEW: Close user modal on outside click ---
+        const userModal = document.getElementById('userDetailsModal');
+        if (event.target == userModal) userModal.style.display = "none";
     };
+
+    // --- NEW: User Details Modal Listeners ---
+    document.getElementById('closeUserDetailsModal').addEventListener('click', () => {
+        document.getElementById('userDetailsModal').style.display = 'none';
+    });
+
+    document.getElementById('bankDetailsForm').addEventListener('submit', handleBankDetailsSave);
+
+    // --- IMPORTANT: This listener is for the table *body* ---
+    document.getElementById('usersTableBody').addEventListener('click', (e) => {
+        const clickable = e.target.closest('.user-email-clickable');
+        if (clickable) {
+            const userId = clickable.dataset.userid;
+            showUserDetailsModal(userId);
+        }
+    });
 
     console.log('✅ All event listeners setup complete.');
 }
@@ -107,21 +126,21 @@ function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to perman
 
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>'; // Updated colspan
-usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Updated colspan
+function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>'; // Colspan is 6
+usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>'})} // Colspan is 6
 
-// --- === THIS IS THE UPDATED FUNCTION === ---
+// --- RENDER USERS TABLE (New Version) ---
 function renderUsersTable() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '';
     
     const usersToRender = searchTerm 
-        ? allUsers.filter(user => (user.email && user.email.toLowerCase().includes(searchTerm)) || user.id.toLowerCase().includes(searchTerm)) 
+        ? allUsers.filter(user => (user.email && user.email.toLowerCase().includes(searchTerm)) || (user.id && user.id.toLowerCase().includes(searchTerm))) 
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found.</td></tr>'; // Updated colspan
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>'; // Colspan is 6
         return;
     }
     
@@ -130,17 +149,13 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
-        // --- NEW CELLS ADDED FOR BANK DETAILS ---
+        // --- Row HTML for 6 columns ---
         tr.innerHTML = `
             <td>${user.id.substring(0, 8)}...</td>
-            <td>${user.email || 'N/A'}</td>
+            <td><span class="user-email-clickable" data-userid="${user.id}">${user.email || 'N/A'}</span></td>
             <td>₹${(user.balance || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
-            <td>${user.bankRealName || 'N/A'}</td>
-            <td>${user.bankAccount || 'N/A'}</td>
-            <td>${user.bankIFSC || 'N/A'}</td>
-            <td>${user.bankUPI || 'N/A'}</td>
             <td>
                 <button class="action-btn block-btn" data-userid="${user.id}" data-is-blocked="${isBlocked}">
                     ${isBlocked ? 'Unblock' : 'Block'}
@@ -150,7 +165,7 @@ function renderUsersTable() {
         tbody.appendChild(tr);
     });
     
-    // Re-attach listener for block buttons
+    // Re-attach listener for block buttons (This is just in case, not strictly needed)
     tbody.querySelectorAll('.block-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userid;
@@ -159,11 +174,11 @@ function renderUsersTable() {
         });
     });
 }
-// --- === END OF UPDATED FUNCTION === ---
+// --- END OF UPDATED FUNCTION ---
 
 
 function toggleUserBlock(userId,shouldBlock){const action=shouldBlock?'block':'unblock';if(!confirm(`Are you sure you want to ${action} this user?`))return;firebase.firestore().collection('users').doc(userId).update({isBlocked:shouldBlock}).then(()=>{alert(`User ${action}ed successfully!`);loadUsers()}).catch(error=>console.error(`❌ Error ${action}ing user:`,error))}
-function loadUserDropdown(){console.log('📋 Loading user dropdown...');const select=document.getElementById('userSelect');select.innerHTML='<option value="">Select a user...</option>';allUsers.sort((a,b)=>a.email.localeCompare(b.email)).forEach(user=>{const option=document.createElement('option');option.value=user.id;option.textContent=`${user.email} (Balance: ₹${(user.balance||0).toFixed(2)})`;select.appendChild(option)})}
+function loadUserDropdown(){console.log('📋 Loading user dropdown...');const select=document.getElementById('userSelect');select.innerHTML='<option value="">Select a user...</option>';allUsers.sort((a,b)=> (a.email || '').localeCompare(b.email || '')).forEach(user=>{const option=document.createElement('option');option.value=user.id;option.textContent=`${user.email} (Balance: ₹${(user.balance||0).toFixed(2)})`;select.appendChild(option)})}
 
 function updateUserBalance() {
     const userId = document.getElementById('userSelect').value;
@@ -229,3 +244,79 @@ function updateUserBalance() {
 function saveSystemSettings(){console.log('💾 Saving system settings...');const settings={commission1:parseFloat(document.getElementById('commission1').value),commission2:parseFloat(document.getElementById('commission2').value),commission3:parseFloat(document.getElementById('commission3').value),minWithdrawal:parseFloat(document.getElementById('minWithdrawal').value),maxWithdrawal:parseFloat(document.getElementById('maxWithdrawal').value)};firebase.firestore().collection('systemSettings').doc('config').set(settings,{merge:true}).then(()=>alert('✅ System settings saved successfully!')).catch(error=>{console.error('❌ Error saving settings:',error);alert('Error saving settings.')})}
 function logoutControl(){console.log('🔒 Logging out...');if(confirm('Are you sure you want to secure logout?')){firebase.auth().signOut().then(()=>window.location.href='system-control.html').catch(error=>console.error('❌ Logout error:',error))}}
                       
+
+// --- === NEW FUNCTIONS FOR USER POPUP === ---
+
+/**
+ * Shows and populates the user details modal.
+ * @param {string} userId - The Firestore document ID of the user.
+ */
+function showUserDetailsModal(userId) {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) {
+        console.error("User not found for modal");
+        return;
+    }
+
+    // Get modal elements
+    const modal = document.getElementById('userDetailsModal');
+    const title = document.getElementById('userDetailsTitle');
+    const bankForm = document.getElementById('bankDetailsForm');
+    
+    // Populate simple details
+    title.textContent = `User Details: ${user.email || 'N/A'}`;
+    document.getElementById('modalUserId').textContent = user.id;
+    document.getElementById('modalUserEmail').textContent = user.email || 'N/A';
+    
+    // Populate bank form
+    bankForm.dataset.userid = userId; // Store ID for saving
+    document.getElementById('modalBankRealName').value = user.bankRealName || '';
+    document.getElementById('modalBankAccount').value = user.bankAccount || '';
+    document.getElementById('modalBankIFSC').value = user.bankIFSC || '';
+    document.getElementById('modalBankUPI').value = user.bankUPI || '';
+
+    // Load transactions
+    loadUserTransactions(userId);
+
+    // Show the modal
+    modal.style.display = 'block';
+}
+
+/**
+ * Loads the last 50 transactions for a user into the modal.
+ * @param {string} userId - The Firestore document ID of the user.
+ */
+async function loadUserTransactions(userId) {
+    const listContainer = document.getElementById('userTransactionList');
+    listContainer.innerHTML = '<p>Loading transactions...</p>';
+
+    try {
+        const txQuery = await firebase.firestore().collection('transactions')
+                                  .where('userId', '==', userId)
+                                  .orderBy('timestamp', 'desc')
+                                  .limit(50) // Load last 50
+                                  .get();
+
+        if (txQuery.empty) {
+            listContainer.innerHTML = '<p>No transactions found for this user.</p>';
+            return;
+        }
+
+        listContainer.innerHTML = ''; // Clear loading
+        txQuery.forEach(doc => {
+            const tx = doc.data();
+            const amount = tx.amount;
+            const date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Just now';
+            
+            // Determine icon (Font Awesome)
+            let iconClass = 'fa-dollar-sign'; // Default
+            if (tx.type === 'Deposit' || tx.type ==="Earnings") iconClass = 'fa-arrow-up';
+            if (tx.type === 'Withdrawal' || tx.type === 'Investment') iconClass = 'fa-arrow-down';
+
+            // Re-using styles from style.css (.transaction-item.modern)
+            const txHTML = `
+                <div class="transaction-item modern">
+                    <div class="transaction-icon">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="transact
