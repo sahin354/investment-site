@@ -309,7 +309,7 @@ async function loadUserTransactions(userId) {
             
             // Determine icon (Font Awesome)
             let iconClass = 'fa-dollar-sign'; // Default
-            if (tx.type === 'Deposit' || tx.type === 'Earnings') iconClass = 'fa-arrow-up';
+            if (tx.type === 'Deposit' || tx.type ==="Earnings") iconClass = 'fa-arrow-up';
             if (tx.type === 'Withdrawal' || tx.type === 'Investment') iconClass = 'fa-arrow-down';
 
             // Re-using styles from style.css (.transaction-item.modern)
@@ -319,4 +319,4 @@ async function loadUserTransactions(userId) {
                         <i class="fas ${iconClass}"></i>
                     </div>
                     <div class="transaction-details">
-                        <span class="transaction-type">${tx
+                        <span class="transaction-type">${tx.
