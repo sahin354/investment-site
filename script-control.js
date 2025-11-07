@@ -5,7 +5,7 @@ console.log('🔧 Admin panel script loading...');
 let allUsers = [];
 let currentAdmin = null;
 const SYSTEM_ADMINS = ["sahin54481@gmail.com", "admin@adani.com"];
-const db = firebase.firestore(); // Define db globally for all functions
+// const db = firebase.firestore(); // <-- THIS LINE IS REMOVED (IT'S IN firebaseConfig.js)
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -316,5 +316,4 @@ async function loadUserTransactions(userId) {
                         <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
                             ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
                         </div>
-                        <div class="transaction-date">${date}</div>
-            
+                        <div class="transaction-date">${date}
