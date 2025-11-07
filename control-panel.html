@@ -26,13 +26,30 @@
         .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
-        /* --- NEW: Payment Sub-Tabs --- */
+        /* --- Payment Sub-Tabs --- */
         .payment-sub-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
         .payment-sub-tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 1.1em; color: #777; }
         .payment-sub-tab.active { color: var(--primary-color); font-weight: bold; border-bottom: 2px solid var(--primary-color); }
         .payment-tab-content { display: none; }
         .payment-tab-content.active { display: block; }
-        
+
+        /* --- NEW: User Details Modal Styles --- */
+        .user-table .user-clickable-cell { cursor: pointer; text-decoration: underline; color: var(--primary-color); }
+        .modal-section { margin-bottom: 20px; }
+        .modal-section h3 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 15px; }
+        .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        #userTransactionList { max-height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px; background: #fdfdfd; }
+        #userTransactionList .transaction-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        #userTransactionList .transaction-item:last-child { border-bottom: none; }
+        #userTransactionList .transaction-details { font-size: 0.9em; }
+        #userTransactionList .transaction-type { font-weight: 600; }
+        #userTransactionList .transaction-info { color: #555; font-size: 0.9em; }
+        #userTransactionList .transaction-amount { font-weight: 700; font-size: 0.95em; }
+        #userTransactionList .transaction-amount.positive { color: #28a745; }
+        #userTransactionList .transaction-amount.negative { color: #dc3545; }
+        #userTransactionList .transaction-date { font-size: 0.8em; color: #777; }
+        #userTransactionList .empty-state { text-align: center; color: #777; padding: 20px; }
+
     </style>
 </head>
 <body>
@@ -69,10 +86,6 @@
                             <th>Balance</th>
                             <th>Join Date</th>
                             <th>Status</th>
-                            <th>Bank Name</th>
-                            <th>Bank Account</th>
-                            <th>IFSC</th>
-                            <th>UPI</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -202,14 +215,61 @@
                 <span class="close-btn" id="closeUserDetailsModal">&times;</span>
             </div>
             
-            <div id="userDetailsContent">
+            <input type="hidden" id="modalUserId">
+            <input type="hidden" id="modalUserEmail">
+
+            <div class="modal-section">
+                <h3>Bank Account Details</h3>
+                <form id="modalBankForm">
+                    <div class="modal-form-grid">
+                        <div class="form-group">
+                            <label for="modalBankRealName">Real Name</label>
+                            <input type="text" id="modalBankRealName">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalBankUPI">UPI ID</label>
+                            <input type="text" id="modalBankUPI">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalBankAccount">Bank Account No.</label>
+                            <input type="text" id="modalBankAccount">
+                        </div>
+                        <div class="form-group">
+                            <label for="modalBankIFSC">IFSC Code</label>
+                            <input type="text" id="modalBankIFSC">
+                        </div>
+                    </div>
+                    <div class="control-actions">
+                        <button type="button" id="saveBankDetailsBtn" class="submit-btn">💾 Save Bank Details</button>
+                        <button type="button" id="removeBankDetailsBtn" class="delete-btn">🗑️ Clear Bank Details</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-section">
+                <h3>Manual Commission / Bonus</h3>
+                <form id="modalCommissionForm">
+                     <div class="modal-form-grid">
+                        <div class="form-group">
+                            <label for="modalCommAmount">Amount (₹)</label>
+                            <input type="number" id="modalCommAmount" placeholder="e.g., 50" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalCommReason">Reason</label>
+                            <input type="text" id="modalCommReason" placeholder="e.g., L1 Refer Bonus" required>
+                        </div>
+                    </div>
+                    <button type="button" id="addManualCommissionBtn" class="submit-btn">➕ Add to User's Balance</button>
+                </form>
+            </div>
+
+            <div class="modal-section">
+                <h3>Transaction History (Last 20)</h3>
+                <div id="userTransactionList">
+                    <div class="empty-state">Loading transactions...</div>
                 </div>
-            
-            <hr>
-            
-            <h3>Transaction History</h3>
-            <div id="userTransactionList" style="max-height: 400px; overflow-y: auto;">
-                </div>
+            </div>
+
         </div>
     </div>
 
@@ -223,4 +283,5 @@
     
     <script src="script-payment-approval.js"></script>
 </body>
-</html>
+                                                                                  </html>
+    
