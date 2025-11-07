@@ -33,6 +33,17 @@
         .payment-sub-tab.active { color: var(--primary-color); font-weight: bold; border-bottom: 2px solid var(--primary-color); }
         .payment-tab-content { display: none; }
         .payment-tab-content.active { display: block; }
+
+        /* --- NEW: Style for clickable email in admin panel --- */
+        .user-email-clickable {
+            cursor: pointer;
+            color: var(--primary-color, #1e3c72);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .user-email-clickable:hover {
+            color: var(--secondary-color, #2a5298);
+        }
         
     </style>
 </head>
@@ -161,7 +172,7 @@
             
             <div class="form-group"><label for="commission1">Referral Commission - Level 1 (%)</label><input type="number" id="commission1" value="21" min="0" max="100"></div>
             <div class="form-group"><label for="commission2">Referral Commission - Level 2 (%)</label><input type="number" id="commission2" value="3" min="0" max="100"></div>
-            <div class="form-group"><label for="commission3">Referral Commission - Level 3 (%)</label><input type="number" id="commission3" value="1" min="0" max="100"></div>
+            <div class="form-group"><label for="commission3">Referral Commission - Level 3 (%)</label><input type="number" id="commission3" value="1" min="0" max="1NTgg"></div>
             <div class="form-group"><label for="minWithdrawal">Minimum Withdrawal Limit</label><input type="number" id="minWithdrawal" value="100"></div>
             <div class="form-group"><label for="maxWithdrawal">Maximum Withdrawal Limit</label><input type="number" id="maxWithdrawal" value="50000"></div>
             <button id="saveSettingsButton" class="submit-btn">💾 Save Configuration</button>
