@@ -47,7 +47,7 @@ function showControlPanel() {
     console.log('🎯 Showing control panel and loading data...');
     loadDashboardStats();
     loadUsers();
-    setupAllEventListeners();
+    setupAllEventListeners(); // This function will no longer crash
     console.log('✅ Control panel fully loaded!');
 }
 
@@ -319,5 +319,4 @@ async function loadUserTransactions(userId) {
                     <div class="transaction-icon">
                         <i class="fas ${iconClass}"></i>
                     </div>
-                    <div class="transaction-details">
-                        <span 
+                    <div class="transaction-de
