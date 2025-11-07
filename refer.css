@@ -217,16 +217,14 @@ body.sidebar-open .side-menu {
 */
 
 /* --- Main Content Styles --- */
-/* This is the new default style for MOBILE */
-/* --- Main Content Styles --- */
 
-/* 1. This is the new style for MOBILE (full-width) */
+/* This is the default style for MOBILE (full-width) */
 main {
   padding: 15px;
   /* We remove max-width and margin so it fills the screen */
 }
 
-/* 2. This new media query adds the DESKTOP layout */
+/* This new media query adds the DESKTOP layout */
 @media (min-width: 768px) {
   main {
     /* This centers the content on wide screens */
@@ -235,6 +233,7 @@ main {
     margin-right: auto;
   }
 }
+
 
 .card {
   background-color: var(--card-bg);
