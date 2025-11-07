@@ -165,7 +165,7 @@ function renderUsersTable() {
         tbody.appendChild(tr);
     });
     
-    // Re-attach listener for block buttons (This is just in case, not strictly needed)
+    // Re-attach listener for block buttons
     tbody.querySelectorAll('.block-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userid;
@@ -319,4 +319,5 @@ async function loadUserTransactions(userId) {
                     <div class="transaction-icon">
                         <i class="fas ${iconClass}"></i>
                     </div>
-                    <div class="transact
+                    <div class="transaction-details">
+                        <span 
