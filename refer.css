@@ -216,23 +216,31 @@ body.sidebar-open .side-menu {
   ================================================================
 */
 
-/* --- Main Content Styles --- */
+
+/* ================================================================
+   START: UPDATED Main Content Styles (THE FIX IS HERE)
+================================================================
+*/
 
 /* This is the default style for MOBILE (full-width) */
 main {
   padding: 15px;
-  /* We remove max-width and margin so it fills the screen */
+  /* max-width and margin are removed so it's full-width */
 }
 
-/* This new media query adds the DESKTOP layout */
+/* This new section adds the DESKTOP layout */
 @media (min-width: 768px) {
   main {
-    /* This centers the content on wide screens */
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
   }
 }
+
+/* ================================================================
+   END: UPDATED Main Content Styles
+================================================================
+*/
 
 
 .card {
@@ -650,9 +658,11 @@ main {
 
 /* --- Mobile Responsive Adjustments --- */
 @media (max-width: 480px) {
-  main {
-    padding: 10px;
-  }
+  /*
+    NOTE: We removed the `main` style from here
+    because it's now handled by the desktop-specific
+    media query above.
+  */
 
   .card {
     padding: 15px;
@@ -698,5 +708,5 @@ main {
   .toast.show {
     transform: translate(0, 0);
   }
-  }
-    
+    }
+  
