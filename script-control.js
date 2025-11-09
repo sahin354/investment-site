@@ -1,4 +1,4 @@
-// System Control Panel JavaScript - FIXED REAL-TIME VERSION
+// System Control Panel JavaScript - FIXED VERSION
 console.log('🔧 Admin panel script loading...');
 
 // --- GLOBAL VARIABLES ---
@@ -47,7 +47,6 @@ function showControlPanel() {
     loadDashboardStats();
     loadUsers();
     setupAllEventListeners();
-    setupRealTimeListeners(); // NEW: Real-time data listeners
     console.log('✅ Control panel fully loaded!');
 }
 
@@ -117,20 +116,6 @@ function setupAllEventListeners() {
     console.log('✅ All event listeners setup complete.');
 }
 
-// --- REAL-TIME DATA LISTENERS ---
-function setupRealTimeListeners() {
-    console.log('🔄 Setting up real-time listeners...');
-    
-    // Real-time users listener for dashboard updates
-    firebase.firestore().collection('users')
-        .onSnapshot(snapshot => {
-            console.log('🔄 Users data updated - refreshing dashboard');
-            loadDashboardStats();
-        }, error => {
-            console.error('❌ Real-time users listener error:', error);
-        });
-}
-
 // --- DASHBOARD/USER FUNCTIONS ---
 function loadDashboardStats() {
     console.log('📊 Loading dashboard stats...');
@@ -153,6 +138,10 @@ function loadDashboardStats() {
         console.log('✅ Dashboard stats loaded - Users:', userCount, 'Balance: ₹', totalBalance);
     }).catch(error => {
         console.error('❌ Error loading dashboard stats:', error);
+        // Set default values if error
+        document.getElementById('totalUsers').textContent = '0';
+        document.getElementById('activeUsers').textContent = '0';
+        document.getElementById('totalBalance').textContent = '₹0';
     });
 }
 
@@ -172,6 +161,7 @@ function loadUsers() {
     });
 }
 
+// --- FIXED: CORRECTED RENDER USERS TABLE FUNCTION ---
 function renderUsersTable() {
     const searchTerm = document.getElementById('searchUser').value.toLowerCase();
     const tbody = document.getElementById('usersTableBody');
@@ -191,6 +181,7 @@ function renderUsersTable() {
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
+        // FIXED: Only 6 columns to match HTML structure
         tr.innerHTML = `
             <td>${user.id.substring(0, 8)}...</td>
             <td><a href="#" class="user-email-link" data-userid="${user.id}">${user.email || 'N/A'}</a></td>
@@ -235,7 +226,10 @@ function toggleUserBlock(userId, shouldBlock) {
         alert(`User ${action}ed successfully!`);
         loadUsers(); // Refresh users list
         loadDashboardStats(); // Refresh stats
-    }).catch(error => console.error(`❌ Error ${action}ing user:`, error));
+    }).catch(error => {
+        console.error(`❌ Error ${action}ing user:`, error);
+        alert(`Error ${action}ing user: ${error.message}`);
+    });
 }
 
 function loadUserDropdown() {
@@ -319,7 +313,7 @@ function updateUserBalance() {
     });
 }
 
-// --- PLAN MANAGEMENT FUNCTIONS (FIXED VERSION) ---
+// --- PLAN MANAGEMENT FUNCTIONS ---
 function loadPlans() {
     console.log('📈 Loading investment plans...');
     const plansContainer = document.getElementById('plansContainer');
@@ -480,4 +474,9 @@ function deletePlan(planId) {
         })
         .catch(error => {
             console.error('❌ Error deleting plan:', error);
-            alert(
+            alert('❌ Error deleting plan: ' + error.message);
+        });
+}
+
+function calculateTotalReturn() {
+    const daily = parseFloat(document.getElementBy
