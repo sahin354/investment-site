@@ -1,4 +1,4 @@
-// System Control Panel JavaScript - COMPLETELY FIXED VERSION
+// System Control Panel JavaScript - FIXED REAL-TIME VERSION
 console.log('🔧 Admin panel script loading...');
 
 // --- GLOBAL VARIABLES ---
@@ -47,7 +47,7 @@ function showControlPanel() {
     loadDashboardStats();
     loadUsers();
     setupAllEventListeners();
-    setupRealTimeListeners(); // NEW: Real-time updates
+    setupRealTimeListeners(); // NEW: Real-time data listeners
     console.log('✅ Control panel fully loaded!');
 }
 
@@ -106,7 +106,13 @@ function setupAllEventListeners() {
 
     window.onclick = event => {
         if (event.target == planModal) planModal.style.display = "none";
+        if (event.target == document.getElementById('userDetailsModal')) {
+            document.getElementById('userDetailsModal').style.display = "none";
+        }
     };
+
+    // User Details Modal Events
+    setupUserDetailsModal();
 
     console.log('✅ All event listeners setup complete.');
 }
@@ -115,24 +121,13 @@ function setupAllEventListeners() {
 function setupRealTimeListeners() {
     console.log('🔄 Setting up real-time listeners...');
     
-    // Real-time users listener
+    // Real-time users listener for dashboard updates
     firebase.firestore().collection('users')
         .onSnapshot(snapshot => {
-            console.log('🔄 Users data updated in real-time');
-            loadDashboardStats(); // Refresh stats when users change
+            console.log('🔄 Users data updated - refreshing dashboard');
+            loadDashboardStats();
         }, error => {
             console.error('❌ Real-time users listener error:', error);
-        });
-
-    // Real-time transactions listener
-    firebase.firestore().collection('transactions')
-        .orderBy('timestamp', 'desc')
-        .limit(1)
-        .onSnapshot(snapshot => {
-            console.log('🔄 New transaction detected');
-            // Transactions are handled in user details modal
-        }, error => {
-            console.error('❌ Real-time transactions listener error:', error);
         });
 }
 
@@ -146,7 +141,8 @@ function loadDashboardStats() {
         let totalBalance = 0;
         
         snapshot.forEach(doc => {
-            totalBalance += parseFloat(doc.data().balance) || 0;
+            const userData = doc.data();
+            totalBalance += parseFloat(userData.balance) || 0;
         });
         
         // UPDATE THE UI IMMEDIATELY
@@ -164,7 +160,7 @@ function loadUsers() {
     console.log('👥 Loading users...');
     const usersRef = firebase.firestore().collection('users').orderBy('createdAt', 'desc');
     const tbody = document.getElementById('usersTableBody');
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">Loading users...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>';
     
     usersRef.get().then(snapshot => {
         allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -172,7 +168,7 @@ function loadUsers() {
         console.log(`✅ Loaded ${allUsers.length} users.`);
     }).catch(error => {
         console.error('❌ Error loading users:', error);
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>';
     });
 }
 
@@ -186,7 +182,7 @@ function renderUsersTable() {
         : allUsers;
 
     if (usersToRender.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No users found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
         return;
     }
     
@@ -201,10 +197,6 @@ function renderUsersTable() {
             <td>₹${(user.balance || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
-            <td>${user.bankRealName || 'N/A'}</td>
-            <td>${user.bankAccount || 'N/A'}</td>
-            <td>${user.bankIFSC || 'N/A'}</td>
-            <td>${user.bankUPI || 'N/A'}</td>
             <td>
                 <button class="action-btn block-btn" data-userid="${user.id}" data-is-blocked="${isBlocked}">
                     ${isBlocked ? 'Unblock' : 'Block'}
@@ -317,7 +309,7 @@ function updateUserBalance() {
         document.getElementById('balanceAmount').value = '';
         document.getElementById('balanceReason').value = '';
         
-        // Refresh data
+        // Refresh data IMMEDIATELY
         loadUsers();
         loadDashboardStats();
         loadUserDropdown();
@@ -327,7 +319,7 @@ function updateUserBalance() {
     });
 }
 
-// --- PLAN MANAGEMENT FUNCTIONS (COMPLETELY REWRITTEN) ---
+// --- PLAN MANAGEMENT FUNCTIONS (FIXED VERSION) ---
 function loadPlans() {
     console.log('📈 Loading investment plans...');
     const plansContainer = document.getElementById('plansContainer');
@@ -480,4 +472,12 @@ function togglePlanStatus(planId, newStatus) {
 function deletePlan(planId) {
     if (!confirm('⚠️ DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.')) return;
     
-    firebase.firestore().collection('investmentPla
+    firebase.firestore().collection('investmentPlans').doc(planId).delete()
+        .then(() => {
+            alert('✅ Plan deleted successfully!');
+            document.getElementById('planModal').style.display = 'none';
+            loadPlans(); // Refresh plans list
+        })
+        .catch(error => {
+            console.error('❌ Error deleting plan:', error);
+            alert(
