@@ -1,4 +1,4 @@
-// System Control Panel - SIMPLIFIED WORKING VERSION
+// System Control Panel - COMPLETE WORKING VERSION
 console.log('🔧 Admin panel script loading...');
 
 // Global variables
@@ -91,10 +91,27 @@ function setupEventListeners() {
     });
     document.getElementById('planForm').addEventListener('submit', savePlan);
     
+    // Plan auto-calculation
+    var dailyReturnInput = document.getElementById('planDailyReturn');
+    var durationInput = document.getElementById('planDuration');
+    var totalReturnInput = document.getElementById('planTotalReturn');
+    
+    if (dailyReturnInput && durationInput && totalReturnInput) {
+        dailyReturnInput.addEventListener('input', calculateTotalReturn);
+        durationInput.addEventListener('input', calculateTotalReturn);
+    }
+    
     // User details modal
     setupUserDetailsModal();
     
     console.log('✅ Listeners setup complete');
+}
+
+function calculateTotalReturn() {
+    var daily = parseFloat(document.getElementById('planDailyReturn').value) || 0;
+    var duration = parseInt(document.getElementById('planDuration').value) || 0;
+    var total = daily * duration;
+    document.getElementById('planTotalReturn').value = total.toFixed(1);
 }
 
 // Dashboard functions
@@ -351,26 +368,31 @@ function showUserDetails(userId) {
 }
 
 function loadUserTransactionHistory(userId) {
+    console.log('📊 Loading transaction history for user:', userId);
+    
     var transactionList = document.getElementById('userTransactionList');
-    transactionList.innerHTML = 'Loading transactions...';
+    transactionList.innerHTML = '<p>Loading transactions...</p>';
     
     firebase.firestore().collection('transactions')
         .where('userId', '==', userId)
         .orderBy('timestamp', 'desc')
-        .limit(20)
+        .limit(50)
         .get()
         .then(function(snapshot) {
-            transactionList.innerHTML = '';
+            console.log('Found', snapshot.size, 'transactions');
             
             if (snapshot.empty) {
-                transactionList.innerHTML = '<p>No transactions found</p>';
+                transactionList.innerHTML = '<p>No transactions found for this user.</p>';
                 return;
             }
             
+            transactionList.innerHTML = '';
             snapshot.forEach(function(doc) {
                 var tx = doc.data();
                 var amount = tx.amount || 0;
-                var date = tx.timestamp ? tx.timestamp.toDate().toLocaleString() : 'Unknown';
+                var date = tx.timestamp ? 
+                    new Date(tx.timestamp.seconds * 1000).toLocaleString() : 
+                    'Unknown date';
                 
                 var txHTML = `
                     <div class="transaction-item">
@@ -388,7 +410,46 @@ function loadUserTransactionHistory(userId) {
             });
         })
         .catch(function(error) {
-            transactionList.innerHTML = '<p style="color:red;">Error loading transactions</p>';
+            console.error('❌ Error loading transaction history:', error);
+            
+            // Try without ordering if there's an index error
+            if (error.code === 'failed-precondition') {
+                firebase.firestore().collection('transactions')
+                    .where('userId', '==', userId)
+                    .limit(50)
+                    .get()
+                    .then(function(snapshot) {
+                        transactionList.innerHTML = '';
+                        if (snapshot.empty) {
+                            transactionList.innerHTML = '<p>No transactions found.</p>';
+                            return;
+                        }
+                        
+                        snapshot.forEach(function(doc) {
+                            var tx = doc.data();
+                            var amount = tx.amount || 0;
+                            var date = tx.timestamp ? 
+                                new Date(tx.timestamp.seconds * 1000).toLocaleString() : 
+                                'Unknown date';
+                            
+                            var txHTML = `
+                                <div class="transaction-item">
+                                    <div class="transaction-details">
+                                        <span class="transaction-type">${tx.type || 'Transaction'}</span>
+                                        <span class="transaction-info">${tx.details || 'No details'}</span>
+                                    </div>
+                                    <div class="transaction-amount ${amount > 0 ? 'positive' : 'negative'}">
+                                        ${amount > 0 ? '+' : ''}₹${amount.toFixed(2)}
+                                        <span class="transaction-date">${date}</span>
+                                    </div>
+                                </div>
+                            `;
+                            transactionList.innerHTML += txHTML;
+                        });
+                    });
+            } else {
+                transactionList.innerHTML = '<p style="color:red;">Error loading transactions. Check console.</p>';
+            }
         });
 }
 
@@ -424,18 +485,32 @@ function saveUserBankDetails() {
         });
 }
 
-// Plan management functions (simplified)
+// Plan Management Functions
 function loadPlans() {
-    console.log('Loading plans...');
-    // Your existing plan loading code here
-}
-
-function showPlanForm(plan) {
-    document.getElementById('planModal').style.display = 'block';
-    // Your existing plan form code here
-}
-
-function savePlan(e) {
-    e.preventDefault();
-    // Your existing save plan code here
-        }
+    console.log('📈 Loading investment plans...');
+    var plansContainer = document.getElementById('plansContainer');
+    plansContainer.innerHTML = '<p>Loading plans...</p>';
+    
+    firebase.firestore().collection('investmentPlans')
+        .orderBy('isVIP', 'desc')
+        .orderBy('minAmount', 'asc')
+        .get()
+        .then(function(snapshot) {
+            if (snapshot.empty) {
+                plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p>';
+                return;
+            }
+            
+            plansContainer.innerHTML = '';
+            snapshot.forEach(function(doc) {
+                var plan = { id: doc.id, ...doc.data() };
+                var planCard = document.createElement('div');
+                planCard.className = 'plan-card ' + (plan.isVIP ? 'vip' : '');
+                planCard.innerHTML = `
+                    <div class="plan-header">
+                        <div class="plan-title">
+                            ${plan.name} 
+                            ${plan.isVIP ? '<span class="vip-badge">VIP</span>' : ''}
+                        </div>
+                        <span style="color: ${plan.isActive ? 'green' : 'gray'}; font-weight: bold;">
+                            ${plan.isActive ? '● Active' : '● Inactiv
