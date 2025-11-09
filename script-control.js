@@ -1,4 +1,4 @@
-// System Control Panel JavaScript - FINAL & FIXED
+// System Control Panel JavaScript - UPDATED & WORKING
 console.log('🔧 Admin panel script loading...');
 
 // --- GLOBAL VARIABLES ---
@@ -7,7 +7,7 @@ let currentAdmin = null;
 const SYSTEM_ADMINS = ["sahin54481@gmail.com", "admin@adani.com"];
 
 // --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM loaded, initializing admin panel...');
     initializeAdminPanel();
 });
@@ -20,7 +20,7 @@ function initializeAdminPanel() {
 // --- AUTHENTICATION ---
 function checkAdminAuth() {
     console.log('🔐 Checking admin authentication...');
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged(function(user) {
         if (user && SYSTEM_ADMINS.includes(user.email.toLowerCase())) {
             currentAdmin = user;
             console.log('✅ Admin access granted for:', user.email);
@@ -35,7 +35,7 @@ function checkAdminAuth() {
             }
             window.location.href = 'system-control.html';
         }
-    }, error => {
+    }, function(error) {
         console.error('❌ Auth state error:', error);
         window.location.href = 'system-control.html';
     });
@@ -54,12 +54,16 @@ function setupAllEventListeners() {
     console.log('⚙️ Setting up event listeners...');
     
     // Tab switching
-    document.querySelectorAll('.control-tab').forEach(tab => {
+    document.querySelectorAll('.control-tab').forEach(function(tab) {
         tab.addEventListener('click', function() {
             const tabName = this.dataset.tab;
-            document.querySelectorAll('.control-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.control-tab').forEach(function(t) {
+                t.classList.remove('active');
+            });
             this.classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(function(content) {
+                content.classList.remove('active');
+            });
             document.getElementById(tabName + 'Tab').classList.add('active');
             if (tabName === 'balance') loadUserDropdown();
             if (tabName === 'plans') loadPlans();
@@ -74,27 +78,35 @@ function setupAllEventListeners() {
 
     // Plan Management Event Listeners
     const planModal = document.getElementById('planModal');
-    document.getElementById('createNewPlanBtn').addEventListener('click', () => showPlanForm());
-    document.getElementById('closePlanModal').addEventListener('click', () => planModal.style.display = 'none');
+    document.getElementById('createNewPlanBtn').addEventListener('click', function() {
+        showPlanForm();
+    });
+    document.getElementById('closePlanModal').addEventListener('click', function() {
+        planModal.style.display = 'none';
+    });
     document.getElementById('planForm').addEventListener('submit', savePlan);
 
     // Auto-calculate total return
     const dailyReturnInput = document.getElementById('planDailyReturn');
     const durationInput = document.getElementById('planDuration');
     const totalReturnInput = document.getElementById('planTotalReturn');
-    const calculateTotal = () => {
+    
+    function calculateTotal() {
         const daily = parseFloat(dailyReturnInput.value) || 0;
         const duration = parseInt(durationInput.value) || 0;
         totalReturnInput.value = (daily * duration).toFixed(2);
-    };
+    }
+    
     dailyReturnInput.addEventListener('input', calculateTotal);
     durationInput.addEventListener('input', calculateTotal);
 
-    window.onclick = event => {
-        if (event.target == planModal) planModal.style.display = "none";
-    };
+    window.addEventListener('click', function(event) {
+        if (event.target == planModal) {
+            planModal.style.display = "none";
+        }
+    });
 
-    // NEW: Setup user details modal
+    // Setup user details modal
     setupUserDetailsModal();
 
     console.log('✅ All event listeners setup complete.');
@@ -104,17 +116,19 @@ function setupAllEventListeners() {
 function loadDashboardStats() {
     console.log('📊 Loading dashboard stats...');
     const usersRef = firebase.firestore().collection('users');
-    usersRef.get().then(snapshot => {
+    usersRef.get().then(function(snapshot) {
         const userCount = snapshot.size;
         let totalBalance = 0;
-        snapshot.forEach(doc => {
+        snapshot.forEach(function(doc) {
             totalBalance += doc.data().balance || 0;
         });
         document.getElementById('totalUsers').textContent = userCount;
         document.getElementById('activeUsers').textContent = userCount;
         document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
         console.log('✅ Dashboard stats loaded.');
-    }).catch(error => console.error('❌ Error loading dashboard stats:', error));
+    }).catch(function(error) {
+        console.error('❌ Error loading dashboard stats:', error);
+    });
 }
 
 function loadUsers() {
@@ -123,11 +137,13 @@ function loadUsers() {
     const tbody = document.getElementById('usersTableBody');
     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Loading...</td></tr>';
     
-    usersRef.get().then(snapshot => {
-        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    usersRef.get().then(function(snapshot) {
+        allUsers = snapshot.docs.map(function(doc) {
+            return { id: doc.id, ...doc.data() };
+        });
         renderUsersTable();
-        console.log(`✅ Loaded ${allUsers.length} users.`);
-    }).catch(error => {
+        console.log('✅ Loaded ' + allUsers.length + ' users.');
+    }).catch(function(error) {
         console.error('❌ Error loading users:', error);
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error loading users.</td></tr>';
     });
@@ -140,7 +156,9 @@ function renderUsersTable() {
     tbody.innerHTML = '';
     
     const usersToRender = searchTerm 
-        ? allUsers.filter(user => (user.email && user.email.toLowerCase().includes(searchTerm)) || user.id.toLowerCase().includes(searchTerm)) 
+        ? allUsers.filter(function(user) {
+            return (user.email && user.email.toLowerCase().includes(searchTerm)) || user.id.toLowerCase().includes(searchTerm);
+        }) 
         : allUsers;
 
     if (usersToRender.length === 0) {
@@ -148,7 +166,7 @@ function renderUsersTable() {
         return;
     }
     
-    usersToRender.forEach(user => {
+    usersToRender.forEach(function(user) {
         const tr = document.createElement('tr');
         const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
@@ -173,7 +191,7 @@ function renderUsersTable() {
     });
     
     // Re-attach listeners for block buttons
-    tbody.querySelectorAll('.block-btn').forEach(btn => {
+    tbody.querySelectorAll('.block-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userid;
             const isBlocked = this.dataset.isBlocked === 'true';
@@ -182,7 +200,7 @@ function renderUsersTable() {
     });
     
     // Attach click listeners to email links
-    tbody.querySelectorAll('.user-email-link').forEach(link => {
+    tbody.querySelectorAll('.user-email-link').forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             const userId = this.dataset.userid;
@@ -193,14 +211,16 @@ function renderUsersTable() {
 
 function toggleUserBlock(userId, shouldBlock) {
     const action = shouldBlock ? 'block' : 'unblock';
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    if (!confirm('Are you sure you want to ' + action + ' this user?')) return;
     
     firebase.firestore().collection('users').doc(userId).update({ isBlocked: shouldBlock })
-        .then(() => {
-            alert(`User ${action}ed successfully!`);
+        .then(function() {
+            alert('User ' + action + 'ed successfully!');
             loadUsers();
         })
-        .catch(error => console.error(`❌ Error ${action}ing user:`, error));
+        .catch(function(error) {
+            console.error('❌ Error ' + action + 'ing user:', error);
+        });
 }
 
 function loadUserDropdown() {
@@ -208,10 +228,12 @@ function loadUserDropdown() {
     const select = document.getElementById('userSelect');
     select.innerHTML = '<option value="">Select a user...</option>';
     
-    allUsers.sort((a, b) => a.email.localeCompare(b.email)).forEach(user => {
+    allUsers.sort(function(a, b) {
+        return a.email.localeCompare(b.email);
+    }).forEach(function(user) {
         const option = document.createElement('option');
         option.value = user.id;
-        option.textContent = `${user.email} (Balance: ₹${(user.balance || 0).toFixed(2)})`;
+        option.textContent = user.email + ' (Balance: ₹' + (user.balance || 0).toFixed(2) + ')';
         select.appendChild(option);
     });
 }
@@ -231,8 +253,8 @@ function updateUserBalance() {
     const userRef = db.collection('users').doc(userId);
     const txRef = db.collection('transactions').doc(); 
 
-    firebase.firestore().runTransaction(transaction => {
-        return transaction.get(userRef).then(userDoc => {
+    firebase.firestore().runTransaction(function(transaction) {
+        return transaction.get(userRef).then(function(userDoc) {
             if (!userDoc.exists) throw new Error("User not found!");
             
             const userData = userDoc.data();
@@ -267,11 +289,11 @@ function updateUserBalance() {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
         });
-    }).then(() => {
+    }).then(function() {
         alert('Balance updated and transaction logged!');
         loadUsers();
         loadDashboardStats();
-    }).catch(error => {
+    }).catch(function(error) {
         console.error('❌ Error updating balance:', error);
         alert('Failed to update balance: ' + error.message);
     });
@@ -288,8 +310,10 @@ function saveSystemSettings() {
     };
     
     firebase.firestore().collection('systemSettings').doc('config').set(settings, { merge: true })
-        .then(() => alert('✅ System settings saved successfully!'))
-        .catch(error => {
+        .then(function() {
+            alert('✅ System settings saved successfully!');
+        })
+        .catch(function(error) {
             console.error('❌ Error saving settings:', error);
             alert('Error saving settings.');
         });
@@ -299,8 +323,12 @@ function logoutControl() {
     console.log('🔒 Logging out...');
     if (confirm('Are you sure you want to secure logout?')) {
         firebase.auth().signOut()
-            .then(() => window.location.href = 'system-control.html')
-            .catch(error => console.error('❌ Logout error:', error));
+            .then(function() {
+                window.location.href = 'system-control.html';
+            })
+            .catch(function(error) {
+                console.error('❌ Logout error:', error);
+            });
     }
 }
 
@@ -312,17 +340,17 @@ function loadPlans() {
     
     const plansRef = firebase.firestore().collection('investmentPlans').orderBy('isVIP', 'desc').orderBy('minAmount', 'asc');
     
-    plansRef.onSnapshot(snapshot => {
+    plansRef.onSnapshot(function(snapshot) {
         if (snapshot.empty) {
             plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p>';
             return;
         }
         
         plansContainer.innerHTML = '';
-        snapshot.forEach(doc => {
+        snapshot.forEach(function(doc) {
             const plan = { id: doc.id, ...doc.data() };
             const planCard = document.createElement('div');
-            planCard.className = `plan-card ${plan.isVIP ? 'vip' : ''}`;
+            planCard.className = 'plan-card ' + (plan.isVIP ? 'vip' : '');
             planCard.innerHTML = `
                 <div class="plan-header">
                     <div class="plan-title">${plan.name} ${plan.isVIP ? '<span class="vip-badge">VIP</span>' : ''}</div>
@@ -343,24 +371,26 @@ function loadPlans() {
         });
         
         // Add event listeners for edit buttons
-        plansContainer.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', e => {
+        plansContainer.querySelectorAll('.edit-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
                 const planId = e.target.closest('.edit-btn').dataset.planid;
                 firebase.firestore().collection('investmentPlans').doc(planId).get()
-                    .then(doc => showPlanForm({ id: doc.id, ...doc.data() }));
+                    .then(function(doc) {
+                        showPlanForm({ id: doc.id, ...doc.data() });
+                    });
             });
         });
         
         // Add event listeners for activate/deactivate buttons
-        plansContainer.querySelectorAll('.block-btn').forEach(btn => {
-            btn.addEventListener('click', e => {
+        plansContainer.querySelectorAll('.block-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
                 const planId = e.target.closest('.block-btn').dataset.planid;
                 const currentStatus = e.target.closest('.block-btn').dataset.status === 'true';
                 togglePlanStatus(planId, !currentStatus);
             });
         });
         
-    }, error => {
+    }, function(error) {
         console.error("Error loading plans: ", error);
         plansContainer.innerHTML = '<p style="color: red;">Could not load plans.</p>';
     });
@@ -385,7 +415,11 @@ function showPlanForm(plan = null) {
     
     const deleteBtn = document.getElementById('deletePlanBtn');
     deleteBtn.style.display = plan ? 'inline-block' : 'none';
-    deleteBtn.onclick = () => deletePlan(plan.id);
+    if (plan) {
+        deleteBtn.onclick = function() {
+            deletePlan(plan.id);
+        };
+    }
     
     modal.style.display = 'block';
 }
@@ -412,10 +446,10 @@ function savePlan(e) {
         promise = firebase.firestore().collection('investmentPlans').add(planData);
     }
     
-    promise.then(() => {
+    promise.then(function() {
         console.log('✅ Plan saved successfully');
         document.getElementById('planModal').style.display = 'none';
-    }).catch(error => {
+    }).catch(function(error) {
         console.error('❌ Error saving plan:', error);
         alert('Error saving plan: ' + error.message);
     });
@@ -423,22 +457,28 @@ function savePlan(e) {
 
 function togglePlanStatus(planId, newStatus) {
     const action = newStatus ? 'activate' : 'deactivate';
-    if (!confirm(`Are you sure you want to ${action} this plan?`)) return;
+    if (!confirm('Are you sure you want to ' + action + ' this plan?')) return;
     
     firebase.firestore().collection('investmentPlans').doc(planId).update({ isActive: newStatus })
-        .then(() => console.log(`✅ Plan ${action}d.`))
-        .catch(error => console.error(`❌ Error ${action}ing plan:`, error));
+        .then(function() {
+            console.log('✅ Plan ' + action + 'd.');
+        })
+        .catch(function(error) {
+            console.error('❌ Error ' + action + 'ing plan:', error);
+        });
 }
 
 function deletePlan(planId) {
     if (!confirm('DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.')) return;
     
     firebase.firestore().collection('investmentPlans').doc(planId).delete()
-        .then(() => {
+        .then(function() {
             console.log('✅ Plan deleted.');
             document.getElementById('planModal').style.display = 'none';
         })
-        .catch(error => console.error('❌ Error deleting plan:', error));
+        .catch(function(error) {
+            console.error('❌ Error deleting plan:', error);
+        });
 }
 
 // --- NEW: User Details Modal Functions ---
@@ -450,40 +490,13 @@ function setupUserDetailsModal() {
     const saveBtn = document.getElementById('saveBankDetailsBtn');
     
     // Close modal when clicking X
-    closeBtn.addEventListener('click', () => {
+    closeBtn.addEventListener('click', function() {
         modal.style.display = 'none';
     });
     
     // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
+    window.addEventListener('click', function(event) {
         if (event.target === modal) {
             modal.style.display = 'none';
-        }
-    });
+                                       }
     
-    // Save bank details
-    saveBtn.addEventListener('click', saveUserBankDetails);
-    
-    console.log('✅ User details modal setup complete.');
-}
-
-function showUserDetails(userId) {
-    console.log('👤 Loading user details for:', userId);
-    
-    const modal = document.getElementById('userDetailsModal');
-    const title = document.getElementById('userDetailsTitle');
-    
-    // Find user data
-    const user = allUsers.find(u => u.id === userId);
-    if (!user) {
-        alert('User data not found!');
-        return;
-    }
-    
-    // Update modal title
-    title.textContent = `User Details - ${user.email}`;
-    
-    // Load bank details into form
-    document.getElementById('userBankRealName').value = user.bankRealName || '';
-    document.getElementById('userBankName').value = user.bankName || '';
-    document.getElementById('userBankAccount').value = user.bank
