@@ -73,6 +73,30 @@ function setupEventListeners() {
             
             if (tabName === 'balance') loadUserDropdown();
             if (tabName === 'plans') loadPlans();
+            if (tabName === 'payments') loadPaymentRequests();
+        });
+    });
+
+    // Payment sub-tabs
+    var paymentTabs = document.querySelectorAll('.payment-sub-tab');
+    paymentTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            var tabName = this.getAttribute('data-tab');
+            
+            // Remove active from all payment tabs
+            paymentTabs.forEach(function(t) {
+                t.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Hide all payment content
+            var contents = document.querySelectorAll('.payment-tab-content');
+            contents.forEach(function(content) {
+                content.classList.remove('active');
+            });
+            
+            // Show selected payment content
+            document.getElementById(tabName + 'Content').classList.add('active');
         });
     });
 
@@ -485,7 +509,7 @@ function saveUserBankDetails() {
         });
 }
 
-// Plan Management Functions
+// Plan Management Functions - COMPLETE VERSION
 function loadPlans() {
     console.log('📈 Loading investment plans...');
     var plansContainer = document.getElementById('plansContainer');
@@ -513,4 +537,255 @@ function loadPlans() {
                             ${plan.isVIP ? '<span class="vip-badge">VIP</span>' : ''}
                         </div>
                         <span style="color: ${plan.isActive ? 'green' : 'gray'}; font-weight: bold;">
-                            ${plan.isActive ? '● Active' : '● Inactiv
+                            ${plan.isActive ? '● Active' : '● Inactive'}
+                        </span>
+                    </div>
+                    <div class="plan-details">
+                        <div><strong>Investment:</strong> ₹${plan.minAmount}</div>
+                        <div><strong>Duration:</strong> ${plan.duration} days</div>
+                        <div><strong>Daily Return:</strong> ${plan.dailyReturn}%</div>
+                        <div><strong>Total Return:</strong> ${plan.totalReturn}%</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="action-btn edit-btn" onclick="editPlan('${plan.id}')">Edit</button>
+                        <button class="action-btn ${plan.isActive ? 'delete-btn' : 'edit-btn'}" 
+                                onclick="togglePlanStatus('${plan.id}', ${!plan.isActive})">
+                            ${plan.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </div>
+                `;
+                plansContainer.appendChild(planCard);
+            });
+        })
+        .catch(function(error) {
+            console.error('❌ Error loading plans:', error);
+            plansContainer.innerHTML = '<p style="color:red;">Error loading plans: ' + error.message + '</p>';
+        });
+}
+
+function showPlanForm(planId = null) {
+    var modal = document.getElementById('planModal');
+    var title = document.getElementById('planModalTitle');
+    var deleteBtn = document.getElementById('deletePlanBtn');
+    
+    if (planId) {
+        // Edit mode
+        title.textContent = 'Edit Plan';
+        deleteBtn.style.display = 'inline-block';
+        
+        // Load plan data
+        firebase.firestore().collection('investmentPlans').doc(planId).get()
+            .then(function(doc) {
+                if (doc.exists) {
+                    var plan = doc.data();
+                    document.getElementById('planId').value = planId;
+                    document.getElementById('planName').value = plan.name || '';
+                    document.getElementById('planMinAmount').value = plan.minAmount || '';
+                    document.getElementById('planDuration').value = plan.duration || '';
+                    document.getElementById('planDailyReturn').value = plan.dailyReturn || '';
+                    document.getElementById('planTotalReturn').value = plan.totalReturn || '';
+                    document.getElementById('planIsVIP').checked = plan.isVIP || false;
+                }
+            });
+    } else {
+        // Create mode
+        title.textContent = 'Create New Plan';
+        deleteBtn.style.display = 'none';
+        document.getElementById('planForm').reset();
+        document.getElementById('planId').value = '';
+        calculateTotalReturn();
+    }
+    
+    modal.style.display = 'block';
+}
+
+function savePlan(event) {
+    event.preventDefault();
+    
+    var planId = document.getElementById('planId').value;
+    var planData = {
+        name: document.getElementById('planName').value,
+        minAmount: parseFloat(document.getElementById('planMinAmount').value),
+        duration: parseInt(document.getElementById('planDuration').value),
+        dailyReturn: parseFloat(document.getElementById('planDailyReturn').value),
+        totalReturn: parseFloat(document.getElementById('planTotalReturn').value),
+        isVIP: document.getElementById('planIsVIP').checked,
+        isActive: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    if (!planData.name || !planData.minAmount || !planData.duration || !planData.dailyReturn) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    var promise;
+    if (planId) {
+        // Update existing plan
+        promise = firebase.firestore().collection('investmentPlans').doc(planId).update(planData);
+    } else {
+        // Create new plan
+        promise = firebase.firestore().collection('investmentPlans').add(planData);
+    }
+    
+    promise.then(function() {
+        alert('Plan saved successfully!');
+        document.getElementById('planModal').style.display = 'none';
+        loadPlans();
+    }).catch(function(error) {
+        alert('Error saving plan: ' + error.message);
+    });
+}
+
+function editPlan(planId) {
+    showPlanForm(planId);
+}
+
+function togglePlanStatus(planId, newStatus) {
+    var action = newStatus ? 'activate' : 'deactivate';
+    if (!confirm(`Are you sure you want to ${action} this plan?`)) return;
+    
+    firebase.firestore().collection('investmentPlans').doc(planId).update({
+        isActive: newStatus
+    }).then(function() {
+        alert(`Plan ${action}d successfully!`);
+        loadPlans();
+    }).catch(function(error) {
+        alert('Error: ' + error.message);
+    });
+}
+
+// Payment Requests Functions
+function loadPaymentRequests() {
+    loadDepositRequests();
+    loadWithdrawalRequests();
+}
+
+function loadDepositRequests() {
+    var tbody = document.getElementById('paymentRequestsTableBody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Loading deposit requests...</td></tr>';
+    
+    firebase.firestore().collection('depositRequests')
+        .where('status', '==', 'pending')
+        .orderBy('timestamp', 'desc')
+        .get()
+        .then(function(snapshot) {
+            tbody.innerHTML = '';
+            
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No pending deposit requests</td></tr>';
+                return;
+            }
+            
+            snapshot.forEach(function(doc) {
+                var request = { id: doc.id, ...doc.data() };
+                var date = request.timestamp ? 
+                    new Date(request.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
+                
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${request.userEmail || 'N/A'}</td>
+                    <td>₹${request.amount || 0}</td>
+                    <td>${request.utr || 'N/A'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="approveDeposit('${request.id}')">Approve</button>
+                        <button class="action-btn delete-btn" onclick="rejectDeposit('${request.id}')">Reject</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(function(error) {
+            console.error('Error loading deposit requests:', error);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error loading requests</td></tr>';
+        });
+}
+
+function loadWithdrawalRequests() {
+    var tbody = document.getElementById('withdrawalRequestsTableBody');
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Loading withdrawal requests...</td></tr>';
+    
+    firebase.firestore().collection('withdrawalRequests')
+        .where('status', '==', 'pending')
+        .orderBy('timestamp', 'desc')
+        .get()
+        .then(function(snapshot) {
+            tbody.innerHTML = '';
+            
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No pending withdrawal requests</td></tr>';
+                return;
+            }
+            
+            snapshot.forEach(function(doc) {
+                var request = { id: doc.id, ...doc.data() };
+                var date = request.timestamp ? 
+                    new Date(request.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
+                var tds = request.amount * 0.18; // 18% TDS
+                var finalAmount = request.amount - tds;
+                
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${request.userEmail || 'N/A'}</td>
+                    <td>₹${request.amount || 0}</td>
+                    <td>₹${tds.toFixed(2)}</td>
+                    <td>₹${finalAmount.toFixed(2)}</td>
+                    <td>${request.bankName || 'N/A'}</td>
+                    <td>${request.bankAccount ? '****' + request.bankAccount.slice(-4) : 'N/A'}</td>
+                    <td>${request.bankIFSC || 'N/A'}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="approveWithdrawal('${request.id}')">Approve</button>
+                        <button class="action-btn delete-btn" onclick="rejectWithdrawal('${request.id}')">Reject</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(function(error) {
+            console.error('Error loading withdrawal requests:', error);
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Error loading requests</td></tr>';
+        });
+}
+
+function approveDeposit(requestId) {
+    if (!confirm('Approve this deposit request?')) return;
+    
+    // This function should be in your script-payment-approval.js
+    if (typeof approveDepositRequest === 'function') {
+        approveDepositRequest(requestId);
+    } else {
+        alert('Payment approval functions not loaded');
+    }
+}
+
+function rejectDeposit(requestId) {
+    if (!confirm('Reject this deposit request?')) return;
+    
+    if (typeof rejectDepositRequest === 'function') {
+        rejectDepositRequest(requestId);
+    } else {
+        alert('Payment approval functions not loaded');
+    }
+}
+
+function approveWithdrawal(requestId) {
+    if (!confirm('Approve this withdrawal request?')) return;
+    
+    if (typeof approveWithdrawalRequest === 'function') {
+        approveWithdrawalRequest(requestId);
+    } else {
+        alert('Payment approval functions not loaded');
+    }
+}
+
+function rejectWithdrawal(requestId) {
+    if (!confirm('Reject this withdrawal request?')) return;
+    
+    if (typeof rejectWithdrawalRequest === 'function') {
+        rejectWithdrawalRequest(requestId);
+    } else {
+        alert('Payment approval functions not loaded');
+    }
+}
