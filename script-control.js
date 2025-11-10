@@ -1,4 +1,4 @@
-// System Control Panel JavaScript - FIXED VERSION
+// System Control Panel JavaScript - WORKING VERSION
 console.log('🔧 Admin panel script loading...');
 
 // --- GLOBAL VARIABLES ---
@@ -184,7 +184,7 @@ function renderUsersTable() {
                     ${user.email || 'N/A'}
                 </a>
             </td>
-            <td>₹${(user.balance || 0).toFixed(2)}</td>
+            <td>₹${(parseFloat(user.balance) || 0).toFixed(2)}</td>
             <td>${joinDate}</td>
             <td>${isBlocked ? 'Blocked' : 'Active'}</td>
             <td>${user.bankName || 'N/A'}</td>
@@ -492,5 +492,4 @@ function loadPlans() {
     
     plansRef.onSnapshot(snapshot => {
         if (snapshot.empty) {
-            plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p>';
-          
+            plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p
