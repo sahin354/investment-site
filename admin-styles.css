@@ -1,6 +1,12 @@
 /* --- ADMIN PANEL STYLES ONLY --- */
 /* This file should only be linked in admin panel pages */
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 .admin-body {
     background-color: #f4f6f9;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -451,3 +457,11 @@
 .submit-btn:hover {
     background-color: #283593;
 }
+
+/* Fix for admin panel data loading */
+.stat-number {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #1a237e;
+    margin: 10px 0;
+    }
