@@ -33,99 +33,14 @@
         .payment-tab-content { display: none; }
         .payment-tab-content.active { display: block; }
         
-        /* --- NEW: User Email Link Styles --- */
+        /* --- Clickable email links --- */
         .user-email-link {
-            color: #3498db;
+            color: #1a237e;
             text-decoration: underline;
             cursor: pointer;
-            transition: color 0.2s;
         }
         .user-email-link:hover {
-            color: #2980b9;
-        }
-        
-        /* --- NEW: User Details Modal Styles --- */
-        .user-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .user-details-field {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-        .user-details-field label {
-            display: block;
-            font-size: 0.8em;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-        .user-details-field input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 1em;
-            color: #333;
-            outline: none;
-        }
-        .user-details-field input:focus {
-            background: white;
-            border: 1px solid #3498db;
-            border-radius: 4px;
-            padding: 4px 8px;
-        }
-        .transaction-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-        .transaction-details {
-            flex-grow: 1;
-        }
-        .transaction-type {
-            font-weight: 600;
-            color: #333;
-        }
-        .transaction-info {
-            font-size: 0.9em;
-            color: #777;
-        }
-        .transaction-amount {
-            font-weight: bold;
-            text-align: right;
-        }
-        .transaction-amount.positive {
-            color: #28a745;
-        }
-        .transaction-amount.negative {
-            color: #dc3545;
-        }
-        .transaction-date {
-            font-size: 0.8em;
-            color: #999;
-        }
-        .save-bank-details-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
+            color: #283593;
         }
         
     </style>
@@ -164,6 +79,10 @@
                             <th>Balance</th>
                             <th>Join Date</th>
                             <th>Status</th>
+                            <th>Bank Name</th>
+                            <th>Account No.</th>
+                            <th>IFSC</th>
+                            <th>UPI</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -286,7 +205,7 @@
         </div>
     </div>
     
-    <!-- NEW: User Details Modal -->
+    <!-- User Details Modal -->
     <div id="userDetailsModal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
@@ -297,38 +216,51 @@
             <div id="userDetailsContent">
                 <h3>Bank Details</h3>
                 <div class="user-details-grid">
-                    <div class="user-details-field">
-                        <label>Account Holder Name</label>
-                        <input type="text" id="userBankRealName" placeholder="Not provided">
+                    <div><strong>Bank Name:</strong> <span id="detailBankName">N/A</span></div>
+                    <div><strong>Account Holder:</strong> <span id="detailBankRealName">N/A</span></div>
+                    <div><strong>Account Number:</strong> <span id="detailBankAccount">N/A</span></div>
+                    <div><strong>IFSC Code:</strong> <span id="detailBankIFSC">N/A</span></div>
+                    <div><strong>UPI ID:</strong> <span id="detailBankUPI">N/A</span></div>
+                </div>
+                
+                <div class="control-actions" style="margin-top: 15px;">
+                    <button id="editBankDetails" class="action-btn edit-btn">Edit Bank Details</button>
+                    <button id="removeBankDetails" class="action-btn delete-btn">Remove Bank Details</button>
+                </div>
+                
+                <div id="bankEditForm" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>Edit Bank Details</h4>
+                    <div class="form-group">
+                        <label for="editBankName">Bank Name</label>
+                        <input type="text" id="editBankName" class="form-control">
                     </div>
-                    <div class="user-details-field">
-                        <label>Bank Name</label>
-                        <input type="text" id="userBankName" placeholder="Not provided">
+                    <div class="form-group">
+                        <label for="editBankRealName">Account Holder Name</label>
+                        <input type="text" id="editBankRealName" class="form-control">
                     </div>
-                    <div class="user-details-field">
-                        <label>Account Number</label>
-                        <input type="text" id="userBankAccount" placeholder="Not provided">
+                    <div class="form-group">
+                        <label for="editBankAccount">Account Number</label>
+                        <input type="text" id="editBankAccount" class="form-control">
                     </div>
-                    <div class="user-details-field">
-                        <label>IFSC Code</label>
-                        <input type="text" id="userBankIFSC" placeholder="Not provided">
+                    <div class="form-group">
+                        <label for="editBankIFSC">IFSC Code</label>
+                        <input type="text" id="editBankIFSC" class="form-control">
                     </div>
-                    <div class="user-details-field">
-                        <label>UPI ID</label>
-                        <input type="text" id="userBankUPI" placeholder="Not provided">
+                    <div class="form-group">
+                        <label for="editBankUPI">UPI ID</label>
+                        <input type="text" id="editBankUPI" class="form-control">
                     </div>
-                    <div class="user-details-field">
-                        <label>Phone Number</label>
-                        <input type="text" id="userPhone" placeholder="Not provided">
+                    <div class="control-actions">
+                        <button id="saveBankDetails" class="submit-btn">Save Changes</button>
+                        <button id="cancelBankEdit" class="action-btn block-btn">Cancel</button>
                     </div>
                 </div>
-                <button id="saveBankDetailsBtn" class="save-bank-details-btn">💾 Save Bank Details</button>
             </div>
             
-            <hr>
+            <hr style="margin: 20px 0;">
             
             <h3>Transaction History</h3>
-            <div id="userTransactionList" class="transaction-list">
+            <div id="userTransactionList" style="max-height: 400px; overflow-y: auto;">
                 <p>Loading transactions...</p>
             </div>
         </div>
@@ -343,4 +275,4 @@
     
     <script src="script-payment-approval.js"></script>
 </body>
-                            </html>
+                                                                                                                                                                                     </html>
