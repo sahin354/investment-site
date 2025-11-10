@@ -1,4 +1,4 @@
-// System Control Panel JavaScript - FINAL & FIXED with User Details Feature
+// System Control Panel JavaScript - FIXED VERSION
 console.log('🔧 Admin panel script loading...');
 
 // --- GLOBAL VARIABLES ---
@@ -52,6 +52,7 @@ function showControlPanel() {
 
 function setupAllEventListeners() {
     console.log('⚙️ Setting up event listeners...');
+    
     // Tab switching
     document.querySelectorAll('.control-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -109,16 +110,48 @@ function setupAllEventListeners() {
     console.log('✅ All event listeners setup complete.');
 }
 
-// --- PLAN MANAGEMENT FUNCTIONS ---
-function loadPlans(){console.log('📈 Loading investment plans...');const plansContainer=document.getElementById('plansContainer');plansContainer.innerHTML='<p>Loading plans...</p>';const plansRef=firebase.firestore().collection('investmentPlans').orderBy('isVIP','desc').orderBy('minAmount','asc');plansRef.onSnapshot(snapshot=>{if(snapshot.empty){plansContainer.innerHTML='<p>No investment plans found. Click "Create New Plan" to add one.</p>';return}plansContainer.innerHTML='';snapshot.forEach(doc=>{const plan={id:doc.id,...doc.data()};const planCard=document.createElement('div');planCard.className=`plan-card ${plan.isVIP?'vip':''}`;planCard.innerHTML=`<div class="plan-header"><div class="plan-title">${plan.name} ${plan.isVIP?'<span class="vip-badge">VIP</span>':''}</div><span style="color: ${plan.isActive?'green':'gray'}; font-weight: bold;">${plan.isActive?'● Active':'● Inactive'}</span></div><div class="plan-details"><div><strong>INVESTMENT</strong>₹${plan.minAmount.toLocaleString()}</div><div><strong>DAILY EARN</strong>${plan.dailyReturnPercent}%</div><div><strong>DURATION</strong>${plan.durationDays} Days</div><div><strong>TOTAL EARN</strong>${plan.totalReturnPercent}%</div></div><div class="plan-actions"><button class="action-btn edit-btn" data-planid="${plan.id}">Edit</button><button class="action-btn block-btn" data-planid="${plan.id}" data-status="${plan.isActive}">${plan.isActive?'Deactivate':'Activate'}</button></div>`;plansContainer.appendChild(planCard)});plansContainer.querySelectorAll('.edit-btn').forEach(btn=>btn.addEventListener('click',e=>{const planId=e.target.closest('.edit-btn').dataset.planid;firebase.firestore().collection('investmentPlans').doc(planId).get().then(doc=>showPlanForm({id:doc.id,...doc.data()}))}));plansContainer.querySelectorAll('.block-btn').forEach(btn=>btn.addEventListener('click',e=>{const planId=e.target.closest('.block-btn').dataset.planid;const currentStatus=e.target.closest('.block-btn').dataset.status==='true';togglePlanStatus(planId,!currentStatus)}))},error=>{console.error("Error loading plans: ",error);plansContainer.innerHTML='<p style="color: red;">Could not load plans.</p>'})}
-function showPlanForm(plan=null){const modal=document.getElementById('planModal');const form=document.getElementById('planForm');form.reset();document.getElementById('planModalTitle').textContent=plan?'Edit Plan':'Create New Plan';document.getElementById('planId').value=plan?plan.id:'';if(plan){document.getElementById('planName').value=plan.name;document.getElementById('planMinAmount').value=plan.minAmount;document.getElementById('planDuration').value=plan.durationDays;document.getElementById('planDailyReturn').value=plan.dailyReturnPercent;document.getElementById('planTotalReturn').value=plan.totalReturnPercent;document.getElementById('planIsVIP').checked=plan.isVIP}const deleteBtn=document.getElementById('deletePlanBtn');deleteBtn.style.display=plan?'inline-block':'none';deleteBtn.onclick=()=>deletePlan(plan.id);modal.style.display='block'}
-function savePlan(e){e.preventDefault();const planId=document.getElementById('planId').value;const planData={name:document.getElementById('planName').value,minAmount:parseFloat(document.getElementById('planMinAmount').value),durationDays:parseInt(document.getElementById('planDuration').value),dailyReturnPercent:parseFloat(document.getElementById('planDailyReturn').value),totalReturnPercent:parseFloat(document.getElementById('planTotalReturn').value),isVIP:document.getElementById('planIsVIP').checked};let promise;if(planId){promise=firebase.firestore().collection('investmentPlans').doc(planId).update(planData)}else{planData.isActive=true;planData.createdAt=firebase.firestore.FieldValue.serverTimestamp();promise=firebase.firestore().collection('investmentPlans').add(planData)}promise.then(()=>{console.log('✅ Plan saved successfully');document.getElementById('planModal').style.display='none'}).catch(error=>{console.error('❌ Error saving plan:',error);alert('Error saving plan: '+error.message)})}
-function togglePlanStatus(planId,newStatus){const action=newStatus?'activate':'deactivate';if(!confirm(`Are you sure you want to ${action} this plan?`))return;firebase.firestore().collection('investmentPlans').doc(planId).update({isActive:newStatus}).then(()=>console.log(`✅ Plan ${action}d.`)).catch(error=>console.error(`❌ Error ${action}ing plan:`,error))}
-function deletePlan(planId){if(!confirm('DANGER: Are you sure you want to permanently delete this plan? This cannot be undone.'))return;firebase.firestore().collection('investmentPlans').doc(planId).delete().then(()=>{console.log('✅ Plan deleted.');document.getElementById('planModal').style.display='none'}).catch(error=>console.error('❌ Error deleting plan:',error))}
-
 // --- DASHBOARD/USER FUNCTIONS ---
-function loadDashboardStats(){console.log('📊 Loading dashboard stats...');const usersRef=firebase.firestore().collection('users');usersRef.get().then(snapshot=>{const userCount=snapshot.size;let totalBalance=0;snapshot.forEach(doc=>{totalBalance+=doc.data().balance||0});document.getElementById('totalUsers').textContent=userCount;document.getElementById('activeUsers').textContent=userCount;document.getElementById('totalBalance').textContent='₹'+totalBalance.toLocaleString();console.log('✅ Dashboard stats loaded.')}).catch(error=>console.error('❌ Error loading dashboard stats:',error))}
-function loadUsers(){console.log('👥 Loading users...');const usersRef=firebase.firestore().collection('users').orderBy('createdAt','desc');const tbody=document.getElementById('usersTableBody');tbody.innerHTML='<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>';usersRef.get().then(snapshot=>{allUsers=snapshot.docs.map(doc=>({id:doc.id,...doc.data()}));renderUsersTable();console.log(`✅ Loaded ${allUsers.length} users.`)}).catch(error=>{console.error('❌ Error loading users:',error);tbody.innerHTML='<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>'})}
+function loadDashboardStats() {
+    console.log('📊 Loading dashboard stats...');
+    const usersRef = firebase.firestore().collection('users');
+    
+    usersRef.get().then(snapshot => {
+        const userCount = snapshot.size;
+        let totalBalance = 0;
+        
+        snapshot.forEach(doc => {
+            const userData = doc.data();
+            totalBalance += parseFloat(userData.balance) || 0;
+        });
+        
+        document.getElementById('totalUsers').textContent = userCount;
+        document.getElementById('activeUsers').textContent = userCount;
+        document.getElementById('totalBalance').textContent = '₹' + totalBalance.toLocaleString();
+        
+        console.log('✅ Dashboard stats loaded:', { userCount, totalBalance });
+    }).catch(error => {
+        console.error('❌ Error loading dashboard stats:', error);
+        document.getElementById('totalUsers').textContent = '0';
+        document.getElementById('activeUsers').textContent = '0';
+        document.getElementById('totalBalance').textContent = '₹0';
+    });
+}
+
+function loadUsers() {
+    console.log('👥 Loading users...');
+    const usersRef = firebase.firestore().collection('users').orderBy('createdAt', 'desc');
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">Loading...</td></tr>';
+    
+    usersRef.get().then(snapshot => {
+        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderUsersTable();
+        console.log(`✅ Loaded ${allUsers.length} users.`);
+    }).catch(error => {
+        console.error('❌ Error loading users:', error);
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: red;">Error loading users.</td></tr>';
+    });
+}
 
 // --- UPDATED USER TABLE RENDER FUNCTION WITH CLICKABLE EMAILS ---
 function renderUsersTable() {
@@ -127,7 +160,10 @@ function renderUsersTable() {
     tbody.innerHTML = '';
     
     const usersToRender = searchTerm 
-        ? allUsers.filter(user => (user.email && user.email.toLowerCase().includes(searchTerm)) || user.id.toLowerCase().includes(searchTerm)) 
+        ? allUsers.filter(user => 
+            (user.email && user.email.toLowerCase().includes(searchTerm)) || 
+            (user.id && user.id.toLowerCase().includes(searchTerm))
+          ) 
         : allUsers;
 
     if (usersToRender.length === 0) {
@@ -137,11 +173,12 @@ function renderUsersTable() {
     
     usersToRender.forEach(user => {
         const tr = document.createElement('tr');
-        const joinDate = user.createdAt && user.createdAt.seconds ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+        const joinDate = user.createdAt && user.createdAt.seconds ? 
+            new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
         const isBlocked = user.isBlocked || false;
         
         tr.innerHTML = `
-            <td>${user.id.substring(0, 8)}...</td>
+            <td>${user.id ? user.id.substring(0, 8) + '...' : 'N/A'}</td>
             <td>
                 <a href="#" class="user-email-link" data-userid="${user.id}" style="color: #1a237e; text-decoration: underline;">
                     ${user.email || 'N/A'}
@@ -252,7 +289,7 @@ function loadUserTransactions(userId) {
                         <div class="transaction-date">${date}</div>
                     </div>
                     <div class="transaction-amount ${amountClass}">
-                        ${amountSign}₹${Math.abs(tx.amount).toFixed(2)}
+                        ${amountSign}₹${Math.abs(tx.amount || 0).toFixed(2)}
                     </div>
                 `;
                 
@@ -326,11 +363,11 @@ function removeUserBankDetails() {
     const userId = modal.dataset.currentUserId;
     
     const bankData = {
-        bankName: null,
-        bankRealName: null,
-        bankAccount: null,
-        bankIFSC: null,
-        bankUPI: null
+        bankName: firebase.firestore.FieldValue.delete(),
+        bankRealName: firebase.firestore.FieldValue.delete(),
+        bankAccount: firebase.firestore.FieldValue.delete(),
+        bankIFSC: firebase.firestore.FieldValue.delete(),
+        bankUPI: firebase.firestore.FieldValue.delete()
     };
     
     firebase.firestore().collection('users').doc(userId).update(bankData)
@@ -339,7 +376,11 @@ function removeUserBankDetails() {
             // Update local data
             const userIndex = allUsers.findIndex(u => u.id === userId);
             if (userIndex !== -1) {
-                allUsers[userIndex] = { ...allUsers[userIndex], ...bankData };
+                allUsers[userIndex].bankName = null;
+                allUsers[userIndex].bankRealName = null;
+                allUsers[userIndex].bankAccount = null;
+                allUsers[userIndex].bankIFSC = null;
+                allUsers[userIndex].bankUPI = null;
             }
             // Refresh the display
             showUserDetails(userId);
@@ -352,4 +393,104 @@ function removeUserBankDetails() {
 }
 
 // --- EXISTING FUNCTIONS ---
-function toggleUserBlock(userId,shouldBlock){const action=shouldBlock?'block':'unblock';if(!confirm(`Are you sure you want to ${a
+function toggleUserBlock(userId, shouldBlock) {
+    const action = shouldBlock ? 'block' : 'unblock';
+    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    
+    firebase.firestore().collection('users').doc(userId).update({ isBlocked: shouldBlock })
+        .then(() => {
+            alert(`User ${action}ed successfully!`);
+            loadUsers();
+            loadDashboardStats();
+        })
+        .catch(error => console.error(`❌ Error ${action}ing user:`, error));
+}
+
+function loadUserDropdown() {
+    console.log('📋 Loading user dropdown...');
+    const select = document.getElementById('userSelect');
+    select.innerHTML = '<option value="">Select a user...</option>';
+    
+    allUsers.sort((a, b) => (a.email || '').localeCompare(b.email || ''))
+        .forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = `${user.email} (Balance: ₹${(user.balance || 0).toFixed(2)})`;
+            select.appendChild(option);
+        });
+}
+
+function updateUserBalance() {
+    const userId = document.getElementById('userSelect').value;
+    const action = document.getElementById('balanceAction').value;
+    const amount = parseFloat(document.getElementById('balanceAmount').value);
+    const reason = document.getElementById('balanceReason').value; 
+
+    if (!userId || !amount || amount <= 0) {
+        alert('Please select a user and enter a valid positive amount.');
+        return;
+    }
+
+    const db = firebase.firestore(); 
+    const userRef = db.collection('users').doc(userId);
+    const txRef = db.collection('transactions').doc(); 
+
+    firebase.firestore().runTransaction(transaction => {
+        return transaction.get(userRef).then(userDoc => {
+            if (!userDoc.exists) throw new Error("User not found!");
+            
+            const userData = userDoc.data();
+            const currentBalance = parseFloat(userData.balance) || 0;
+            let newBalance;
+            let txAmount;
+            let txType;
+
+            if (action === 'add') {
+                newBalance = currentBalance + amount;
+                txAmount = amount; 
+                txType = 'Deposit';
+            } else if (action === 'subtract') {
+                newBalance = currentBalance - amount;
+                txAmount = -amount; 
+                txType = 'Withdrawal';
+            } else if (action === 'set') {
+                newBalance = amount;
+                txAmount = amount - currentBalance; 
+                txType = 'Adjustment';
+            }
+
+            if (newBalance < 0) throw new Error("Balance cannot be negative.");
+
+            transaction.update(userRef, { balance: newBalance });
+            transaction.set(txRef, {
+                userId: userId,
+                userEmail: userData.email,
+                type: txType, 
+                amount: txAmount,
+                details: reason, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+    }).then(() => {
+        alert('Balance updated and transaction logged!');
+        loadUsers();
+        loadDashboardStats();
+        loadUserDropdown();
+    }).catch(error => {
+        console.error('❌ Error updating balance:', error);
+        alert('Failed to update balance: ' + error.message);
+    });
+}
+
+// --- PLAN MANAGEMENT FUNCTIONS ---
+function loadPlans() {
+    console.log('📈 Loading investment plans...');
+    const plansContainer = document.getElementById('plansContainer');
+    plansContainer.innerHTML = '<p>Loading plans...</p>';
+    
+    const plansRef = firebase.firestore().collection('investmentPlans').orderBy('isVIP', 'desc').orderBy('minAmount', 'asc');
+    
+    plansRef.onSnapshot(snapshot => {
+        if (snapshot.empty) {
+            plansContainer.innerHTML = '<p>No investment plans found. Click "Create New Plan" to add one.</p>';
+          
