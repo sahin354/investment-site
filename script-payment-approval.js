@@ -1,12 +1,13 @@
-// This file handles the new Payment Approval tab in the admin panel.
+// This is your NEW, FULL script-payment-approval.js file.
+// It calls your secure Node.js functions.
+
 document.addEventListener('DOMContentLoaded', () => {
     
     if (typeof firebase === 'undefined') return;
     
     const db = firebase.firestore();
-    const functions = firebase.functions();
 
-    // --- 1. Load Deposit Requests (UPDATED) ---
+    // --- 1. Load Deposit Requests ---
     function loadDepositRequests() {
         const tableBody = document.getElementById('paymentRequestsTableBody');
         if (!tableBody) return; 
@@ -26,9 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
               requests.forEach(request => {
                   const requestId = request.id;
                   const date = request.createdAt ? new Date(request.createdAt.seconds * 1000).toLocaleString() : 'N/A';
-                  
-                  // We need to pass the transactionId to the approve button
-                  const txId = request.transactionId || ''; // Get the linked transaction ID
+                  const txId = request.transactionId || ''; 
                   
                   const tr = document.createElement('tr');
                   tr.innerHTML = `
@@ -52,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 2. Load Withdrawal Requests (Unchanged) ---
+    // --- 2. Load Withdrawal Requests ---
     function loadWithdrawalRequests() {
         const tableBody = document.getElementById('withdrawalRequestsTableBody');
         if (!tableBody) return;
@@ -92,144 +91,103 @@ document.addEventListener('DOMContentLoaded', () => {
           });
     }
 
-    // --- 3. Add Listeners for ALL buttons (Deposit listener is UPDATED) ---
+    // --- 3. Add Listeners for ALL buttons ---
     document.body.addEventListener('click', async (e) => {
+        
         // --- Deposit Approve ---
         if (e.target.classList.contains('approve-deposit-btn')) {
-            if (!confirm('Are you sure you have received this payment? This will add money to the user account.')) return;
+            if (!confirm('Are you sure you have received this payment?')) return;
             
-            const requestId = e.target.dataset.id;
-            const userId = e.target.dataset.user;
-            const amount = parseFloat(e.target.dataset.amount);
-            const txId = e.target.dataset.txid; // <-- Get the new transaction ID
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = '...';
             
-            if (!txId) {
-                alert('Error: This request is missing a Transaction ID. Cannot process.');
-                return;
+            const approveDepositFunction = firebase.functions().httpsCallable('approveDeposit');
+            try {
+                const result = await approveDepositFunction({
+                    requestId: btn.dataset.id,
+                    userId: btn.dataset.user,
+                    amount: parseFloat(btn.dataset.amount),
+                    txId: btn.dataset.txid
+                });
+                alert(result.data.message);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Approve';
             }
-            
-            await approveDepositPayment(requestId, userId, amount, txId); // <-- Pass txId
         }
         
         // --- Deposit Reject ---
         if (e.target.classList.contains('reject-deposit-btn')) {
             if (!confirm('Are you sure you want to reject this payment?')) return;
-            const requestId = e.target.dataset.id;
-            const txId = e.target.dataset.txid; // <-- Get the new transaction ID
-            await rejectDepositPayment(requestId, txId);
-        }
-        
-        // --- Withdrawal Approve (Unchanged) ---
-        if (e.target.classList.contains('approve-withdraw-btn')) {
-            if (!confirm('Have you sent the money to this user? This will mark the transaction as successful.')) return;
             
-            const requestId = e.target.dataset.id;
-            const txId = e.target.dataset.txid;
-            await approveWithdrawal(requestId, txId);
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = '...';
+            
+            const rejectDepositFunction = firebase.functions().httpsCallable('rejectDeposit');
+            try {
+                const result = await rejectDepositFunction({
+                    requestId: btn.dataset.id,
+                    txId: btn.dataset.txid
+                });
+                alert(result.data.message);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Reject';
+            }
         }
         
-        // --- Withdrawal Reject (Unchanged) ---
+        // --- Withdrawal Approve ---
+        if (e.target.classList.contains('approve-withdraw-btn')) {
+            if (!confirm('Have you sent the money to this user?')) return;
+            
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            const approveWithdrawalFunction = firebase.functions().httpsCallable('approveWithdrawal');
+            try {
+                const result = await approveWithdrawalFunction({
+                    requestId: btn.dataset.id,
+                    txId: btn.dataset.txid
+                });
+                alert(result.data.message);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Approve';
+            }
+        }
+        
+        // --- Withdrawal Reject ---
         if (e.target.classList.contains('reject-withdraw-btn')) {
             if (!confirm('Are you sure you want to reject this? This will return the funds to the user.')) return;
             
-            const requestId = e.target.dataset.id;
-            const txId = e.target.dataset.txid;
-            const userId = e.target.dataset.user;
-            const amount = parseFloat(e.target.dataset.amount);
-            await rejectWithdrawal(requestId, txId, userId, amount);
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            const rejectWithdrawalFunction = firebase.functions().httpsCallable('rejectWithdrawal');
+            try {
+                const result = await rejectWithdrawalFunction({
+                    requestId: btn.dataset.id,
+                    txId: btn.dataset.txid,
+                    userId: btn.dataset.user,
+                    amount: parseFloat(btn.dataset.amount)
+                });
+                alert(result.data.message);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Reject';
+            }
         }
     });
 
-    // --- 4. Function to Approve a Deposit (*** THIS IS THE MAIN FIX ***) ---
-    async function approveDepositPayment(requestId, userId, amount, txId) {
-        const batch = db.batch();
-        
-        // 1. Mark the request as 'approved'
-        const reqRef = db.collection('payment_requests').doc(requestId);
-        batch.update(reqRef, { status: 'approved' });
-        
-        // 2. Give the user their money
-        const userRef = db.collection('users').doc(userId);
-        batch.update(userRef, {
-            balance: firebase.firestore.FieldValue.increment(amount)
-        });
-        
-        // 3. Update the user's existing transaction log
-        const txRef = db.collection('transactions').doc(txId); // Use the passed-in txId
-        batch.update(txRef, {
-            status: 'Success',
-            details: 'Deposit Successful'
-        });
-
-        try {
-            await batch.commit();
-            alert('Payment approved and balance updated!');
-        } catch (err) {
-            console.error("Error approving payment:", err);
-            alert('Error: ' + err.message);
-        }
-    }
-
-    // --- 5. Function to Reject the deposit payment (UPDATED) ---
-    async function rejectDepositPayment(requestId, txId) {
-        const batch = db.batch();
-        
-        // 1. Mark request as rejected
-        const reqRef = db.collection('payment_requests').doc(requestId);
-        batch.update(reqRef, { status: 'rejected' });
-        
-        // 2. Mark user's transaction as rejected
-        if (txId) { // Only update if txId exists
-            const txRef = db.collection('transactions').doc(txId);
-            batch.update(txRef, { status: 'Rejected', details: 'Deposit Rejected' });
-        }
-        
-        try {
-            await batch.commit();
-            alert('Payment rejected.');
-        } catch (err) {
-            console.error("Error rejecting payment:", err);
-            alert('Error: ' + err.message);
-        }
-    }
-    
-    // --- 6. Function to Approve a Withdrawal (Unchanged) ---
-    async function approveWithdrawal(requestId, txId) {
-        const batch = db.batch();
-        const reqRef = db.collection('withdrawal_requests').doc(requestId);
-        batch.update(reqRef, { status: 'Success' });
-        const txRef = db.collection('transactions').doc(txId);
-        batch.update(txRef, { status: 'Success', details: 'Withdrawal Successful' });
-        try {
-            await batch.commit();
-            alert('Withdrawal approved!');
-        } catch (err) {
-            console.error('Error approving withdrawal:', err);
-            alert('Error: ' + err.message);
-        }
-    }
-
-    // --- 7. Function to Reject a Withdrawal (Unchanged) ---
-    async function rejectWithdrawal(requestId, txId, userId, amount) {
-        const batch = db.batch();
-        const reqRef = db.collection('withdrawal_requests').doc(requestId);
-        batch.update(reqRef, { status: 'Rejected' });
-        const txRef = db.collection('transactions').doc(txId);
-        batch.update(txRef, { status: 'Rejected', details: 'Withdrawal Rejected' });
-        const userRef = db.collection('users').doc(userId);
-        batch.update(userRef, {
-            balance: firebase.firestore.FieldValue.increment(amount)
-        });
-        try {
-            await batch.commit();
-            alert('Withdrawal rejected and funds returned to user.');
-        } catch (err) {
-            console.error('Error rejecting withdrawal:', err);
-            alert('Error: ' + err.message);
-        }
-    }
-
-    // --- 8. Tab/Sub-tab logic (Unchanged) ---
+    // --- 4. Tab/Sub-tab logic (Unchanged) ---
     document.addEventListener('click', e => {
         if (e.target.classList.contains('control-tab') && e.target.dataset.tab === 'payments') {
             loadDepositRequests();
@@ -249,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadWithdrawalRequests();
     }
     
-    // --- 9. Config loading (Unchanged) ---
+    // --- 5. Config loading (Unchanged) ---
     const saveSettingsButton = document.getElementById('saveSettingsButton');
     if (saveSettingsButton) {
         saveSettingsButton.addEventListener('click', async () => {
@@ -285,4 +243,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadPaymentConfig();
 });
-              
