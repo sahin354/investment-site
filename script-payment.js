@@ -1,192 +1,125 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let currentUser;
-    let rechargeAmount;
-    let paymentEndTime;
-    let upiId;
-    let timerInterval;
+// Import necessary Firebase modules from your firebaseConfig.js
+import { db, auth, functions, httpsCallable } from './firebaseConfig.js';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore'; // For reading user data
 
-    const timerElement = document.getElementById('countdownTimer');
-    const upiField = document.getElementById('upiToCopy');
-    const amountField = document.getElementById('amountToCopy');
-    const payableAmount = document.getElementById('payableAmount');
+let currentUserId = null;
+let currentUserBalance = 0;
 
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (!user) {
-            window.location.href = 'login.html';
-        } else {
-            currentUser = user;
-            loadPaymentPage();
+// Initialize callable function reference
+const requestWithdrawalCallable = httpsCallable(functions, 'requestWithdrawal');
+
+// Listen for auth state changes to get current user info
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUserId = user.uid;
+        // Fetch user balance
+        const userDocRef = doc(db, 'users', currentUserId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+            currentUserBalance = userDocSnap.data().balance || 0;
+            updateBalanceDisplay(currentUserBalance); // Call a function to update UI
         }
-    });
-
-    function loadPaymentPage() {
-        rechargeAmount = localStorage.getItem('rechargeAmount');
-        paymentEndTime = localStorage.getItem('paymentEndTime');
-        localStorage.removeItem('rechargeAmount');
-        localStorage.removeItem('paymentEndTime');
-
-        if (!rechargeAmount || !paymentEndTime) {
-            if(timerInterval) clearInterval(timerInterval);
-            timerElement.textContent = "SESSION EXPIRED";
-            alert('This payment session has expired or is invalid. Please try again.');
-            document.body.innerHTML = "<h1>Session Expired. Please close this tab and try again.</h1>";
-            return;
-        }
-
-        startTimer(paymentEndTime);
-
-        const amountNum = parseFloat(rechargeAmount);
-        payableAmount.textContent = `₹ ${amountNum.toFixed(2)}`;
-        amountField.value = amountNum.toFixed(2);
-
-        loadPaymentDetails();
-        setupListeners();
-    }
-
-    function startTimer(endTime) {
-        timerInterval = setInterval(() => {
-            const now = Date.now();
-            const remaining = endTime - now;
-
-            if (remaining <= 0) {
-                clearInterval(timerInterval);
-                timerElement.textContent = "Time Expired";
-                alert('Payment session expired. Please try again.');
-                window.close(); // Close this tab
-                return;
-            }
-
-            const minutes = Math.floor((remaining / 1000) / 60);
-            const seconds = Math.floor((remaining / 1000) % 60);
-            
-            timerElement.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-        }, 1000);
-    }
-
-    async function loadPaymentDetails() {
-        try {
-            const doc = await firebase.firestore().collection('system_config').doc('payment_details').get();
-            if (doc.exists && doc.data().upiId) {
-                upiId = doc.data().upiId;
-                upiField.value = upiId;
-                
-                generateQrCode(upiId, rechargeAmount); 
-
-            } else {
-                upiField.value = 'Error: Admin has not set a UPI ID.';
-                alert('Error: Payment UPI ID is not set. Please contact support.');
-            }
-        } catch (err) {
-            console.error("Error loading payment details:", err);
-            upiField.value = 'Error loading details.';
-        }
-    }
-
-    function generateQrCode(upiAddress, amount) {
-        const payeeName = encodeURIComponent("Adani Corporation");
-        const qrLink = `upi://pay?pa=${upiAddress}&pn=${payeeName}&am=${amount}&cu=INR`;
-        
-        const qrCodeImage = document.getElementById('qrCodeImage');
-        const qrCodeLoader = document.getElementById('qrCodeLoader');
-        const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrLink)}`;
-        
-        qrCodeImage.src = qrApi;
-        qrCodeImage.onload = () => {
-            qrCodeLoader.style.display = 'none'; 
-            qrCodeImage.style.display = 'block';
-        }
-    }
-
-    function setupListeners() {
-        // Copy buttons
-        document.getElementById('copyAmountBtn').addEventListener('click', () => {
-            copyToClipboard(amountField);
-        });
-        
-        document.getElementById('copyUpiBtn').addEventListener('click', () => {
-            copyToClipboard(upiField);
-        });
-
-        // Toggle QR Code
-        document.getElementById('scanQrToggle').addEventListener('click', () => {
-            const qrContainer = document.getElementById('qrCodeContainer');
-            qrContainer.style.display = qrContainer.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Payment Failed Link
-        document.getElementById('paymentFailedLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm("Are you sure you want to cancel this payment?")) {
-                clearInterval(timerInterval);
-                alert("Payment cancelled.");
-                window.close();
-            }
-        });
-
-        // --- === UTR Form submission (THIS IS THE UPDATED PART) === ---
-        document.getElementById('utrForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const utr = document.getElementById('utrNumber').value;
-            const submitBtn = document.getElementById('submitUtrBtn');
-
-            if (utr.length < 12 || utr.length > 12) {
-                alert('Please enter a valid 12-digit UTR/Ref No.');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            clearInterval(timerInterval);
-
-            const db = firebase.firestore();
-            const batch = db.batch();
-
-            try {
-                // 1. Create the Transaction doc first to get its ID
-                const txRef = db.collection('transactions').doc();
-                const txId = txRef.id;
-                
-                batch.set(txRef, {
-                    userId: currentUser.uid,
-                    type: 'Deposit',
-                    amount: parseFloat(rechargeAmount),
-                    details: `Deposit Request (UTR: ${utr})`,
-                    status: 'Pending', // <-- As requested
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // 2. Create the Admin's Payment Request doc
-                const reqRef = db.collection('payment_requests').doc();
-                batch.set(reqRef, {
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    amount: parseFloat(rechargeAmount),
-                    utr: utr,
-                    status: 'pending', 
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    transactionId: txId // <-- Link the two documents
-                });
-    
-                // 3. Commit both writes at once
-                await batch.commit();
-
-                alert('Request submitted! Your transaction history will show "Pending" until approved (1-2 hours).');
-                window.close(); // Close this tab on success
-
-            } catch (err) {
-                console.error("Error submitting request:", err);
-                alert('An error occurred. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Ref Number';
-            }
-        });
-    }
-
-    function copyToClipboard(inputElement) {
-        inputElement.select();
-        document.execCommand('copy');
-        alert('Copied to clipboard!');
+    } else {
+        currentUserId = null;
+        currentUserBalance = 0;
+        updateBalanceDisplay(0);
+        // Redirect to login or show login prompt
     }
 });
-    
+
+function updateBalanceDisplay(balance) {
+    const balanceElement = document.getElementById('userBalanceDisplayWithdraw'); // Assuming a specific element for withdrawal balance
+    if (balanceElement) {
+        balanceElement.textContent = `₹${balance.toFixed(2)}`;
+    }
+}
+
+
+// --- NEW WITHDRAWAL LOGIC (Replaces direct Firestore writes) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const withdrawalForm = document.getElementById('withdrawalForm'); // Assuming your withdrawal form has this ID
+    if (withdrawalForm) {
+        withdrawalForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!currentUserId) {
+                alert("Please log in to request a withdrawal.");
+                return;
+            }
+
+            // Get values from your withdrawal form inputs
+            const amountInput = document.getElementById('withdrawalAmount');
+            const methodInput = document.getElementById('withdrawalMethod'); // e.g., 'UPI', 'Bank Transfer'
+            const accountNumberInput = document.getElementById('accountNumber');
+            const ifscCodeInput = document.getElementById('ifscCode');
+            const bankNameInput = document.getElementById('bankName');
+            const accountHolderNameInput = document.getElementById('accountHolderName');
+
+            const amount = parseFloat(amountInput.value);
+            const method = methodInput.value;
+            const accountNumber = accountNumberInput.value;
+            const ifscCode = ifscCodeInput ? ifscCodeInput.value : null; // IFSC might be optional
+            const bankName = bankNameInput.value;
+            const accountHolderName = accountHolderNameInput.value;
+
+            // Basic client-side validation (Cloud Function will re-validate)
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid withdrawal amount.');
+                return;
+            }
+            if (!accountNumber || !bankName || !accountHolderName) {
+                alert('Please fill in all required bank details.');
+                return;
+            }
+
+            // Optional: Disable form elements and show loading spinner
+            withdrawalForm.querySelector('button[type="submit"]').disabled = true;
+            // Add a loading message somewhere in your UI
+
+            try {
+                // Call the Cloud Function
+                const result = await requestWithdrawalCallable({
+                    amount: amount,
+                    withdrawalMethod: method,
+                    accountNumber: accountNumber,
+                    ifscCode: ifscCode,
+                    bankName: bankName,
+                    accountHolderName: accountHolderName
+                });
+
+                alert(result.data.message);
+                
+                // On success: Clear form, refresh user balance, show withdrawal history
+                if (result.data.status === 'success') {
+                    withdrawalForm.reset(); // Clear the form
+                    // Update current user balance locally (or re-fetch from Firestore)
+                    const userDocRef = doc(db, 'users', currentUserId);
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (userDocSnap.exists()) {
+                        currentUserBalance = userDocSnap.data().balance || 0;
+                        updateBalanceDisplay(currentUserBalance);
+                    }
+                    // You might also want to refresh the list of user withdrawal requests
+                }
+
+            } catch (error) {
+                console.error("Error calling requestWithdrawal:", error.code, error.message, error.details);
+                let userFacingMessage = 'An unexpected error occurred during withdrawal.';
+                if (error.code === 'unauthenticated') {
+                    userFacingMessage = 'You must be logged in.';
+                } else if (error.code === 'failed-precondition') {
+                    userFacingMessage = error.message; // e.g., "Insufficient balance"
+                } else if (error.code === 'invalid-argument') {
+                    userFacingMessage = 'Please provide valid withdrawal details.';
+                }
+                alert(`Withdrawal failed: ${userFacingMessage}`);
+            } finally {
+                // Re-enable form elements
+                withdrawalForm.querySelector('button[type="submit"]').disabled = false;
+                // Hide loading message
+            }
+        });
+    }
+});
+
