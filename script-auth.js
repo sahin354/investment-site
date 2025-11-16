@@ -1,150 +1,206 @@
-// This is the complete and final script for all authentication functions.
-document.addEventListener('DOMContentLoaded', () => {
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+// script-auth.js - FOR CDN-BASED (NON-MODULE) SETUP WITH MOBILE LOGIN
 
-    // --- [ REUSABLE PASSWORD TOGGLE FUNCTION ] ---
-    function setupPasswordToggle(inputId, toggleId) {
-        const passwordInput = document.getElementById(inputId);
-        const toggleIcon = document.getElementById(toggleId);
-        if (passwordInput && toggleIcon) {
-            toggleIcon.addEventListener('click', () => {
-                // Toggle the type attribute
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // Toggle the icon text
-                toggleIcon.textContent = type === 'password' ? '👁️' : '🙈';
-            });
-        }
+// Assuming Firebase is globally available from CDN scripts and firebaseConfig.js has initialized it.
+// Access Firebase services globally:
+const auth = firebase.auth();
+const db = firebase.firestore();
+const functions = firebase.functions(); // If functions are used in auth.js
+
+
+// --- Global variable to hold the current user's ID ---
+let currentUserId = null;
+
+// Listen for authentication state changes (using global firebase.auth())
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUserId = user.uid;
+        console.log("User is logged in (global):", user.uid, user.email);
+        // You can fetch and update user-specific UI data here if needed on auth state change
+    } else {
+        currentUserId = null;
+        console.log("No user is logged in (global).");
     }
+});
 
-    // --- [ REGISTRATION LOGIC ] ---
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        // Setup eye icons for both password fields
-        setupPasswordToggle('password', 'togglePassword');
-        setupPasswordToggle('confirmPassword', 'toggleConfirmPassword');
 
-        // Capture referral code from URL when the page loads
-        const urlParams = new URLSearchParams(window.location.search);
-        const refCode = urlParams.get('ref');
-        if (refCode) {
-            registerForm.dataset.referralCode = refCode;
-        }
+// Helper function to convert a mobile number to a dummy email format
+// This is critical for using Firebase Email/Password Auth with a mobile number UI
+function mobileToEmail(mobileNumber) {
+    const cleanedMobile = mobileNumber.replace(/\D/g, ''); 
+    // REPLACE 'yourdomain.com' with your actual domain or a unique identifier
+    return `${cleanedMobile}@yourdomain.com`; 
+}
 
-        registerForm.addEventListener('submit', async (e) => {
+// Helper function to check if a mobile number is already registered in Firestore
+async function isMobileNumberRegistered(mobileNumber) {
+    try {
+        const querySnapshot = await db.collection("users").where("mobileNumber", "==", mobileNumber).get();
+        return !querySnapshot.empty;
+    } catch (error) {
+        console.error("Error checking mobile number registration:", error);
+        return false; // Assume not registered if error, or handle more robustly
+    }
+}
+
+
+// --- Login Form Handling ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const registerBtn = document.getElementById('registerBtn');
-            registerBtn.disabled = true;
-            registerBtn.textContent = 'Registering...';
 
-            const name = registerForm.name.value;
-            const phone = registerForm.phone.value;
-            const email = registerForm.email.value;
-            const password = registerForm.password.value;
-            const confirmPassword = registerForm.confirmPassword.value;
-            const referredByCode = registerForm.dataset.referralCode || null;
+            const mobileInput = document.getElementById('loginMobile');
+            const passwordInput = document.getElementById('loginPassword');
 
-            if (password !== confirmPassword) {
-                alert('Passwords do not match.');
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'Register';
+            if (!mobileInput || !passwordInput) {
+                console.error("Login form inputs not found. Check HTML IDs: 'loginMobile', 'loginPassword'.");
+                alert("Login form elements missing. Please check the website's configuration.");
                 return;
             }
 
-            try {
-                const emailCheck = db.collection('users').where('email', '==', email).get();
-                const phoneCheck = db.collection('users').where('phone', '==', phone).get();
-                const [emailSnapshot, phoneSnapshot] = await Promise.all([emailCheck, phoneCheck]);
+            const mobileNumber = mobileInput.value;
+            const password = passwordInput.value;
 
-                if (!emailSnapshot.empty) throw new Error('This email is already registered.');
-                if (!phoneSnapshot.empty) throw new Error('This phone number is already registered.');
+            const email = mobileToEmail(mobileNumber); // Convert to dummy email
 
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                await user.sendEmailVerification();
-
-                const uniqueUserId = Date.now().toString().slice(-5) + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                await db.collection('users').doc(user.uid).set({
-                    uid: user.uid, name, phone, email, userId: uniqueUserId,
-                    balance: 0, vipLevel: 0, totalRechargeAmount: 0,
-                    referralCode: `REF${Date.now().toString().slice(-7)}`,
-                    referredBy: referredByCode,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    isBlocked: false // <-- Set default isBlocked flag
-                });
-                
-                window.location.href = 'verify-email.html';
-
-            } catch (error) {
-                alert(`Registration failed: ${error.message}`);
-                console.error("Full Registration Error:", error);
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'Register';
+            const loginButton = loginForm.querySelector('button[type="submit"]');
+            if (loginButton) {
+                loginButton.disabled = true;
+                loginButton.textContent = 'Logging in...';
             }
-        });
-    }
-
-    // --- [ LOGIN LOGIC ] ---
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        // Setup eye icon for the password field
-        setupPasswordToggle('password', 'togglePassword');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const loginId = loginForm.loginId.value;
-            const password = loginForm.password.value;
-            let userEmail = loginId;
 
             try {
-                // Find email if user logs in with phone number
-                if (!loginId.includes('@') && /^\+?[0-9\s]+$/.test(loginId)) {
-                    const snapshot = await db.collection('users').where('phone', '==', loginId).limit(1).get();
-                    if (snapshot.empty) throw new Error("No account found with this phone number.");
-                    userEmail = snapshot.docs[0].data().email;
-                }
-                
-                // 1. Attempt to sign in
-                const userCredential = await auth.signInWithEmailAndPassword(userEmail, password);
-                
-                // 2. Get user's Firestore document
-                const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
-                
-                // 3. Check if user document exists and has 'isBlocked: true'
-                if (userDoc.exists && userDoc.data().isBlocked === true) {
-                    await auth.signOut();
-                    alert("Your account is blocked due to suspicious activity. Please contact HR.");
-                    return; 
-                }
-                
-                // 4. If not blocked, proceed with email verification check
-                if (userCredential.user.emailVerified) {
-                    window.location.href = 'index.html';
-                } else {
-                    await auth.signOut();
-                    alert("Your email has not been verified. Please check your inbox for the verification link.");
-                }
+                // Use Firebase Auth sign-in method
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log("Successfully logged in user (Firebase UID):", userCredential.user.uid);
+                alert("Login successful!");
+                window.location.href = 'index.html'; // Redirect
             } catch (error) {
-                alert(`Login failed: ${error.message}`);
-                console.error("Full Login Error:", error);
+                console.error("Login error (auth.signInWithEmailAndPassword):", error.code, error.message);
+                let errorMessage = "Login failed. Please check your mobile number and password.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMessage = "Invalid mobile number or password.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Invalid mobile number format provided.";
+                }
+                alert(errorMessage);
+            } finally {
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Login';
+                }
             }
         });
-
-        // --- [ FORGOT PASSWORD LOGIC ] ---
-        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-        if (forgotPasswordLink) {
-            forgotPasswordLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                const email = prompt("Please enter your registered email address:");
-                if (email) {
-                    auth.sendPasswordResetEmail(email)
-                        .then(() => alert("Password reset email sent! Please check your inbox."))
-                        .catch((error) => alert(`Error: ${error.message}`));
-                }
-            });
-        }
+    } else {
+        console.warn("Login form with ID 'loginForm' not found on this page.");
     }
 });
-                        
+
+
+// --- Registration Form Handling ---
+document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const mobileInput = document.getElementById('registerMobile');
+            const passwordInput = document.getElementById('registerPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (!mobileInput || !passwordInput) {
+                console.error("Registration form inputs not found. Check HTML IDs: 'registerMobile', 'registerPassword'.");
+                alert("Registration form elements missing.");
+                return;
+            }
+
+            const mobileNumber = mobileInput.value;
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : password;
+
+            // Basic client-side validation
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+            if (password.length < 6) {
+                alert("Password should be at least 6 characters.");
+                return;
+            }
+
+            const email = mobileToEmail(mobileNumber); // Convert to dummy email
+
+            const registerButton = registerForm.querySelector('button[type="submit"]');
+            if (registerButton) {
+                registerButton.disabled = true;
+                registerButton.textContent = 'Registering...';
+            }
+
+            try {
+                // Check if mobile number is already in use
+                if (await isMobileNumberRegistered(mobileNumber)) {
+                    throw { code: 'custom/mobile-already-in-use', message: "This mobile number is already registered." };
+                }
+
+                // Create Firebase user with the dummy email and actual password
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                console.log("Successfully registered Firebase user (UID):", user.uid);
+
+                // Create a corresponding user document in Firestore
+                await db.collection("users").doc(user.uid).set({
+                    uid: user.uid,
+                    email: user.email,          // Storing the dummy email
+                    mobileNumber: mobileNumber, // IMPORTANT: Store the actual mobile number
+                    balance: 0, 
+                    totalRechargeAmount: 0,
+                    vipLevel: 'standard',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
+                });
+
+                alert("Registration successful! You can now log in.");
+                window.location.href = 'login.html'; // Redirect
+            } catch (error) {
+                console.error("Registration error (auth.createUserWithEmailAndPassword):", error.code, error.message);
+                let errorMessage = "Registration failed.";
+                if (error.code === 'auth/email-already-in-use' || error.code === 'custom/mobile-already-in-use') {
+                    errorMessage = "This mobile number or email is already registered.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Please enter a valid mobile number format.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "Password should be at least 6 characters.";
+                }
+                alert(errorMessage);
+            } finally {
+                if (registerButton) {
+                    registerButton.disabled = false;
+                    registerButton.textContent = 'Register';
+                }
+            }
+        });
+    } else {
+        console.warn("Register form with ID 'registerForm' not found on this page.");
+    }
+});
+
+
+// --- Logout Function (Global Access) ---
+// This function needs to be called from your logout button's event listener (e.g., in index.html)
+// Example: document.getElementById('logoutButton').addEventListener('click', handleLogout);
+function handleLogout() { // Changed to non-exported function for global use
+    auth.signOut()
+        .then(() => {
+            alert("Logged out successfully!");
+            window.location.href = 'login.html'; // Redirect to login after logout
+        })
+        .catch((error) => {
+            console.error("Logout error:", error.message);
+            alert("Failed to log out: " + error.message);
+        });
+}
+
+// Attach handleLogout to a global scope or specific button if needed on other pages
+// If you want to call handleLogout from other scripts, you'll need a mechanism
+// For simple direct HTML call, you can add onclick="handleLogout()" to your button
+// Or in script-control.js if it manages global listeners.
