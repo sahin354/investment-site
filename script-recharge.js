@@ -1,42 +1,41 @@
-// script-recharge.js
+// script-recharge.js - FOR CDN-BASED (NON-MODULE) SETUP
 
-// Import necessary Firebase modules from your firebaseConfig.js
-import { db, auth, functions, httpsCallable } from './firebaseConfig.js';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Added collection and getDocs for plan loading
+// Access Firebase services globally:
+const auth = firebase.auth();
+const db = firebase.firestore();
+const functions = firebase.functions(); // Initialize Cloud Functions for callable
 
 let currentUserId = null;
 let currentUserBalance = 0;
 
-// Initialize callable function reference for buying investment plans
-const buyInvestmentPlanCallable = httpsCallable(functions, 'buyInvestmentPlan');
+// Initialize callable function reference
+const buyInvestmentPlanCallable = functions.httpsCallable('buyInvestmentPlan');
+
 
 // Listen for auth state changes to get current user info and update UI
-onAuthStateChanged(auth, async (user) => {
+auth.onAuthStateChanged(async (user) => {
     if (user) {
         currentUserId = user.uid;
         // Fetch user balance
-        const userDocRef = doc(db, 'users', currentUserId);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
+        const userDocRef = db.collection('users').doc(currentUserId);
+        const userDocSnap = await userDocRef.get();
+        if (userDocSnap.exists) {
             currentUserBalance = userDocSnap.data().balance || 0;
-            updateBalanceDisplay(currentUserBalance); // Update UI with current balance
+            updateBalanceDisplay(currentUserBalance); 
         } else {
             console.warn("User document not found for logged-in user:", currentUserId);
-            updateBalanceDisplay(0); // Show 0 if doc doesn't exist
+            updateBalanceDisplay(0); 
         }
     } else {
         currentUserId = null;
         currentUserBalance = 0;
         updateBalanceDisplay(0);
-        // Optionally, redirect to login or show a login prompt if not authenticated
         console.log("No user logged in on recharge page.");
     }
 });
 
-// Function to update the balance display on the UI
 function updateBalanceDisplay(balance) {
-    const balanceElement = document.getElementById('userBalanceDisplay'); // Assuming an element with this ID
+    const balanceElement = document.getElementById('userBalanceDisplay'); 
     if (balanceElement) {
         balanceElement.textContent = `₹${balance.toFixed(2)}`;
     }
@@ -44,29 +43,27 @@ function updateBalanceDisplay(balance) {
 
 // --- Logic for displaying Investment Plans ---
 async function loadInvestmentPlans() {
-    const plansContainer = document.getElementById('investmentPlansContainer'); // Adjust this ID if your container is different
+    const plansContainer = document.getElementById('investmentPlansContainer'); 
     if (!plansContainer) {
         console.error("Investment plans container not found (ID: investmentPlansContainer).");
         return;
     }
 
     try {
-        // Fetch plans from Firestore (this read is allowed by your rules for logged-in users)
-        const querySnapshot = await getDocs(collection(db, 'investmentPlans'));
-        plansContainer.innerHTML = ''; // Clear existing plans
+        const querySnapshot = await db.collection('investmentPlans').get();
+        plansContainer.innerHTML = ''; 
 
         if (querySnapshot.empty) {
             plansContainer.innerHTML = '<p>No investment plans available at the moment.</p>';
             return;
         }
 
-        querySnapshot.forEach((documentSnapshot) => {
-            const plan = documentSnapshot.data();
-            const planId = documentSnapshot.id; // Get the document ID for the plan
+        querySnapshot.forEach((doc) => {
+            const plan = doc.data();
+            const planId = doc.id; 
 
             const planCard = document.createElement('div');
-            planCard.className = 'plan-card'; // Add your specific styling class for a plan card
-            // You might want to match your existing HTML structure for a plan item
+            planCard.className = 'plan-card'; 
             planCard.innerHTML = `
                 <div class="plan-header">${plan.name}</div>
                 <div class="plan-details">
@@ -80,7 +77,6 @@ async function loadInvestmentPlans() {
             plansContainer.appendChild(planCard);
         });
 
-        // Attach event listeners to the new "Buy Now" buttons AFTER they are added to the DOM
         attachBuyNowListeners();
 
     } catch (error) {
@@ -92,9 +88,8 @@ async function loadInvestmentPlans() {
 
 // --- BUY NOW LOGIC (Calls Cloud Function) ---
 function attachBuyNowListeners() {
-    const buyButtons = document.querySelectorAll('.buy-now-button'); // Select all buttons with this class
+    const buyButtons = document.querySelectorAll('.buy-now-button'); 
     buyButtons.forEach(button => {
-        // Remove old listeners to prevent multiple triggers if loadInvestmentPlans is called again
         button.onclick = null; 
         button.addEventListener('click', async (event) => {
             if (!currentUserId) {
@@ -102,33 +97,27 @@ function attachBuyNowListeners() {
                 return;
             }
 
-            const planId = event.target.dataset.planId; // Get plan ID from the button's data-plan-id attribute
+            const planId = event.target.dataset.planId; 
             if (!planId) {
                 alert("Could not find plan ID for purchase.");
                 return;
             }
 
-            // Optional: Disable button and show loading indicator
             event.target.disabled = true;
             const originalButtonText = event.target.textContent;
             event.target.textContent = 'Purchasing...';
 
             try {
-                // Call the buyInvestmentPlan Cloud Function
                 const result = await buyInvestmentPlanCallable({ planId: planId });
                 alert(result.data.message);
                 
-                // On successful purchase, refresh UI elements
                 if (result.data.status === 'success') {
-                    // Re-fetch user balance to ensure it's up-to-date
-                    const userDocRef = doc(db, 'users', currentUserId);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists()) {
+                    const userDocRef = db.collection('users').doc(currentUserId);
+                    const userDocSnap = await userDocRef.get();
+                    if (userDocSnap.exists) {
                         currentUserBalance = userDocSnap.data().balance || 0;
                         updateBalanceDisplay(currentUserBalance);
                     }
-                    // You might also want to refresh a list of user's active investments here
-                    // window.location.reload(); // Simple but effective if you want a full refresh
                 }
 
             } catch (error) {
@@ -137,7 +126,7 @@ function attachBuyNowListeners() {
                 if (error.code === 'unauthenticated') {
                     userFacingMessage = 'You must be logged in to purchase a plan.';
                 } else if (error.code === 'failed-precondition') {
-                    userFacingMessage = error.message; // This will show "Insufficient balance" or other specific messages
+                    userFacingMessage = error.message; 
                 } else if (error.code === 'not-found') {
                     userFacingMessage = 'Investment plan or your user profile not found.';
                 } else if (error.code === 'invalid-argument') {
@@ -145,7 +134,6 @@ function attachBuyNowListeners() {
                 }
                 alert(`Purchase failed: ${userFacingMessage}`);
             } finally {
-                // Re-enable button and restore text
                 event.target.disabled = false;
                 event.target.textContent = originalButtonText;
             }
@@ -154,9 +142,7 @@ function attachBuyNowListeners() {
 }
 
 
-// --- Recharge logic (assuming it's already here and only creates payment_requests) ---
-// This part is assumed to be correct and create a 'payment_requests' document,
-// which is allowed by your Firestore rules. No Cloud Function needed for just creating the request.
+// --- Recharge logic (if present and uses global firebase.firestore()) ---
 /*
 document.getElementById('rechargeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -170,12 +156,11 @@ document.getElementById('rechargeForm').addEventListener('submit', async (e) => 
         return;
     }
     try {
-        // This is a direct Firestore write, which is allowed by your rules for payment_requests
-        await addDoc(collection(db, 'payment_requests'), {
+        await db.collection('payment_requests').add({
             userId: currentUserId,
             amount: amount,
             status: 'pending',
-            requestDate: serverTimestamp() // Use serverTimestamp if imported
+            requestDate: firebase.firestore.FieldValue.serverTimestamp()
         });
         alert("Recharge request submitted. Awaiting admin approval.");
         document.getElementById('rechargeForm').reset();
@@ -186,8 +171,6 @@ document.getElementById('rechargeForm').addEventListener('submit', async (e) => 
 });
 */
 
-
-// Load investment plans when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', loadInvestmentPlans);
 
-                    
+                
