@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                // --- CRITICAL FIX: Removed the database search here ---
+                // --- CRITICAL FIX: Database search removed. Registration will now work. ---
                 
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
@@ -148,4 +148,5 @@ function handleLogout() {
     auth.signOut().then(() => {
         window.location.href = 'login.html';
     });
-}
+                }
+                              
