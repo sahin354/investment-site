@@ -1,7 +1,6 @@
 // firebaseConfig.js - FOR CDN-BASED (NON-MODULE) SETUP
 
 // Your web app's Firebase configuration
-// You MUST REPLACE THE PLACEHOLDERS BELOW WITH YOUR ACTUAL FIREBASE CONFIG VALUES
 const firebaseConfig = {
   apiKey: "AIzaSyBqnJpGCtplUIwspovyntn9bbaTY2ygLNE",
   authDomain: "adani-investment.firebaseapp.com",
@@ -9,17 +8,24 @@ const firebaseConfig = {
   storageBucket: "adani-investment.firebasestorage.app",
   messagingSenderId: "549652082720",
   appId: "1:549652082720:web:09bc0f371a498ee5184c45",
-  measurementId: "G-TGFHW9XKF2"                                
-  // Optional: If you use Google Analytics
-  // measurementId: "G-XXXXXXXXXX" 
+  measurementId: "G-TGFHW9XKF2"
 };
 
-// Initialize Firebase (makes 'firebase' global)
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+try {
+  firebase.initializeApp(firebaseConfig);
+  console.log("Firebase initialized successfully");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
 
-// Get references to Firebase services (these become globally accessible through firebase.auth(), firebase.firestore(), etc.)
+// Get references to Firebase services
 const auth = firebase.auth();
 const db = firebase.firestore();
-const functions = firebase.functions(); // Initialize Cloud Functions
+const functions = firebase.functions();
 
-// No exports needed as everything is accessed globally
+// Enable offline persistence for better performance
+db.enablePersistence()
+  .catch((err) => {
+    console.log("Persistence failed:", err);
+  });
