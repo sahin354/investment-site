@@ -1,5 +1,6 @@
 // firebaseConfig.js
-// REPLACE THE VALUES BELOW WITH YOUR ACTUAL FIREBASE KEYS
+
+// REPLACE WITH YOUR KEYS
 const firebaseConfig = {
   apiKey: "AIzaSyBqnJpGCtplUIwspovyntn9bbaTY2ygLNE",
   authDomain: "adani-investment.firebaseapp.com",
@@ -10,14 +11,14 @@ const firebaseConfig = {
   measurementId: "G-TGFHW9XKF2"
 };
 
-// Initialize Firebase
+// Initialize
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// Global Variables
+// Global variables for your scripts
 const auth = firebase.auth();
 const db = firebase.firestore();
 const functions = firebase.functions();
 
-console.log("Firebase Config Loaded");
+console.log("Firebase Connected");
