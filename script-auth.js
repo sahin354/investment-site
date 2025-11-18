@@ -1,149 +1,99 @@
 // script-auth.js
 
-// 1. Ensure Firebase services are available globally (from firebaseConfig.js)
+// 1. Get Global References
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 2. Set Firebase Auth Persistence (for stable sessions)
-// This helps prevent unexpected logouts.
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(() => console.log("Firebase Auth persistence set to LOCAL."))
-  .catch(error => console.error("Error setting persistence:", error));
-
-// 3. Global Variable for current user
-let currentUserId = null;
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    currentUserId = user.uid;
-    console.log("User logged in:", user.uid, user.email);
-    // Optional: Redirect to index.html if on login/register page and already logged in
-    if (window.location.pathname.includes('login.html') || window.location.pathname.includes('register.html')) {
-      window.location.href = 'index.html';
-    }
-  } else {
-    currentUserId = null;
-    console.log("No user logged in.");
-    // Optional: Redirect to login.html if on a protected page and not logged in
-    // For example, if (!window.location.pathname.includes('login.html') && !window.location.pathname.includes('register.html')) {
-    //   window.location.href = 'login.html';
-    // }
-  }
-});
-
-// 4. Helper: Mobile Number to Dummy Email Converter
-//    >>> IMPORTANT: This MUST generate the EXACT same email format
-//    >>>            as what is stored in Firebase Authentication for your users.
-//    >>>            For example, if Firebase stores "+911234567890@adanisite.auth"
-//    >>>            then this function needs to generate that exact string.
+// 2. Mobile to Email Converter
+// This ensures +91 or spaces don't break the login
 function mobileToEmail(mobileNumber) {
-    const cleanedMobile = mobileNumber.replace(/\D/g, ''); // Removes non-digits
-    // If your Firebase Auth stores +91 in the email, uncomment the line below.
-    // const formattedMobile = `+91${cleanedMobile}`; 
-    // Otherwise, just use the cleaned number.
-    const formattedMobile = cleanedMobile; // Assuming no +91 prefix in dummy email
-    return `${formattedMobile}@adanisite.auth`; // Ensure this domain matches exactly!
+    // Remove everything that is NOT a number (spaces, +, -)
+    const cleanedMobile = mobileNumber.replace(/\D/g, ''); 
+    // Create the dummy email
+    return `${cleanedMobile}@adanisite.auth`; 
 }
 
-// 5. Login Form Handling
+// 3. Login Logic
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const loginBtn = loginForm.querySelector('button[type="submit"]');
-        if (loginBtn) {
-            loginBtn.textContent = "Logging in...";
-            loginBtn.disabled = true;
-        }
+        
+        const submitBtn = loginForm.querySelector('button');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Logging in...";
+        submitBtn.disabled = true;
 
+        // Get Inputs (Support both ID names you might have used)
         const mobileInput = document.getElementById('loginMobile') || document.getElementById('loginId');
         const passwordInput = document.getElementById('loginPassword') || document.getElementById('password');
-
-        if (!mobileInput || !passwordInput || !mobileInput.value || !passwordInput.value) {
-            alert("Please enter both mobile number and password.");
-            if (loginBtn) { loginBtn.textContent = "Login"; loginBtn.disabled = false; }
-            return;
-        }
-
-        const mobileNumber = mobileInput.value;
+        
+        const mobileNumber = mobileInput.value.trim();
         const password = passwordInput.value;
-        const email = mobileToEmail(mobileNumber); // Generate dummy email
+
+        // Convert to Email
+        const email = mobileToEmail(mobileNumber);
+        console.log("Attempting login with:", email);
 
         try {
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            console.log("User signed in:", userCredential.user.uid);
-            // Success! Redirect.
-            window.location.href = "index.html"; 
+            await auth.signInWithEmailAndPassword(email, password);
+            // Success
+            window.location.href = "index.html";
         } catch (error) {
-            console.error("Login Error:", error.code, error.message);
-            let errorMessage = "Login Failed: ";
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                errorMessage += "Invalid mobile number or password.";
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage += "Invalid mobile number format.";
+            console.error("Login Error:", error);
+            let msg = "Login Failed.";
+            if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                msg = "Invalid Mobile Number or Password.";
             } else {
-                errorMessage += error.message; // Show Firebase's message for other errors
+                msg = error.message;
             }
-            alert(errorMessage);
+            alert(msg);
         } finally {
-            if (loginBtn) {
-                loginBtn.textContent = "Login";
-                loginBtn.disabled = false;
-            }
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         }
     });
-} else {
-  console.warn("loginForm not found.");
 }
 
-// 6. Registration Form Handling
+// 4. Registration Logic
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const regBtn = document.getElementById('registerBtn') || registerForm.querySelector('button[type="submit"]');
-        if (regBtn) {
-            regBtn.textContent = "Processing...";
-            regBtn.disabled = true;
-        }
+        
+        const submitBtn = registerForm.querySelector('button');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Registering...";
+        submitBtn.disabled = true;
 
         const mobileInput = document.getElementById('registerMobile');
         const passwordInput = document.getElementById('registerPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const confirmInput = document.getElementById('confirmPassword');
 
-        if (!mobileInput || !passwordInput || !confirmPasswordInput || !mobileInput.value || !passwordInput.value || !confirmPasswordInput.value) {
-            alert("Please fill all registration fields.");
-            if (regBtn) { regBtn.textContent = "Register"; regBtn.disabled = false; }
-            return;
-        }
-
-        const mobileNumber = mobileInput.value;
+        const mobile = mobileInput.value.trim();
         const password = passwordInput.value;
-        const confirmPass = confirmPasswordInput.value;
+        const confirm = confirmInput.value;
 
-        if (password !== confirmPass) {
-            alert("Passwords do not match!");
-            if (regBtn) { regBtn.textContent = "Register"; regBtn.disabled = false; }
-            return;
-        }
-        if (password.length < 6) {
-            alert("Password should be at least 6 characters.");
-            if (regBtn) { regBtn.textContent = "Register"; regBtn.disabled = false; }
+        if (password !== confirm) {
+            alert("Passwords do not match");
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
             return;
         }
 
-        const email = mobileToEmail(mobileNumber); // Generate dummy email for Auth
+        const email = mobileToEmail(mobile);
+        console.log("Registering with:", email);
 
         try {
-            // A. Create User in Firebase Authentication
+            // Create Auth User
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
-            console.log("User registered:", user.uid);
-            
-            // B. Create User Profile Document in Firestore
+
+            // Create Firestore Profile
             await db.collection('users').doc(user.uid).set({
                 uid: user.uid,
-                mobileNumber: mobileNumber,
-                email: email, // Store the dummy email used for Auth
+                mobileNumber: mobile,
+                email: email, // Store the dummy email
                 balance: 0,
                 vipLevel: 0,
                 totalRechargeAmount: 0,
@@ -151,41 +101,22 @@ if (registerForm) {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            alert("Registration Successful! Please log in.");
+            alert("Registration Successful!");
             window.location.href = "login.html";
 
         } catch (error) {
-            console.error("Registration Error:", error.code, error.message);
-            let errorMessage = "Registration Failed: ";
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage += "This mobile number is already registered.";
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage += "Password should be at least 6 characters.";
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage += "Invalid mobile number format.";
-            } else {
-                errorMessage += error.message;
-            }
-            alert(errorMessage);
+            console.error("Reg Error:", error);
+            alert("Registration Failed: " + error.message);
         } finally {
-            if (regBtn) {
-                regBtn.textContent = "Register";
-                regBtn.disabled = false;
-            }
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         }
     });
-} else {
-  console.warn("registerForm not found.");
 }
 
-// 7. Logout Function (global access)
-window.handleLogout = function() {
+// 5. Logout
+function handleLogout() {
     auth.signOut().then(() => {
-        console.log("User logged out.");
         window.location.href = "login.html";
-    }).catch((error) => {
-        console.error("Logout Error:", error);
-        alert("Logout failed: " + error.message);
     });
-};
-            
+              }
