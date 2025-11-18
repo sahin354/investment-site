@@ -1,4 +1,4 @@
-// firebaseConfig.js - FOR CDN-BASED (NON-MODULE) SETUP
+// firebaseConfig.js
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -12,20 +12,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-try {
-  firebase.initializeApp(firebaseConfig);
-  console.log("Firebase initialized successfully");
-} catch (error) {
-  console.error("Firebase initialization error:", error);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+} else {
+    firebase.app(); // if already initialized, use that one
 }
 
-// Get references to Firebase services
-const auth = firebase.auth();
-const db = firebase.firestore();
-const functions = firebase.functions();
+// Make these available globally
+window.auth = firebase.auth();
+window.db = firebase.firestore();
+window.functions = firebase.functions();
 
-// Enable offline persistence for better performance
-db.enablePersistence()
-  .catch((err) => {
-    console.log("Persistence failed:", err);
-  });
+console.log("Firebase initialized.");
