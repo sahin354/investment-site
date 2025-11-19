@@ -1,122 +1,146 @@
-// script-auth.js
+document.addEventListener('DOMContentLoaded', () => {
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-// 1. Get Global References
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// 2. Mobile to Email Converter
-// This ensures +91 or spaces don't break the login
-function mobileToEmail(mobileNumber) {
-    // Remove everything that is NOT a number (spaces, +, -)
-    const cleanedMobile = mobileNumber.replace(/\D/g, ''); 
-    // Create the dummy email
-    return `${cleanedMobile}@adanisite.auth`; 
-}
-
-// 3. Login Logic
-const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = loginForm.querySelector('button');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = "Logging in...";
-        submitBtn.disabled = true;
-
-        // Get Inputs (Support both ID names you might have used)
-        const mobileInput = document.getElementById('loginMobile') || document.getElementById('loginId');
-        const passwordInput = document.getElementById('loginPassword') || document.getElementById('password');
-        
-        const mobileNumber = mobileInput.value.trim();
-        const password = passwordInput.value;
-
-        // Convert to Email
-        const email = mobileToEmail(mobileNumber);
-        console.log("Attempting login with:", email);
-
-        try {
-            await auth.signInWithEmailAndPassword(email, password);
-            // Success
-            window.location.href = "index.html";
-        } catch (error) {
-            console.error("Login Error:", error);
-            let msg = "Login Failed.";
-            if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                msg = "Invalid Mobile Number or Password.";
-            } else {
-                msg = error.message;
-            }
-            alert(msg);
-        } finally {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-    });
-}
-
-// 4. Registration Logic
-const registerForm = document.getElementById('registerForm');
-if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const submitBtn = registerForm.querySelector('button');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = "Registering...";
-        submitBtn.disabled = true;
-
-        const mobileInput = document.getElementById('registerMobile');
-        const passwordInput = document.getElementById('registerPassword');
-        const confirmInput = document.getElementById('confirmPassword');
-
-        const mobile = mobileInput.value.trim();
-        const password = passwordInput.value;
-        const confirm = confirmInput.value;
-
-        if (password !== confirm) {
-            alert("Passwords do not match");
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            return;
-        }
-
-        const email = mobileToEmail(mobile);
-        console.log("Registering with:", email);
-
-        try {
-            // Create Auth User
-            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-            const user = userCredential.user;
-
-            // Create Firestore Profile
-            await db.collection('users').doc(user.uid).set({
-                uid: user.uid,
-                mobileNumber: mobile,
-                email: email, // Store the dummy email
-                balance: 0,
-                vipLevel: 0,
-                totalRechargeAmount: 0,
-                isBlocked: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    // --- PASSWORD TOGGLE FUNCTION ---
+    function setupPasswordToggle(inputId, toggleId) {
+        const passwordInput = document.getElementById(inputId);
+        const toggleIcon = document.getElementById(toggleId);
+        if (passwordInput && toggleIcon) {
+            toggleIcon.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                toggleIcon.textContent = type === 'password' ? '👁️' : '🙈';
             });
-
-            alert("Registration Successful!");
-            window.location.href = "login.html";
-
-        } catch (error) {
-            console.error("Reg Error:", error);
-            alert("Registration Failed: " + error.message);
-        } finally {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
         }
-    });
-}
+    }
 
-// 5. Logout
-function handleLogout() {
-    auth.signOut().then(() => {
-        window.location.href = "login.html";
-    });
-              }
+    // --- REGISTER FORM ---
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        setupPasswordToggle('password', 'togglePassword');
+        setupPasswordToggle('confirmPassword', 'toggleConfirmPassword');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('ref')) {
+            registerForm.dataset.referralCode = urlParams.get('ref');
+        }
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Processing...';
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                registerBtn.disabled = false;
+                return;
+            }
+
+            try {
+                // Check if user exists in DB first
+                const checkEmail = await db.collection('users').where('email', '==', email).get();
+                if (!checkEmail.empty) throw new Error('Email already registered.');
+
+                // Create Auth User
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Send Verification Email
+                await user.sendEmailVerification();
+
+                // Create User Document
+                const userIdShort = Date.now().toString().slice(-6) + Math.floor(Math.random() * 100);
+                await db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    userId: userIdShort,
+                    balance: 0,
+                    referralCode: 'REF' + userIdShort,
+                    referredBy: registerForm.dataset.referralCode || null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isBlocked: false
+                });
+
+                window.location.href = 'verify-email.html';
+
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+    }
+
+    // --- LOGIN FORM (UPDATED) ---
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        setupPasswordToggle('password', 'togglePassword');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Logging in...";
+
+            const loginId = document.getElementById('loginId').value; // Can be email or phone
+            const password = document.getElementById('password').value;
+            let emailToLogin = loginId;
+
+            try {
+                // 1. If loginId is a phone number, find the email
+                if (!loginId.includes('@')) {
+                    const phoneQuery = await db.collection('users').where('phone', '==', loginId).get();
+                    if (phoneQuery.empty) throw new Error('Phone number not found.');
+                    emailToLogin = phoneQuery.docs[0].data().email;
+                }
+
+                // 2. Sign In
+                const userCredential = await auth.signInWithEmailAndPassword(emailToLogin, password);
+                const user = userCredential.user;
+
+                // 3. Check Block Status
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists && userDoc.data().isBlocked) {
+                    await auth.signOut();
+                    throw new Error('Your account has been blocked by Admin.');
+                }
+
+                // 4. ADMIN REDIRECT LOGIC
+                const ADMIN_EMAIL = "sahin54481@gmail.com"; 
+                
+                if (user.email === ADMIN_EMAIL) {
+                    // If Admin, go to control panel
+                    window.location.href = 'control-panel.html';
+                } else {
+                    // Normal user
+                    if (user.emailVerified) {
+                        window.location.href = 'index.html';
+                    } else {
+                        await auth.signOut();
+                        alert('Please verify your email first.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Login";
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Login";
+            }
+        });
+    }
+});
+                
