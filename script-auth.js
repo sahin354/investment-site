@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (password !== confirmPassword) {
                 alert('Passwords do not match.');
                 registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
                 return;
             }
 
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     isBlocked: false
                 });
 
+                alert("Registration successful! Please verify your email.");
                 window.location.href = 'verify-email.html';
 
             } catch (error) {
@@ -82,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LOGIN FORM (UPDATED) ---
+    // --- LOGIN FORM ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         setupPasswordToggle('password', 'togglePassword');
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.textContent = "Logging in...";
 
-            const loginId = document.getElementById('loginId').value; // Can be email or phone
+            const loginId = document.getElementById('loginId').value; 
             const password = document.getElementById('password').value;
             let emailToLogin = loginId;
 
@@ -116,22 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('Your account has been blocked by Admin.');
                 }
 
-                // 4. ADMIN REDIRECT LOGIC
-                const ADMIN_EMAIL = "sahin54481@gmail.com"; 
-                
-                if (user.email === ADMIN_EMAIL) {
-                    // If Admin, go to control panel
-                    window.location.href = 'control-panel.html';
+                // 4. REDIRECT LOGIC (Everyone goes to index.html)
+                if (user.emailVerified) {
+                    window.location.href = 'index.html';
                 } else {
-                    // Normal user
-                    if (user.emailVerified) {
-                        window.location.href = 'index.html';
-                    } else {
-                        await auth.signOut();
-                        alert('Please verify your email first.');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = "Login";
-                    }
+                    await auth.signOut();
+                    alert('Please verify your email first.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Login";
                 }
 
             } catch (error) {
@@ -143,4 +137,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-                
+            
