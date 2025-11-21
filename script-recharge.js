@@ -1,35 +1,81 @@
-document.addEventListener("DOMContentLoaded", function () {
+// ------------------------
+//  RECHARGE PAGE SCRIPT
+// ------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+
     const amountInput = document.getElementById("rechargeAmount");
     const quickButtons = document.querySelectorAll(".quick-amount-btn");
     const rechargeForm = document.getElementById("rechargeForm");
+    const balanceDisplay = document.getElementById("currentBalance");
 
-    // Handle Quick Select Buttons
+    let currentUser = null;
+
+    // -------------------------
+    // 1. GET CURRENT USER BALANCE
+    // -------------------------
+    firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+            console.warn("No user logged in");
+            return;
+        }
+
+        currentUser = user;
+
+        try {
+            const userDoc = await firebase.firestore()
+                .collection("users")
+                .doc(user.uid)
+                .get();
+
+            const bal = userDoc.data().balance || 0;
+            balanceDisplay.textContent = "₹" + bal.toFixed(2);
+
+        } catch (err) {
+            console.error("Error fetching balance:", err);
+        }
+    });
+
+
+    // ----------------------------------------
+    // 2. QUICK SELECT BUTTONS (FIXED SELECTION)
+    // ----------------------------------------
     quickButtons.forEach(btn => {
-        btn.addEventListener("click", function () {
+        btn.addEventListener("click", () => {
 
+            // remove active from all
             quickButtons.forEach(b => b.classList.remove("active"));
 
-            this.classList.add("active");
+            // activate selected
+            btn.classList.add("active");
 
-            amountInput.value = this.getAttribute("data-amount");
+            // set amount in input
+            const amt = btn.dataset.amount;
+            amountInput.value = amt;
         });
     });
 
-    // Handle Recharge Submission
+
+    // ------------------------------------
+    // 3. SUBMIT RECHARGE → OPEN PAY PAGE
+    // ------------------------------------
     rechargeForm.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const amount = amountInput.value.trim();
+        let amount = Number(amountInput.value);
 
-        if (!amount || Number(amount) < 120) {
+        if (!amount || amount < 120) {
             alert("Minimum recharge amount is ₹120");
             return;
         }
 
-        // ⭐ Your correct API route
-        const apiURL = `/api/pay0-create-order?amount=${amount}`;
+        // --------------------------
+        // FIX 404: correct API route
+        // --------------------------
+        const url = `/api/pay0-create-order?amount=${amount}`;
 
-        // Open in new tab
-        window.open(apiURL, "_blank");
+        // open in new tab
+        window.open(url, "_blank");
     });
+
 });
