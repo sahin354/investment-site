@@ -2,48 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recharge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adani Corporation - Recharge</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-    <div class="container">
+    <!-- TOP NAV & SIDEBAR SAME (unchanged) -->
 
-        <h2>Recharge Amount</h2>
+    <main class="page-container">
 
-        <form id="rechargeForm">
-
-            <input 
-                type="number" 
-                id="rechargeAmount" 
-                placeholder="₹ Enter Amount"
-                required
-            >
-
-            <div class="quick-select">
-                <button type="button" class="quick-amount-btn" data-amount="100">₹100</button>
-                <button type="button" class="quick-amount-btn" data-amount="500">₹500</button>
-                <button type="button" class="quick-amount-btn" data-amount="1000">₹1000</button>
-                <button type="button" class="quick-amount-btn" data-amount="2000">₹2000</button>
-                <button type="button" class="quick-amount-btn" data-amount="5000">₹5000</button>
-                <button type="button" class="quick-amount-btn" data-amount="10000">₹10000</button>
-            </div>
-
-            <button type="submit" class="submit-btn">Proceed to Recharge</button>
-        </form>
-
-        <!-- ⭐ YOUR ORIGINAL NOTES (UNCHANGED) ⭐ -->
-        <div class="notes">
-            <h3>Important Notes</h3>
-            <p>1. The minimum deposit amount is ₹120 and the maximum deposit limit is ₹50,000.</p>
-            <p>2. While making a payment, please verify the UPI ID carefully. If the payment is sent to an incorrect UPI ID, we will not be responsible for the loss.</p>
-            <p>3. After completing the recharge, please check the UTR (Transaction) number and submit it for verification.</p>
+        <div class="card current-balance-card">
+            <div>Current Balance</div>
+            <div id="currentBalance" class="balance-amount-small">₹0.00</div>
         </div>
 
-    </div>
+        <form id="rechargeForm">
+            <div class="card">
+                <h3>Recharge Amount</h3>
 
+                <div class="input-container">
+                    <span>₹</span>
+                    <input type="number" id="rechargeAmount" placeholder="120" min="120" max="50000">
+                </div>
+
+                <div class="quick-amounts-label">Quick Select</div>
+
+                <div class="quick-amounts">
+                    <button type="button" class="quick-amount-btn" data-amount="100">₹100</button>
+                    <button type="button" class="quick-amount-btn" data-amount="500">₹500</button>
+                    <button type="button" class="quick-amount-btn" data-amount="1000">₹1000</button>
+                    <button type="button" class="quick-amount-btn" data-amount="2000">₹2000</button>
+                    <button type="button" class="quick-amount-btn" data-amount="5000">₹5000</button>
+                    <button type="button" class="quick-amount-btn" data-amount="10000">₹10000</button>
+                </div>
+
+                <button type="submit" id="proceedRecharge" class="submit-btn">
+                    Proceed to Recharge
+                </button>
+            </div>
+        </form>
+
+        <div class="card recharge-note">
+            <h4>Important Notes</h4>
+            <ol>
+                <li>The minimum deposit is ₹120 and maximum ₹50,000.</li>
+                <li>Verify UPI before sending payment.</li>
+                <li>After payment, check UTR/Transaction ID.</li>
+                <li>Send screenshot to support for confirmation.</li>
+            </ol>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <footer class="bottom-nav">
+        <a href="index.html"><i class="fas fa-home"></i> Home</a>
+        <a href="recharge.html" class="active"><i class="fas fa-bolt"></i> Recharge</a>
+        <a href="refer.html"><i class="fas fa-user-friends"></i> Refer</a>
+        <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
+    </footer>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- your firebase settings -->
+    <script src="firebaseConfig.js"></script>
+
+    <!-- common global functions -->
+    <script src="common.js"></script>
+
+    <!-- recharge logic -->
     <script src="script-recharge.js"></script>
 
 </body>
-</html>
+    </html>
