@@ -171,8 +171,6 @@ document.getElementById('rechargeForm').addEventListener('submit', async (e) => 
 });
 */
 
-document.addEventListener('DOMContentLoaded', loadInvestmentPlans);
-
  // -----------------------------
 // PAY0 AUTO RECHARGE INTEGRATION
 // -----------------------------
