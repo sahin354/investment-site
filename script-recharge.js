@@ -59,15 +59,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // ------------------------------------
     // 3. SUBMIT RECHARGE → OPEN PAY PAGE
     // ------------------------------------
-    rechargeForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+    rechargeForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-        let amount = Number(amountInput.value);
+    const amount = amountInput.value.trim();
+    if (!amount || Number(amount) < 120) {
+        alert("Minimum recharge amount is ₹120");
+        return;
+    }
 
-        if (!amount || amount < 120) {
-            alert("Minimum recharge amount is ₹120");
-            return;
-        }
+    window.location.href = `/api/pay0-create-order?amount=${amount}`;
+});
 
         // --------------------------
         // FIX 404: correct API route
