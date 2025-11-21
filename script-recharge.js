@@ -167,7 +167,7 @@ function setupRechargeUI() {
           localStorage.setItem("pay0_last_amount", String(amount));
 
           // 👉 OPTION B: open Pay0 link in new tab
-          window.open(data.result.payment_url, "_blank");
+          window.open(`/api/pay0-create-order?amount=${amount}`, "_blank");
         } else {
           alert(data.message || "Unable to start payment. Please try again.");
         }
