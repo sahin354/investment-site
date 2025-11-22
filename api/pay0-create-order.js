@@ -2,21 +2,21 @@ const axios = require("axios");
 
 module.exports = async function handler(req, res) {
     try {
-        // SUPPORT GET AND POST BOTH
-        const amount =
-            req.method === "POST" ? req.body.amount : req.query.amount;
-
-        if (!amount) {
-            return res.status(400).json({
+        if (req.method !== "POST") {
+            return res.status(405).json({
                 status: false,
-                message: "Amount is required",
+                message: "Method not allowed"
             });
         }
 
-        const customer_mobile =
-            req.method === "POST"
-                ? req.body.customer_mobile
-                : req.query.customer_mobile || "9999999999";
+        const { amount, customer_mobile } = req.body;
+
+        if (!amount || !customer_mobile) {
+            return res.status(400).json({
+                status: false,
+                message: "Amount & customer_mobile required"
+            });
+        }
 
         const orderId = "ORD" + Date.now();
 
@@ -32,20 +32,20 @@ module.exports = async function handler(req, res) {
 
         const response = await axios.post(
             "https://pay0.shop/api/create-order",
-            data,
+            data.toString(),
             {
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
             }
         );
 
         return res.status(200).json(response.data);
 
-    } catch (error) {
+    } catch (err) {
         return res.status(500).json({
             status: false,
-            message: error.response?.data || error.message,
+            message: err.response?.data || err.message
         });
     }
 };
