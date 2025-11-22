@@ -1,11 +1,10 @@
-// script-recharge.js
-
 document.addEventListener("DOMContentLoaded", function () {
+
     const amountInput = document.getElementById("rechargeAmount");
     const quickButtons = document.querySelectorAll(".quick-amount-btn");
     const rechargeForm = document.getElementById("rechargeForm");
 
-    // Quick amount selection (keep same UI)
+    // Quick amount selection
     quickButtons.forEach((btn) => {
         btn.addEventListener("click", function () {
             quickButtons.forEach((b) => b.classList.remove("active"));
@@ -14,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Handle form submit
+    // Submit Recharge
     rechargeForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -25,41 +24,45 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // You can replace this with real logged-in mobile if you store it
         const customer_mobile =
             window.localStorage.getItem("userPhone") || "9999999999";
 
         try {
+            // ⭐ FIXED: Correct API route for Vercel
             const res = await fetch("/api/pay0CreateOrder", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ amount, customer_mobile }),
+                body: JSON.stringify({
+                    amount,
+                    customer_mobile
+                })
             });
 
             const data = await res.json();
 
             if (!res.ok || data.status === false) {
+                console.log("Pay0 Error: ", data);
                 alert(data.message || "Failed to create order.");
                 return;
             }
 
-            // Try to find payment URL in Pay0 response
+            // Find Pay0 payment URL
             const paymentUrl =
                 data.payment_url ||
                 data.paymentURL ||
                 (data.data && (data.data.payment_url || data.data.paymentURL));
 
             if (paymentUrl) {
-                // Redirect user to Pay0 payment page
-                window.location.href = paymentUrl;
+                window.location.href = paymentUrl; // Redirect to Pay0
             } else {
-                console.log("Pay0 response:", data);
-                alert("Payment URL not received from gateway.");
+                console.log("Full Response:", data);
+                alert("Payment URL not received from Pay0.");
             }
-        } catch (err) {
-            console.error("Recharge error:", err);
+
+        } catch (error) {
+            console.error("Recharge Failed:", error);
             alert("Server error. Please try again.");
         }
     });
