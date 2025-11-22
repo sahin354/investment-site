@@ -2,8 +2,9 @@ const axios = require("axios");
 
 module.exports = async function handler(req, res) {
     try {
-        // SUPPORT BOTH GET + POST
-        const amount = req.method === "POST" ? req.body.amount : req.query.amount;
+        // SUPPORT GET AND POST BOTH
+        const amount =
+            req.method === "POST" ? req.body.amount : req.query.amount;
 
         if (!amount) {
             return res.status(400).json({
