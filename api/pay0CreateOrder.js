@@ -1,12 +1,9 @@
 const axios = require("axios");
 
-module.exports = async function handler(req, res) {
+module.exports = async (req, res) => {
     try {
         if (req.method !== "POST") {
-            return res.status(405).json({
-                status: false,
-                message: "Method not allowed"
-            });
+            return res.status(405).json({ status: false, message: "Method not allowed" });
         }
 
         const { amount, customer_mobile } = req.body;
@@ -33,11 +30,7 @@ module.exports = async function handler(req, res) {
         const response = await axios.post(
             "https://pay0.shop/api/create-order",
             data.toString(),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            }
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
         );
 
         return res.status(200).json(response.data);
