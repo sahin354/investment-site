@@ -1,83 +1,66 @@
-// ------------------------
-//  RECHARGE PAGE SCRIPT
-// ------------------------
+// script-recharge.js
 
-document.addEventListener("DOMContentLoaded", () => {
-
+document.addEventListener("DOMContentLoaded", function () {
     const amountInput = document.getElementById("rechargeAmount");
     const quickButtons = document.querySelectorAll(".quick-amount-btn");
     const rechargeForm = document.getElementById("rechargeForm");
-    const balanceDisplay = document.getElementById("currentBalance");
 
-    let currentUser = null;
-
-    // -------------------------
-    // 1. GET CURRENT USER BALANCE
-    // -------------------------
-    firebase.auth().onAuthStateChanged(async user => {
-        if (!user) {
-            console.warn("No user logged in");
-            return;
-        }
-
-        currentUser = user;
-
-        try {
-            const userDoc = await firebase.firestore()
-                .collection("users")
-                .doc(user.uid)
-                .get();
-
-            const bal = userDoc.data().balance || 0;
-            balanceDisplay.textContent = "₹" + bal.toFixed(2);
-
-        } catch (err) {
-            console.error("Error fetching balance:", err);
-        }
-    });
-
-
-    // ----------------------------------------
-    // 2. QUICK SELECT BUTTONS (FIXED SELECTION)
-    // ----------------------------------------
-    quickButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-
-            // remove active from all
-            quickButtons.forEach(b => b.classList.remove("active"));
-
-            // activate selected
-            btn.classList.add("active");
-
-            // set amount in input
-            const amt = btn.dataset.amount;
-            amountInput.value = amt;
+    // Quick amount selection (keep same UI)
+    quickButtons.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            quickButtons.forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+            amountInput.value = this.getAttribute("data-amount");
         });
     });
 
-
-    // ------------------------------------
-    // 3. SUBMIT RECHARGE → OPEN PAY PAGE
-    // ------------------------------------
+    // Handle form submit
     rechargeForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    const amount = amountInput.value.trim();
-    if (!amount || Number(amount) < 120) {
-        alert("Minimum recharge amount is ₹120");
-        return;
-    }
+        const amount = parseInt(amountInput.value || "0", 10);
 
-    window.open(`/api/pay0CreateOrder?amount=${amount}`, "_blank");
-});
+        if (!amount || amount < 120) {
+            alert("Minimum recharge amount is ₹120");
+            return;
+        }
 
-        // --------------------------
-        // FIX 404: correct API route
-        // --------------------------
-        const url = `/api/pay0-create-order?amount=${amount}`;
+        // You can replace this with real logged-in mobile if you store it
+        const customer_mobile =
+            window.localStorage.getItem("userPhone") || "9999999999";
 
-        // open in new tab
-        window.open(url, "_blank");
+        try {
+            const res = await fetch("/api/pay0CreateOrder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ amount, customer_mobile }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || data.status === false) {
+                alert(data.message || "Failed to create order.");
+                return;
+            }
+
+            // Try to find payment URL in Pay0 response
+            const paymentUrl =
+                data.payment_url ||
+                data.paymentURL ||
+                (data.data && (data.data.payment_url || data.data.paymentURL));
+
+            if (paymentUrl) {
+                // Redirect user to Pay0 payment page
+                window.location.href = paymentUrl;
+            } else {
+                console.log("Pay0 response:", data);
+                alert("Payment URL not received from gateway.");
+            }
+        } catch (err) {
+            console.error("Recharge error:", err);
+            alert("Server error. Please try again.");
+        }
     });
-
 });
