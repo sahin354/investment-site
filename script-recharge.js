@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    window.location.href = `/api/pay0-create-order?amount=${amount}`;
+    window.open(`/api/pay0CreateOrder?amount=${amount}`, "_blank");
 });
 
         // --------------------------
