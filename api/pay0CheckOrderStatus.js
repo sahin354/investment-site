@@ -1,5 +1,5 @@
 // api/pay0CheckOrderStatus.js
-// Node serverless function (CommonJS)
+// CommonJS Vercel function – asks Pay0 for status
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -8,29 +8,39 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const body = req.body || {};
-    const { order_id } = body;
-
+    const { order_id } = req.body || {};
     if (!order_id) {
       res.statusCode = 400;
-      return res.json({ message: "Missing order_id" });
+      return res.json({ error: true, message: "Missing order_id" });
     }
 
-    // Call Pay0 order-status API
-    const response = await fetch(process.env.PAY0_STATUS_URL, {
+    const { PAY0_STATUS_URL, PAY0_TOKEN, PAY0_SECRET } = process.env;
+
+    if (!PAY0_STATUS_URL || !PAY0_TOKEN || !PAY0_SECRET) {
+      res.statusCode = 500;
+      return res.json({
+        error: true,
+        message: "Pay0 env vars not set (PAY0_STATUS_URL / PAY0_TOKEN / PAY0_SECRET)",
+      });
+    }
+
+    const response = await fetch(PAY0_STATUS_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.PAY0_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ order_id }),
+      body: JSON.stringify({
+        api_key: PAY0_TOKEN,
+        secret: PAY0_SECRET,
+        order_id,
+      }),
     });
 
     const data = await response.json();
 
     const payment_status = data.payment_status || data.status || "unknown";
 
-    // Shape the response for your frontend script-recharge.js
+    res.statusCode = response.ok ? 200 : 500;
     return res.json({
       status: payment_status === "success" ? "success" : payment_status,
       payment_status,
@@ -38,11 +48,11 @@ module.exports = async (req, res) => {
       raw: data,
     });
   } catch (err) {
-    console.error("Pay0 check status error:", err);
+    console.error("Pay0 check-status error:", err);
     res.statusCode = 500;
     return res.json({
       error: true,
-      message: "Server error while checking Pay0 status",
+      message: err.message || "Internal server error in check-status",
     });
   }
 };
