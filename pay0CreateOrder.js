@@ -1,34 +1,17 @@
-export const config = { runtime: "edge",
-};
-export default async function handler(req) { if (req.method !== 
-  "POST") {
-    return new Response(JSON.stringify({ message: "Method Not 
-    Allowed" }), {
-      status: 405,
-    });
+module.exports = async function handler(req, res) { if (req.method !== "POST") { return 
+    res.status(405).json({ message: "Method Not Allowed" });
   }
-  try { const body = await req.json(); const { amount, mobile, 
-    order_id } = body; if (!process.env.PAY0_CREATE_URL || 
-    !process.env.PAY0_TOKEN) {
-      return new Response( JSON.stringify({ error: true, message: 
-          "Missing PAY0 environment variables",
-        }),
-        { status: 500 } );
-    }
-    const res = await fetch(process.env.PAY0_CREATE_URL, { method: 
-      "POST", headers: {
-        Authorization: `Bearer ${process.env.PAY0_TOKEN}`, 
-        "Content-Type": "application/json",
+  try { const { amount, mobile, order_id } = req.body; const response = await 
+    fetch(process.env.PAY0_CREATE_URL, {
+      method: "POST", headers: { Authorization: `Bearer ${process.env.PAY0_TOKEN}`, 
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ amount, mobile, order_id, redirect_url: 
         process.env.PAY0_REDIRECT_URL,
-      }),
+      })
     });
-    const data = await res.json(); return new 
-    Response(JSON.stringify(data), { status: 200 });
+    const data = await response.json(); return res.status(200).json(data);
   } catch (err) {
-    return new Response( JSON.stringify({ error: true, message: 
-      err.message }), { status: 500 }
-    );
+    return res.status(500).json({ error: true, message: err.message });
   }
-}
+};
