@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Uzumaki - Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside id="sideMenu" class="side-menu">
+    <div class="sidebar-header"><div id="sidebarId">Loading...</div><div id="sidebarVIP">...</div></div>
+    <div class="sidebar-actions">
+      
+      <a href="contact.html" class="sidebar-btn"><span>🧑‍💼</span> Customer Support</a>
+      
+      <a href="#" target="_blank" class="sidebar-btn"><span>💬</span> Telegram Channel</a>
+      
+      <button class="sidebar-btn" id="settingsToggleBtn">
+        <div class="sidebar-btn-content">
+            <span>⚙️</span> Settings
+        </div>
+        <span class="chevron">›</span>
+      </button>
+      
+      <div class="settings-submenu" id="settingsSubmenu">
+        <a href="terms.html" class="sidebar-btn sub-item"><span>📄</span> Terms & Conditions</a>
+        <a href="privacy-policy.html" class="sidebar-btn sub-item"><span>🔒</span> Privacy Policy</a>
+        <a href="refund.html" class="sidebar-btn sub-item"><span>💳</span> Refund Policy</a>
+      </div>
+    <span id="closeBtn" class="close-btn">&times;</span>
+  </aside>
+  <header class="top-bar">
+    <div id="menuBtn" class="menu-btn"><span></span><span></span><span></span></div>
+    Uzumaki 
+  </header>
+  <main>
+    <img src="banner.jpg" alt="Adani Corporation banner" class="banner-img"/>
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="primary">Primary</button>
+      <button class="tab-button" data-tab="vip">VIP</button>
+      <button class="tab-button" data-tab="purchased">Purchased</button>
+    </nav>
+    <section id="primary" class="tab-content active"></section>
+    <section id="vip" class="tab-content"></section>
+    <section id="purchased" class="tab-content"></section>
+  </main>
+  <div class="bottom-nav-spacer"></div>
+  
+  <footer class="bottom-nav">
+    <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
+    <a href="recharge.html"><i class="fas fa-bolt"></i> Recharge</a>
+    <a href="refer.html"><i class="fas fa-user-friends"></i> Refer</a>
+    <a href="mine.html"><i class="fas fa-user"></i> Mine</a>
+  </footer>
+  
+<script type="module" src="supabase.js"></script>
+<script type="module" src="common.js"></script>
+<script type="module" src="script.js"></script>  <!-- page-specific JS -->
+</body>
+</html>

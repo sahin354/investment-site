@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uzumaki - Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="auth-page-background">
+
+  <div class="auth-container-wrapper">
+
+      <!-- Welcome Section -->
+      <div class="auth-header">
+          <div class="company-name">Uzumaki</div>
+          <p class="welcome-text">Start your journey today!</p>
+          <a href="login.html" class="header-link">Login Instead</a>
+      </div>
+
+      <!-- Register Form -->
+      <div class="auth-content">
+          <h2>Create Account</h2>
+
+          <form id="registerForm">
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="text" id="name" name="name" placeholder="Full Name" required />
+                  </div>
+              </div>
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="tel" id="phone" name="phone" placeholder="Phone Number" required />
+                  </div>
+              </div>
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="email" id="email" name="email" placeholder="Email" required />
+                  </div>
+              </div>
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="password" id="password" name="password" placeholder="Password" required />
+                  </div>
+              </div>
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required />
+                  </div>
+              </div>
+
+              <div class="input-group">
+                  <div class="password-wrapper">
+                      <input type="text" id="referralCode" name="referralCode" placeholder="Referral Code (Optional)" />
+                  </div>
+              </div>
+
+              <button type="button" id="registerBtn" class="submit-btn">Register</button>
+
+              <div class="auth-footer-link">
+                  Already have an account? <a href="login.html">Login</a>
+              </div>
+
+          </form>
+      </div>
+
+  </div>
+
+<!-- Load Supabase directly from CDN -->
+<script type="module">
+  // Simple Supabase client
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  
+  const supabaseUrl = "https://zrufavpxsnootmvwybye.supabase.co";
+  const supabaseKey = "sb_publishable_EvHDWxi1BcEjcv_UnycVIQ_3T-V_A5s";
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
+  // Simple registration function
+  async function handleRegistration() {
+    try {
+      // Get form values
+      const fullName = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const referralCode = document.getElementById('referralCode')?.value.trim() || null;
+      
+      // Basic validation
+      if (!fullName || !phone || !email || !password || !confirmPassword) {
+        alert('Please fill all fields');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+      }
+      
+      // Disable button
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+      
+      // Step 1: Create auth user
+      alert('Step 1: Creating account...');
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone
+          }
+        }
+      });
+      
+      if (authError) {
+        alert('Auth Error: ' + authError.message);
+        btn.disabled = false;
+        btn.textContent = 'Register';
+        return;
+      }
+      
+      if (!authData.user) {
+        alert('No user created');
+        btn.disabled = false;
+        btn.textContent = 'Register';
+        return;
+      }
+      
+      alert('Step 2: Creating profile...');
+
+      // Get ?ref= from URL
+function getRefCode() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("ref");
+}
+
+const refCode = getRefCode();
+      
+      // Step 2: Create profile
+      const userId = authData.user.id;
+      const userReferralCode = 'REF' + userId.substring(0, 8).toUpperCase();
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          full_name: fullName,
+          phone: phone,
+          email: email,
+          balance: 0,
+          referral_code: userReferralCode,
+          is_vip: false
+        });
+      
+      if (profileError) {
+        alert('Profile Error: ' + profileError.message);
+        btn.disabled = false;
+        btn.textContent = 'Register';
+        return;
+      }
+      
+      // SUCCESS
+      alert('✅ Registration successful! You can now login.');
+      
+      // Clear form
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('confirmPassword').value = '';
+      if (document.getElementById('referralCode')) {
+        document.getElementById('referralCode').value = '';
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Register';
+      
+      // Redirect to login
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+      
+    } catch (error) {
+      alert('Unexpected error: ' + error.message);
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = false;
+      btn.textContent = 'Register';
+    }
+  }
+  
+  // Add event listener
+  document.getElementById('registerBtn').addEventListener('click', handleRegistration);
+</script>
+
+</body>
+</html>
