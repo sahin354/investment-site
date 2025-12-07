@@ -1,34 +1,29 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
-
-  try {
-    const { amount, mobile, order_id } = req.body;
-
-    if (!amount || !mobile || !order_id) {
-      return res.status(400).json({ message: "Missing fields" });
-    }
-
-    const params = new URLSearchParams();
-    params.append("user_token", process.env.PAY0_TOKEN);
-    params.append("amount", amount);
-    params.append("mobile", mobile);
-    params.append("order_id", order_id);
-    params.append("redirect_url", process.env.PAY0_REDIRECT_URL);
-
-    const response = await fetch(process.env.PAY0_CREATE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
+export const config = { runtime: "edge",
+};
+export default async function handler(req) { if (req.method 
+  !== "POST") {
+    return new Response(JSON.stringify({ message: "Method 
+    Not Allowed" }), {
+      status: 405,
     });
-
-    const result = await response.json();
-    console.log("PAY0 Response:", result);
-
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error("Pay0 ERROR:", error);
-    return res.status(500).json({ message: "Payment Gateway Error", error: error.message });
+  }
+  try { const body = await req.json(); const { amount, 
+    mobile, order_id } = body; const res = await 
+    fetch(process.env.PAY0_CREATE_URL, {
+      method: "POST", headers: { Authorization: `Bearer 
+        ${process.env.PAY0_TOKEN}`, "Content-Type": 
+        "application/json",
+      },
+      body: JSON.stringify({ amount, mobile, order_id, 
+        redirect_url: process.env.PAY0_REDIRECT_URL,
+      }),
+    });
+    const data = await res.json(); return new 
+    Response(JSON.stringify(data), { status: 200 });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: true, 
+    message: err.message }), {
+      status: 500,
+    });
   }
 }

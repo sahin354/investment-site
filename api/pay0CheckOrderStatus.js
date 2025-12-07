@@ -1,39 +1,25 @@
-// api/pay0CheckOrderStatus.js
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ status: false, message: "Method Not Allowed" });
+export const config = { runtime: "edge",
+};
+export default async function handler(req) { if (req.method 
+  !== "POST") {
+    return new Response(JSON.stringify({ message: "Method 
+    Not Allowed" }), {
+      status: 405,
+    });
   }
-
-  try {
-    const { order_id } = req.body || {};
-    if (!order_id) {
-      return res.status(400).json({ status: false, message: "Missing order_id" });
-    }
-
-    const params = new URLSearchParams();
-    params.append("user_token", process.env.PAY0_TOKEN);
-    params.append("order_id", order_id);
-
-    const response = await fetch(process.env.PAY0_STATUS_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
+  try { const body = await req.json(); const { order_id } = 
+    body; const res = await 
+    fetch(`${process.env.PAY0_STATUS_URL}/${order_id}`, {
+      method: "GET", headers: { Authorization: `Bearer 
+        ${process.env.PAY0_SECRET}`,
+      },
     });
-
-    const data = await response.json();
-
-    // Normalise to what frontend expects
-    return res.status(200).json({
-      status: data.status === "success",
-      payment_status: data.status,
-      amount: data.amount,
-      utr: data.utr || data.transaction_id,
-      raw: data,
-    });
+    const data = await res.json(); return new 
+    Response(JSON.stringify(data), { status: 200 });
   } catch (err) {
-    console.error("pay0CheckOrderStatus error:", err);
-    return res
-      .status(500)
-      .json({ status: false, message: "Gateway error", error: String(err) });
+    return new Response(JSON.stringify({ error: true, 
+    message: err.message }), {
+      status: 500,
+    });
   }
 }
