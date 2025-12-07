@@ -1,25 +1,48 @@
-export const config = { runtime: "edge",
-};
-export default async function handler(req) { if (req.method !== "POST") { 
-    return new Response(JSON.stringify({ message: "Method Not Allowed" }), 
-    {
-      status: 405,
-    });
+// api/pay0CheckOrderStatus.js
+// Node serverless function (CommonJS)
+
+module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    res.statusCode = 405;
+    return res.json({ message: "Method Not Allowed" });
   }
-  try { const body = await req.json(); const { order_id } = body; const res 
-    = await fetch(`${process.env.PAY0_STATUS_URL}?order_id=${order_id}`, {
-      method: "GET", headers: { Authorization: `Bearer 
-        ${process.env.PAY0_TOKEN}`,
-      },
-    });
-    const data = await res.json(); if (!data.status) { return new 
-      Response(JSON.stringify({ status: "pending" }), { status: 200 });
+
+  try {
+    const body = req.body || {};
+    const { order_id } = body;
+
+    if (!order_id) {
+      res.statusCode = 400;
+      return res.json({ message: "Missing order_id" });
     }
-    return new Response(JSON.stringify(data), { status: 200 });
+
+    // Call Pay0 order-status API
+    const response = await fetch(process.env.PAY0_STATUS_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.PAY0_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ order_id }),
+    });
+
+    const data = await response.json();
+
+    const payment_status = data.payment_status || data.status || "unknown";
+
+    // Shape the response for your frontend script-recharge.js
+    return res.json({
+      status: payment_status === "success" ? "success" : payment_status,
+      payment_status,
+      utr: data.utr || data.transaction_id || null,
+      raw: data,
+    });
   } catch (err) {
-    return new Response(JSON.stringify({ error: true, message: err.message 
-    }), {
-      status: 500,
+    console.error("Pay0 check status error:", err);
+    res.statusCode = 500;
+    return res.json({
+      error: true,
+      message: "Server error while checking Pay0 status",
     });
   }
-}
+};
