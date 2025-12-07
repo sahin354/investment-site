@@ -1,12 +1,12 @@
-export const config = { runtime: "edge",
-};
-export default async function handler(req) { if (req.method 
+# paste codeexport const config = { runtime: "edge",
+CTRL + X then Y + ENTER}; export default async function 
+handler(req) { if (req.method
   !== "POST") {
-    return new Response(JSON.stringify({ message: "Method 
-    Not Allowed" }), {
-      status: 405,
-    });
-  }
+cd ..  return new Response(JSON.stringify({ message: 
+    "Method Not Allowed" }), {
+git add api/pay0CreateOrder.js status: 405, git commit 
+-m "Debug Pay0" });
+git push  }
   try { const body = await req.json(); const { amount, 
     mobile, order_id } = body; const res = await 
     fetch(process.env.PAY0_CREATE_URL, {

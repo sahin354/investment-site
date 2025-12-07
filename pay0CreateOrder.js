@@ -1,38 +1,33 @@
-import fetch from "node-fetch"; import { 
-createClient } from "@supabase/supabase-js"; 
-export default async function handler(req, 
-res) {
-  if (req.method !== "POST") return 
-  res.status(405).json({ error: "Method Not 
-  Allowed" }); const { amount, mobile, 
-  order_id, user_id, email } = req.body; if 
-  (!amount || !mobile || !order_id) {
-    return res.status(400).json({ error: 
-    "Missing fields" });
+export const config = { runtime: "edge",
+};
+export default async function handler(req) { if 
+  (req.method !== "POST") {
+    return new Response(JSON.stringify({ message: 
+    "Method Not Allowed" }), {
+      status: 405,
+    });
   }
-  const supabase = createClient( 
-    process.env.SUPABASE_URL, 
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
-  // Call Pay0 API
-  const response = await 
-  fetch("https://api.pay0.shop/create-order", 
-  {
-    method: "POST", headers: { "Content-Type": 
-    "application/json" }, body: 
-    JSON.stringify({
-      api_key: process.env.PAYO_TOKEN, secret: 
-      process.env.PAYO_SECRET, amount, mobile, 
-      order_id
-    })
-  });
-  const result = await response.json();
-  // Store pending request
-  await 
-  supabase.from("payment_requests").insert({
-    user_id, user_email: email, order_id, 
-    amount, status: "pending", 
-    customer_mobile: mobile
-  });
-  return res.status(200).json(result);
+  try { const body = await req.json(); const { amount, 
+    mobile, order_id } = body; const response = await 
+    fetch(process.env.PAY0_CREATE_URL, {
+      method: "POST", headers: { "Authorization": 
+        `Bearer ${process.env.PAY0_TOKEN}`, 
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount, mobile, order_id, 
+        redirect_url: process.env.PAY0_REDIRECT_URL,
+      }),
+    });
+    const data = await response.json(); return new 
+    Response(
+      JSON.stringify({ success: true, raw: data // 👈 
+        This returns full Pay0 response
+      }),
+      { status: 200 } );
+  } catch (err) {
+    return new Response( JSON.stringify({ success: 
+        false, error: err.message,
+      }),
+      { status: 500 } );
+  }
 }
