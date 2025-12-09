@@ -12,44 +12,46 @@ export default async function handler(req, res) {
       return res.json({ ok: false, message: "Missing required fields" });
     }
 
-    const user_token = process.env.PAY0_USER_TOKEN;
+    const PAY0_URL = process.env.PAY0_CREATE_URL; 
+    const PAY0_TOKEN = process.env.PAY0_TOKEN;  
+    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
-    if (!user_token) {
-      return res.json({ ok: false, message: "PAY0 key missing in environment" });
+    if (!PAY0_URL || !PAY0_TOKEN) {
+      return res.json({ ok: false, message: "Missing Pay0 environment variables" });
     }
 
     const params = new URLSearchParams();
     params.append("customer_mobile", customer_mobile);
     params.append("customer_name", customer_name);
-    params.append("user_token", user_token);
+    params.append("user_token", PAY0_TOKEN);
     params.append("amount", amount);
     params.append("order_id", order_id);
-    params.append("redirect_url", "https://investsafe.vercel.app/payment-success.html");
+    params.append("redirect_url", REDIRECT_URL);
 
-    const response = await fetch("https://pay0.shop/api/create-order", {
+    const response = await fetch(PAY0_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params.toString(),
     });
 
-    const resultText = await response.text();
+    const text = await response.text();
 
-    let result;
+    let json;
     try {
-      result = JSON.parse(resultText);
+      json = JSON.parse(text);
     } catch {
       return res.json({
         ok: false,
-        message: "Invalid response from payment gateway",
-        raw: resultText,
+        message: "Pay0 returned non-JSON response",
+        raw: text,
       });
     }
 
-    if (!result.status) {
-      return res.json({ ok: false, message: result.message || "Gateway rejected" });
+    if (!json.status) {
+      return res.json({ ok: false, message: json.message || "Gateway rejected" });
     }
 
-    return res.json({ ok: true, paymentUrl: result.result.payment_url });
+    return res.json({ ok: true, paymentUrl: json.result.payment_url });
 
   } catch (error) {
     console.error(error);
