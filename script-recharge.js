@@ -1,4 +1,5 @@
-// script-recharge.js  –  ONLY VERCEL API, NO EDGE FUNCTION
+// script-recharge.js  – FIXED & WORKING WITH VERCEL BACKEND
+
 import { supabase } from "./supabase.js";
 import { appAuth } from "./common.js";
 
@@ -63,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const orderId = "ORD" + Date.now() + Math.random().toString(36).slice(2, 6);
 
-      // 1) create payment_request
+      // 1) save in DB as pending
       const { error: prErr } = await supabase.from("payment_requests").insert({
         user_id: user.id,
         user_email: user.email,
@@ -90,126 +91,71 @@ document.addEventListener("DOMContentLoaded", () => {
         reference_id: orderId,
       });
 
-      // 3) call Vercel API to create Pay0 order
-      const response = await fetch("/api/pay0CreateOrder", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    amount,
-    order_id,
-  }),
-});
+      // 3) call Vercel backend to create Pay0 order
+      const response = await fetch("/api/pay0-create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          customer_name: user.email || "User",
+          customer_mobile: mobile,
+          order_id: orderId,
+        }),
+      });
 
-      const data = await res.json();
+      const data = await response.json();
       console.log("[Pay0 create-order reply]", data);
 
-      const paymentUrl =
-        data.payment_url || data.result?.payment_url || data.data?.payment_url;
-
-      if (!paymentUrl) {
+      if (!data.ok || !data.paymentUrl) {
         throw new Error(data.message || "Payment Gateway Error");
       }
 
-      // 4) redirect to gateway
-      window.location.href = paymentUrl;
+      // 4) redirect user to gateway
+      window.location.href = data.paymentUrl;
+
     } catch (err) {
       console.error(err);
-      alert("Payment Gateway Error");
+      alert(err.message || "Payment Gateway Error");
       rechargeBtn.disabled = false;
       rechargeBtn.textContent = "Proceed to Recharge";
     }
   });
 
-  // handle return from gateway
   checkPaymentAfterReturn();
 });
 
-// ---------- AFTER PAYMENT RETURN ----------
+
+// -------------------- AFTER PAYMENT RETURN --------------------
 async function checkPaymentAfterReturn() {
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("order_id");
 
-  // if user opened normal recharge page, nothing to do
   if (!orderId) return;
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // 1) verify with backend
-    const res = await fetch("/api/pay0CheckOrderStatus", {
+    const res = await fetch("/api/pay0-check-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ order_id: orderId }),
+      body: JSON.stringify({ order_id: orderId, user_id: user.id }),
     });
 
     const verify = await res.json();
     console.log("[Pay0 check-order reply]", verify);
 
-    if (!verify.status || verify.payment_status !== "success") {
-      alert("Payment failed or cancelled.");
+    if (!verify.ok) {
+      alert("Payment failed or still pending.");
       cleanUrl();
       return;
     }
 
-    // 2) get payment_request
-    const { data: payment, error: payErr } = await supabase
-      .from("payment_requests")
-      .select("*")
-      .eq("order_id", orderId)
-      .single();
+    alert(`Payment Successful!\n₹${verify.amount} added to wallet.`);
 
-    if (payErr || !payment) {
-      console.error("Payment request not found", payErr);
-      cleanUrl();
-      return;
-    }
-
-    if (payment.status !== "pending") {
-      // already processed earlier
-      cleanUrl();
-      return;
-    }
-
-    // 3) update wallet
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("balance, referred_by")
-      .eq("id", user.id)
-      .single();
-
-    const currentBalance = profile?.balance || 0;
-    const newBalance = currentBalance + payment.amount;
-
-    await supabase
-      .from("profiles")
-      .update({ balance: newBalance })
-      .eq("id", user.id);
-
-    // 4) mark payment + transaction success
-    await supabase
-      .from("payment_requests")
-      .update({
-        status: "completed",
-        utr: verify.utr || verify.transaction_id || null,
-      })
-      .eq("id", payment.id);
-
-    await supabase
-      .from("transactions")
-      .update({
-        status: "Success",
-        details: "Payment completed successfully",
-      })
-      .eq("reference_id", orderId);
-
-    // 5) give referral commission (16 / 2 / 1 %) as locked
-    await giveReferralCommission(user.id, payment.amount, profile?.referred_by);
-
-    alert("Payment successful! Amount added to your wallet.");
   } catch (err) {
     console.error(err);
-    alert("Error while confirming payment");
+    alert("Error verifying payment.");
   } finally {
     cleanUrl();
   }
@@ -217,75 +163,4 @@ async function checkPaymentAfterReturn() {
 
 function cleanUrl() {
   window.history.replaceState({}, document.title, window.location.pathname);
-}
-
-// ---------- REFERRAL COMMISSION ----------
-async function giveReferralCommission(userId, amount, directRefId) {
-  try {
-    let level1Id = directRefId;
-    if (!level1Id) {
-      const { data: p1 } = await supabase
-        .from("profiles")
-        .select("referred_by")
-        .eq("id", userId)
-        .single();
-      level1Id = p1?.referred_by || null;
-    }
-    if (!level1Id) return;
-
-    let level2Id = null;
-    let level3Id = null;
-
-    const { data: p2 } = await supabase
-      .from("profiles")
-      .select("referred_by")
-      .eq("id", level1Id)
-      .single();
-    level2Id = p2?.referred_by || null;
-
-    if (level2Id) {
-      const { data: p3 } = await supabase
-        .from("profiles")
-        .select("referred_by")
-        .eq("id", level2Id)
-        .single();
-      level3Id = p3?.referred_by || null;
-    }
-
-    const rows = [];
-
-    if (level1Id) {
-      rows.push({
-        user_id: level1Id,
-        from_user_id: userId,
-        level: 1,
-        amount: Number((amount * 0.16).toFixed(2)),
-        status: "locked",
-      });
-    }
-    if (level2Id) {
-      rows.push({
-        user_id: level2Id,
-        from_user_id: userId,
-        level: 2,
-        amount: Number((amount * 0.02).toFixed(2)),
-        status: "locked",
-      });
-    }
-    if (level3Id) {
-      rows.push({
-        user_id: level3Id,
-        from_user_id: userId,
-        level: 3,
-        amount: Number((amount * 0.01).toFixed(2)),
-        status: "locked",
-      });
-    }
-
-    if (!rows.length) return;
-
-    await supabase.from("referral_earnings").insert(rows);
-  } catch (err) {
-    console.error("giveReferralCommission error:", err);
   }
-}
