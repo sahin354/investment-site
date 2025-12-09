@@ -9,10 +9,14 @@ export default async function handler(req, res) {
     const { amount, customer_name, customer_mobile, order_id } = req.body;
 
     if (!amount || !customer_mobile || !customer_name || !order_id) {
-      return res.json({ ok: false, message: "Missing payment data" });
+      return res.json({ ok: false, message: "Missing required fields" });
     }
 
     const user_token = process.env.PAY0_USER_TOKEN;
+
+    if (!user_token) {
+      return res.json({ ok: false, message: "PAY0 key missing in environment" });
+    }
 
     const params = new URLSearchParams();
     params.append("customer_mobile", customer_mobile);
@@ -28,15 +32,27 @@ export default async function handler(req, res) {
       body: params.toString(),
     });
 
-    const result = await response.json();
+    const resultText = await response.text();
+
+    let result;
+    try {
+      result = JSON.parse(resultText);
+    } catch {
+      return res.json({
+        ok: false,
+        message: "Invalid response from payment gateway",
+        raw: resultText,
+      });
+    }
 
     if (!result.status) {
-      return res.json({ ok: false, message: result.message });
+      return res.json({ ok: false, message: result.message || "Gateway rejected" });
     }
 
     return res.json({ ok: true, paymentUrl: result.result.payment_url });
 
-  } catch (err) {
-    return res.json({ ok: false, message: "Server Error" });
+  } catch (error) {
+    console.error(error);
+    return res.json({ ok: false, message: "Server error creating payment" });
   }
 }
