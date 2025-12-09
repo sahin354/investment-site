@@ -76,8 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (prErr) {
-        console.error(prErr);
-        throw new Error("Failed to create payment request");
+  alert("SUPABASE ERROR:\n" + JSON.stringify(prErr, null, 2));
+  rechargeBtn.disabled = false;
+  rechargeBtn.textContent = "Proceed to Recharge";
+  return;
       }
 
       // 2) log transaction as Pending
