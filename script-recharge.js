@@ -91,15 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // 3) call Vercel API to create Pay0 order
-      const res = await fetch("/api/pay0CreateOrder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount,
-          mobile,
-          order_id: orderId,
-        }),
-      });
+      const response = await fetch("/api/pay0CreateOrder", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    amount,
+    order_id,
+  }),
+});
 
       const data = await res.json();
       console.log("[Pay0 create-order reply]", data);
