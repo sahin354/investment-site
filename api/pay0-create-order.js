@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ ok: false, message: "Method Not Allowed" });
@@ -12,8 +12,8 @@ export default async function handler(req, res) {
       return res.json({ ok: false, message: "Missing required fields" });
     }
 
-    const PAY0_URL = process.env.PAY0_CREATE_URL; 
-    const PAY0_TOKEN = process.env.PAY0_TOKEN;  
+    const PAY0_URL = process.env.PAY0_CREATE_URL;
+    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN || process.env.PAY0_TOKEN;
     const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
     if (!PAY0_URL || !PAY0_TOKEN) {
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     } catch {
       return res.json({
         ok: false,
-        message: "Pay0 returned non-JSON response",
+        message: "Gateway returned non-JSON response",
         raw: text,
       });
     }
@@ -57,4 +57,4 @@ export default async function handler(req, res) {
     console.error(error);
     return res.json({ ok: false, message: "Server error creating payment" });
   }
-}
+};
