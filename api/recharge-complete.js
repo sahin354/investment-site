@@ -1,16 +1,21 @@
+// api/recharge-complete.js
+
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
-
   if (req.method !== "POST") {
-    return res.status(405).json({ status: false, message: "Method not allowed" });
+    return res
+      .status(405)
+      .json({ status: false, message: "Method not allowed" });
   }
 
   try {
     const { user_id, amount, order_id } = req.body;
 
     if (!user_id || !amount) {
-      return res.status(400).json({ status: false, message: "Missing fields" });
+      return res
+        .status(400)
+        .json({ status: false, message: "Missing fields" });
     }
 
     const supabase = createClient(
@@ -39,15 +44,17 @@ export default async function handler(req, res) {
       .update({ status: "completed" })
       .eq("order_id", order_id);
 
-    // 4️⃣ Trigger referral chain (your function)
+    // 4️⃣ Trigger referral chain
     await supabase.rpc("give_referral_reward", {
       p_user_id: user_id,
-      p_amount: Number(amount)
+      p_amount: Number(amount),
     });
 
     return res.status(200).json({ status: true });
-
   } catch (error) {
-    return res.status(500).json({ status: false, error: error.message });
+    console.error("recharge-complete error:", error);
+    return res
+      .status(500)
+      .json({ status: false, error: error.message });
   }
-      }
+}
