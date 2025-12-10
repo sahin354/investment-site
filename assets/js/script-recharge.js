@@ -94,16 +94,56 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // 3) call Vercel backend to create Pay0 order
-      const response = await fetch("/api/pay0-create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount,
-          customer_name: user.email || "User",
-          customer_mobile: mobile,
-          order_id: orderId,
-        }),
-      });
+const response = await fetch("/api/pay0-create-order", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    amount,
+    customer_name: user.email || "User",
+    customer_mobile: mobile,
+    order_id: orderId,
+  }),
+});
+
+// ⛔ Step 1: Read RAW text exactly as server returned
+const rawText = await response.text();
+
+// ⛔ Step 2: Try to parse JSON safely
+let data;
+try {
+  data = JSON.parse(rawText);
+} catch (e) {
+
+  // ⚠️ THIS WILL FINALLY SHOW THE REAL ERROR FROM SERVER
+  alert("SERVER RAW RESPONSE:\n\n" + rawText);
+
+  console.error("Server raw response (not JSON):", rawText);
+  rechargeBtn.disabled = false;
+  rechargeBtn.textContent = "Proceed to Recharge";
+  return;
+}
+
+// ⛔ Step 3: Pay0 API responded but failed
+if (!response.ok || data.ok === false) {
+  alert("API ERROR:\n" + (data.message || "Unknown error"));
+  console.error("API error:", data);
+  rechargeBtn.disabled = false;
+  rechargeBtn.textContent = "Proceed to Recharge";
+  return;
+}
+
+console.log("[Pay0 create-order reply]", data);
+
+// ⛔ Step 4: Check if payment URL missing
+if (!data.paymentUrl) {
+  alert("Payment URL missing from server.");
+  rechargeBtn.disabled = false;
+  rechargeBtn.textContent = "Proceed to Recharge";
+  return;
+}
+
+// ⭐ SUCCESS → redirect to Pay0 payment page
+window.location.href = data.paymentUrl;
 
       const data = await response.json();
       console.log("[Pay0 create-order reply]", data);
