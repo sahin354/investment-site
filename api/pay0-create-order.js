@@ -1,4 +1,4 @@
-// api/pay0-create-order.js
+export const config = { runtime: "nodejs" };   // <-- add this
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -9,16 +9,14 @@ export default async function handler(req, res) {
     const { amount, customer_name, customer_mobile, order_id } = req.body;
 
     if (!amount || !customer_mobile || !customer_name || !order_id) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "Missing required fields" });
+      return res.status(400).json({ ok: false, message: "Missing required fields" });
     }
 
     const PAY0_URL = process.env.PAY0_CREATE_URL;
-    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN || process.env.PAY0_TOKEN;
+    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
     const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
-    if (!PAY0_URL || !PAY0_TOKEN) {
+    if (!PAY0_URL || !PAY0_TOKEN || !REDIRECT_URL) {
       return res.status(500).json({
         ok: false,
         message: "Missing Pay0 environment variables",
@@ -33,28 +31,26 @@ export default async function handler(req, res) {
     params.append("order_id", order_id);
     params.append("redirect_url", REDIRECT_URL);
 
-    // use global fetch (no node-fetch)
     const response = await fetch(PAY0_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params.toString(),
     });
 
-    const text = await response.text();
-
+    const raw = await response.text();
     let json;
+
     try {
-      json = JSON.parse(text);
+      json = JSON.parse(raw);
     } catch (e) {
-      console.error("Pay0 non-JSON response:", text);
       return res.status(502).json({
         ok: false,
         message: "Gateway returned non-JSON response",
-        raw: text,
+        raw,
       });
     }
 
-    if (!json.status || !json.result || !json.result.payment_url) {
+    if (!json.status || !json.result?.payment_url) {
       return res.status(502).json({
         ok: false,
         message: json.message || "Gateway rejected",
@@ -66,10 +62,11 @@ export default async function handler(req, res) {
       ok: true,
       paymentUrl: json.result.payment_url,
     });
+
   } catch (error) {
-    console.error("pay0-create-order error:", error);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Server error creating payment" });
+    return res.status(500).json({
+      ok: false,
+      message: "Server error creating payment",
+    });
   }
-}
+};
