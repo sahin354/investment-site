@@ -1,72 +1,47 @@
-export const config = { runtime: "nodejs" };   // <-- add this
+export const config = { runtime: "edge" };
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, message: "Method Not Allowed" });
+    return new Response(JSON.stringify({ error: true, message: "Method Not Allowed" }), {
+      status: 405,
+    });
   }
 
   try {
-    const { amount, customer_name, customer_mobile, order_id } = req.body;
+    const body = await req.json();
+    const { amount, order_id, mobile } = body;
 
-    if (!amount || !customer_mobile || !customer_name || !order_id) {
-      return res.status(400).json({ ok: false, message: "Missing required fields" });
+    if (!amount || !order_id) {
+      return new Response(JSON.stringify({ error: true, message: "Missing fields" }), { status: 400 });
     }
 
-    const PAY0_URL = process.env.PAY0_CREATE_URL;
-    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
-    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
-
-    if (!PAY0_URL || !PAY0_TOKEN || !REDIRECT_URL) {
-      return res.status(500).json({
-        ok: false,
-        message: "Missing Pay0 environment variables",
-      });
-    }
-
-    const params = new URLSearchParams();
-    params.append("customer_mobile", customer_mobile);
-    params.append("customer_name", customer_name);
-    params.append("user_token", PAY0_TOKEN);
-    params.append("amount", amount);
-    params.append("order_id", order_id);
-    params.append("redirect_url", REDIRECT_URL);
-
-    const response = await fetch(PAY0_URL, {
+    // Call Pay0
+    const res = await fetch(process.env.PAY0_CREATE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
+      headers: {
+        "Authorization": `Bearer ${process.env.PAY0_USER_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        mobile: mobile || "9999999999",
+        order_id,
+        redirect_url: process.env.PAY0_REDIRECT_URL
+      }),
     });
 
-    const raw = await response.text();
-    let json;
+    const raw = await res.text();
 
-    try {
-      json = JSON.parse(raw);
-    } catch (e) {
-      return res.status(502).json({
-        ok: false,
-        message: "Gateway returned non-JSON response",
-        raw,
-      });
-    }
+    // Show raw Pay0 response for debugging
+    return new Response(JSON.stringify({
+      ok: res.ok,
+      status: res.status,
+      raw_response_from_pay0: raw
+    }), { status: 200 });
 
-    if (!json.status || !json.result?.payment_url) {
-      return res.status(502).json({
-        ok: false,
-        message: json.message || "Gateway rejected",
-        raw: json,
-      });
-    }
-
-    return res.status(200).json({
-      ok: true,
-      paymentUrl: json.result.payment_url,
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      ok: false,
-      message: "Server error creating payment",
+  } catch (err) {
+    return new Response(JSON.stringify({ error: true, message: err.message }), {
+      status: 500,
     });
   }
-};
+}
