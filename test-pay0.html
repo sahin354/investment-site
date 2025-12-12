@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Test Pay0 Create Order (POST)</h2>
+
+<button onclick="test()">Run Test</button>
+
+<pre id="out"></pre>
+
+<script>
+async function test() {
+  const res = await fetch("/api/pay0-create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: 10,
+      order_id: "TEST12345",
+      mobile: "9999999999"
+    })
+  });
+
+  const text = await res.text();
+  document.getElementById("out").textContent = text;
+}
+</script>
+
+</body>
+</html>
