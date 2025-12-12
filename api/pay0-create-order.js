@@ -1,3 +1,7 @@
+export const config = {
+  runtime: "nodejs"
+};
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -16,7 +20,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const pay0Response = await fetch(process.env.PAY0_CREATE_URL, {
+    const response = await fetch(process.env.PAY0_CREATE_URL, {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.PAY0_USER_TOKEN}`,
@@ -30,7 +34,7 @@ export default async function handler(req, res) {
       })
     });
 
-    const text = await pay0Response.text();
+    const text = await response.text();
 
     let data;
     try {
@@ -38,12 +42,12 @@ export default async function handler(req, res) {
     } catch {
       return res.status(500).json({
         error: true,
-        message: "Invalid Pay0 response",
+        message: "Pay0 returned invalid response",
         raw: text
       });
     }
 
-    if (!pay0Response.ok || data.error) {
+    if (!response.ok || data.error) {
       return res.status(500).json({
         error: true,
         message: data.message || "Pay0 create order failed",
@@ -56,7 +60,7 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({
       error: true,
-      message: err.message || "Server error"
+      message: err.message
     });
   }
 }
