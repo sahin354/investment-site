@@ -4,49 +4,136 @@
   <meta charset="UTF-8" />
   <title>Payment Status</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .success { color: green; }
+    .failed { color: red; }
+    .pending { color: orange; }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn-success { background: #28a745; color: white; }
+    .btn-failed { background: #dc3545; color: white; }
+    .btn-home { background: #007bff; color: white; }
+  </style>
 </head>
+
 <body>
 
-  <h2>Please wait, verifying your payment...</h2>
+  <div class="card">
+    <div id="icon" class="icon pending">⏳</div>
+    <h2 id="title">Verifying Payment</h2>
+    <p id="message">Please wait, do not refresh…</p>
 
-  <script>
-    (async () => {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const orderId = params.get("order_id");
+    <button id="btn" style="display:none"></button>
+  </div>
 
-        // you already store uid in localStorage
-        const userId = localStorage.getItem("uid");
+<script>
+(async () => {
+  const orderId = new URLSearchParams(location.search).get("order_id");
+  const userId = localStorage.getItem("uid");
 
-        if (!orderId || !userId) {
-          document.body.innerHTML = "<h3>Invalid payment session</h3>";
-          return;
-        }
+  if (!orderId || !userId) {
+    showFailed("Invalid payment data");
+    return;
+  }
 
-        const res = await fetch("/api/pay0-verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order_id: orderId,
-            user_id: userId
-          })
-        });
+  try {
+    const res = await fetch("/api/pay0-verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order_id: orderId, user_id: userId })
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (data.status === "SUCCESS") {
-          document.body.innerHTML = "<h2>✅ Payment Successful</h2>";
-        } else if (data.status === "FAILED") {
-          document.body.innerHTML = "<h2>❌ Payment Failed</h2>";
-        } else {
-          document.body.innerHTML = "<h2>⏳ Payment Pending</h2>";
-        }
+    if (data.status === "SUCCESS") {
+      showSuccess();
+    } else if (data.status === "FAILED") {
+      showFailed("Payment failed");
+    } else {
+      showPending();
+    }
 
-      } catch (err) {
-        document.body.innerHTML = "<h2>⚠️ Verification error</h2>";
-      }
-    })();
-  </script>
+  } catch (e) {
+    showFailed("Verification error");
+  }
+})();
+
+function showSuccess() {
+  document.getElementById("icon").textContent = "✅";
+  document.getElementById("icon").className = "icon success";
+  document.getElementById("title").textContent = "Payment Successful";
+  document.getElementById("message").textContent =
+    "Amount added to your wallet successfully.";
+
+  const btn = document.getElementById("btn");
+  btn.textContent = "Go to Wallet";
+  btn.className = "btn-success";
+  btn.style.display = "block";
+  btn.onclick = () => location.href = "/mine.html";
+}
+
+function showFailed(msg) {
+  document.getElementById("icon").textContent = "❌";
+  document.getElementById("icon").className = "icon failed";
+  document.getElementById("title").textContent = "Payment Failed";
+  document.getElementById("message").textContent = msg;
+
+  const btn = document.getElementById("btn");
+  btn.textContent = "Retry Payment";
+  btn.className = "btn-failed";
+  btn.style.display = "block";
+  btn.onclick = () => location.href = "/recharge.html";
+}
+
+function showPending() {
+  document.getElementById("icon").textContent = "⏳";
+  document.getElementById("icon").className = "icon pending";
+  document.getElementById("title").textContent = "Payment Pending";
+  document.getElementById("message").textContent =
+    "Your payment is being verified. Please check again after some time.";
+
+  const btn = document.getElementById("btn");
+  btn.textContent = "Go to Wallet";
+  btn.className = "btn-home";
+  btn.style.display = "block";
+  btn.onclick = () => location.href = "/mine.html";
+}
+</script>
 
 </body>
 </html>
