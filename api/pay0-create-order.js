@@ -1,66 +1,70 @@
-export const config = {
-  runtime: "nodejs"
-};
+// api/pay0-create-order.js
+import axios from 'axios';
 
 export default async function handler(req, res) {
+  // 1. Allow only POST requests
   if (req.method !== "POST") {
-    return res.status(405).json({
-      error: true,
-      message: "Method Not Allowed"
-    });
+    return res.status(405).json({ ok: false, message: "Method Not Allowed" });
   }
 
   try {
-    const { amount, customer_mobile, order_id } = req.body;
+    const { amount, customer_name, customer_mobile, order_id } = req.body;
 
-    if (!amount || !customer_mobile || !order_id) {
-      return res.status(400).json({
-        error: true,
-        message: "Missing required fields"
-      });
+    // 2. Validate Input
+    if (!amount || !customer_mobile || !customer_name || !order_id) {
+      return res.status(400).json({ ok: false, message: "Missing required fields" });
     }
 
-    const response = await fetch(process.env.PAY0_CREATE_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.PAY0_USER_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        amount: Number(amount),
-        order_id: order_id,
-        customer_mobile: customer_mobile,
-        redirect_url: process.env.PAY0_REDIRECT_URL
-      })
+    // 3. Load Environment Variables
+    const PAY0_URL = process.env.PAY0_CREATE_URL;
+    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
+    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
+
+    if (!PAY0_URL || !PAY0_TOKEN) {
+      console.error("Missing Env Vars: PAY0_CREATE_URL or PAY0_USER_TOKEN");
+      return res.status(500).json({ ok: false, message: "Server Misconfiguration" });
+    }
+
+    // 4. Prepare Data for Pay0
+    // Pay0 requires application/x-www-form-urlencoded
+    const params = new URLSearchParams();
+    params.append("customer_mobile", customer_mobile);
+    params.append("customer_name", customer_name);
+    params.append("user_token", PAY0_TOKEN);
+    params.append("amount", amount);
+    params.append("order_id", order_id);
+    params.append("redirect_url", REDIRECT_URL);
+
+    // 5. Send Request using Axios
+    const response = await axios.post(PAY0_URL, params.toString(), {
+      headers: { 
+        "Content-Type": "application/x-www-form-urlencoded" 
+      }
     });
 
-    const text = await response.text();
+    // 6. Handle Pay0 Response
+    // Axios automatically parses JSON, so we use response.data
+    const result = response.data;
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      return res.status(500).json({
-        error: true,
-        message: "Pay0 returned invalid response",
-        raw: text
+    if (!result.status || !result.result || !result.result.payment_url) {
+      console.error("Pay0 Error:", result);
+      return res.status(502).json({
+        ok: false,
+        message: result.message || "Payment Gateway Error",
       });
     }
 
-    if (!response.ok || data.error) {
-      return res.status(500).json({
-        error: true,
-        message: data.message || "Pay0 create order failed",
-        raw: data
-      });
-    }
+    // 7. Success
+    return res.status(200).json({
+      ok: true,
+      paymentUrl: result.result.payment_url,
+    });
 
-    return res.status(200).json(data);
-
-  } catch (err) {
-    return res.status(500).json({
-      error: true,
-      message: err.message
+  } catch (error) {
+    console.error("pay0-create-order error:", error.response?.data || error.message);
+    return res.status(500).json({ 
+      ok: false, 
+      message: "Server error creating payment. Check logs." 
     });
   }
 }
