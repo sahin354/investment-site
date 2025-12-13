@@ -1,78 +1,108 @@
+// api/pay0-create-order.js
+
 export default async function handler(req, res) {
-  // 1. Allow only POST
+  // 1️⃣ Only POST allowed
   if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, message: "Method Not Allowed" });
+    return res.status(405).json({
+      ok: false,
+      message: "Method Not Allowed"
+    });
   }
 
   try {
     const { amount, customer_name, customer_mobile, order_id } = req.body;
 
-    if (!amount || !customer_mobile || !customer_name || !order_id) {
-      return res.status(400).json({ ok: false, message: "Missing required fields" });
+    // 2️⃣ Validate input
+    if (!amount || !customer_name || !customer_mobile || !order_id) {
+      return res.status(400).json({
+        ok: false,
+        message: "Missing required fields"
+      });
     }
 
-    // 2. Get Env Vars
-    const PAY0_URL = process.env.PAY0_CREATE_URL; // https://payo.shop/api/create-order
-    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
-    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
+    // 3️⃣ Read ENV (MATCHES YOUR VERCEL EXACTLY)
+    const PAY0_CREATE_URL = process.env.PAY0_CREATE_URL;
+    const PAY0_USER_TOKEN = process.env.PAY0_USER_TOKEN;
+    const PAY0_REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
-    if (!PAY0_URL || !PAY0_TOKEN) {
-      console.error("Missing Vercel Env Vars");
-      return res.status(500).json({ ok: false, message: "Server Config Error" });
+    if (!PAY0_CREATE_URL || !PAY0_USER_TOKEN || !PAY0_REDIRECT_URL) {
+      console.error("❌ Missing Pay0 ENV", {
+        PAY0_CREATE_URL: !!PAY0_CREATE_URL,
+        PAY0_USER_TOKEN: !!PAY0_USER_TOKEN,
+        PAY0_REDIRECT_URL: !!PAY0_REDIRECT_URL,
+      });
+
+      return res.status(500).json({
+        ok: false,
+        message: "Server configuration error"
+      });
     }
 
-    // 3. Prepare Form Data
+    // 4️⃣ Prepare Pay0 request (FORM URL ENCODED)
     const params = new URLSearchParams();
-    params.append("customer_mobile", customer_mobile);
-    params.append("customer_name", customer_name);
-    params.append("user_token", PAY0_TOKEN);
-    params.append("amount", amount);
+    params.append("user_token", PAY0_USER_TOKEN);
     params.append("order_id", order_id);
-    params.append("redirect_url", REDIRECT_URL);
+    params.append("amount", amount);
+    params.append("customer_name", customer_name);
+    params.append("customer_mobile", customer_mobile);
+    params.append("redirect_url", PAY0_REDIRECT_URL);
 
-    // 4. Send Request (using standard fetch)
-    const response = await fetch(PAY0_URL, {
+    // 5️⃣ Call Pay0
+    const response = await fetch(PAY0_CREATE_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: params.toString(),
+      body: params.toString()
     });
 
-    // 5. Handle Text Response (Safe Parsing)
-    const text = await response.text();
-    let json;
+    const rawText = await response.text();
 
+    let data;
     try {
-      json = JSON.parse(text);
-    } catch (e) {
-      console.error("Pay0 returned non-JSON:", text);
-      return res.status(502).json({ 
-        ok: false, 
-        message: "Gateway Invalid Response", 
-        raw: text.substring(0, 100) 
+      data = JSON.parse(rawText);
+    } catch (err) {
+      console.error("❌ Pay0 non-JSON response:", rawText);
+      return res.status(502).json({
+        ok: false,
+        message: "Invalid response from payment gateway"
       });
     }
 
-    // 6. Check Success
-    if (!json.status || !json.result || !json.result.payment_url) {
-      console.error("Pay0 Failed:", json);
-      return res.status(502).json({ 
-        ok: false, 
-        message: json.message || "Gateway Rejected Transaction" 
+    // 6️⃣ Validate Pay0 success
+    if (
+      !data.status ||
+      !data.result ||
+      !data.result.payment_url
+    ) {
+      console.error("❌ Pay0 rejected order:", data);
+      return res.status(502).json({
+        ok: false,
+        message: data.message || "Payment gateway error"
       });
     }
 
+    // 7️⃣ ⚠️ IMPORTANT PLACE (DO NOT REMOVE)
+    // 👉 HERE you will insert "PENDING" transaction later
+    // Example (DO LATER):
+    // saveTransaction({
+    //   order_id,
+    //   amount,
+    //   status: "PENDING",
+    //   gateway: "PAY0"
+    // });
+
+    // 8️⃣ Return payment URL
     return res.status(200).json({
       ok: true,
-      paymentUrl: json.result.payment_url,
+      paymentUrl: data.result.payment_url
     });
 
-  } catch (error) {
-    console.error("Critical Error:", error);
-    return res.status(500).json({ 
-      ok: false, 
-      message: "Internal Server Error" 
+  } catch (err) {
+    console.error("🔥 pay0-create-order error:", err);
+    return res.status(500).json({
+      ok: false,
+      message: "Internal Server Error"
     });
   }
-        }
+}
