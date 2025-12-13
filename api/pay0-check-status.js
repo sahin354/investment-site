@@ -1,86 +1,75 @@
-// api/pay0-check-status.js
-
-import { createClient } from "@supabase/supabase-js";
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, message: "Method Not Allowed" });
+    return res.status(405).json({ error: true });
   }
 
-  try {
-    const { order_id, user_id } = req.body;
+  const { order_id, user_id } = req.body;
 
-    if (!order_id || !user_id) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "Missing order_id or user_id" });
-    }
+  // 1️⃣ Fetch order
+  const { data: order } = await supabase
+    .from("payment_orders")
+    .select("*")
+    .eq("order_id", order_id)
+    .single();
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+  if (!order || order.user_id !== user_id) {
+    return res.json({ status: "FAILED" });
+  }
 
-    const params = new URLSearchParams();
-    params.append("user_token", process.env.PAY0_USER_TOKEN);
-    params.append("order_id", order_id);
+  // 2️⃣ Already processed
+  if (order.locked) {
+    return res.json({ status: order.status });
+  }
 
-    const response = await fetch(
-      "https://pay0.shop/api/check-order-status",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString(),
-      }
-    );
+  // 3️⃣ Call Pay0 status API
+  const pay0Res = await fetch(process.env.PAY0_STATUS_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": process.env.PAY0_USER_TOKEN,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ order_id })
+  });
 
-    const text = await response.text();
+  const pay0Data = await pay0Res.json();
 
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      console.error("Pay0 check-status non-JSON:", text);
-      return res.status(502).json({
-        ok: false,
-        message: "Gateway returned non-JSON response",
-        raw: text,
-      });
-    }
+  if (pay0Data.status === "SUCCESS") {
 
-    if (!result.status || result.result?.txnStatus !== "SUCCESS") {
-      return res.json({
-        ok: false,
-        message: result.message || "Pending or Failed",
-      });
-    }
-
-    const amount = Number(result.result.amount);
-
-    // increment wallet using your function (you already had this)
-    await supabase.rpc("increment_wallet", {
+    // 4️⃣ Update wallet
+    await supabase.rpc("add_wallet_balance", {
       uid: user_id,
-      amount,
+      amt: order.amount
     });
 
-    // Store transaction log
+    // 5️⃣ Save transaction
     await supabase.from("transactions").insert({
       user_id,
       order_id,
-      amount,
-      utr: result.result.utr,
+      amount: order.amount,
       status: "SUCCESS",
+      type: "RECHARGE"
     });
 
-    return res.json({
-      ok: true,
-      utr: result.result.utr,
-      amount,
-    });
-  } catch (error) {
-    console.error("pay0-check-status error:", error);
-    return res
-      .status(500)
-      .json({ ok: false, message: "Server error checking status" });
+    // 6️⃣ Lock order
+    await supabase.from("payment_orders")
+      .update({ status: "SUCCESS", locked: true })
+      .eq("order_id", order_id);
+
+    return res.json({ status: "SUCCESS" });
   }
+
+  // FAILED
+  await supabase.from("payment_orders")
+    .update({ status: "FAILED", locked: true })
+    .eq("order_id", order_id);
+
+  await supabase.from("transactions").insert({
+    user_id,
+    order_id,
+    amount: order.amount,
+    status: "FAILED",
+    type: "RECHARGE"
+  });
+
+  return res.json({ status: "FAILED" });
 }
