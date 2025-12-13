@@ -32,6 +32,23 @@ export default async function handler(req, res) {
     params.append("order_id", order_id);
     params.append("redirect_url", REDIRECT_URL);
 
+    // 1. Save order as PENDING
+await supabase.from("payment_orders").insert({
+  order_id,
+  user_id,
+  amount,
+  status: "PENDING"
+});
+
+// 2. Create transaction (PENDING)
+await supabase.from("transactions").insert({
+  user_id,
+  order_id,
+  amount,
+  type: "RECHARGE",
+  status: "PENDING"
+});
+
     // 4. Send Request (using standard fetch)
     const response = await fetch(PAY0_URL, {
       method: "POST",
