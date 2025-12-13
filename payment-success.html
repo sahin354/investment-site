@@ -1,65 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
   <title>Payment Status</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .card {
-      background: white;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 12px;
-      padding: 25px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
-    }
-
-    .icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    .success { color: green; }
-    .failed { color: red; }
-    .pending { color: orange; }
-
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .btn-success { background: #28a745; color: white; }
-    .btn-failed { background: #dc3545; color: white; }
-    .btn-home { background: #007bff; color: white; }
-  </style>
 </head>
-
 <body>
-
-  <div class="card">
-    <div id="icon" class="icon pending">⏳</div>
-    <h2 id="title">Verifying Payment</h2>
-    <p id="message">Please wait, do not refresh…</p>
-
-    <button id="btn" style="display:none"></button>
-  </div>
+  <h3 id="msg">⏳ Verifying payment...</h3>
 
 <script>
 (async () => {
@@ -67,12 +12,12 @@
   const userId = localStorage.getItem("uid");
 
   if (!orderId || !userId) {
-    showFailed("Invalid payment data");
+    document.getElementById("msg").innerText = "Invalid payment session";
     return;
   }
 
   try {
-    const res = await fetch("/api/pay0-verify-payment", {
+    const res = await fetch("/api/pay0-check-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order_id: orderId, user_id: userId })
@@ -81,59 +26,22 @@
     const data = await res.json();
 
     if (data.status === "SUCCESS") {
-      showSuccess();
+      document.body.innerHTML = `
+        <h2>✅ Payment Successful</h2>
+        <button onclick="location.href='/mine.html'">Go Back</button>
+      `;
     } else if (data.status === "FAILED") {
-      showFailed("Payment failed");
+      document.body.innerHTML = `
+        <h2>❌ Payment Failed</h2>
+        <button onclick="location.href='/recharge.html'">Retry</button>
+      `;
     } else {
-      showPending();
+      document.body.innerHTML = `<h2>⏳ Payment Pending</h2>`;
     }
-
   } catch (e) {
-    showFailed("Verification error");
+    document.getElementById("msg").innerText = "Verification failed";
   }
 })();
-
-function showSuccess() {
-  document.getElementById("icon").textContent = "✅";
-  document.getElementById("icon").className = "icon success";
-  document.getElementById("title").textContent = "Payment Successful";
-  document.getElementById("message").textContent =
-    "Amount added to your wallet successfully.";
-
-  const btn = document.getElementById("btn");
-  btn.textContent = "Go to Wallet";
-  btn.className = "btn-success";
-  btn.style.display = "block";
-  btn.onclick = () => location.href = "/mine.html";
-}
-
-function showFailed(msg) {
-  document.getElementById("icon").textContent = "❌";
-  document.getElementById("icon").className = "icon failed";
-  document.getElementById("title").textContent = "Payment Failed";
-  document.getElementById("message").textContent = msg;
-
-  const btn = document.getElementById("btn");
-  btn.textContent = "Retry Payment";
-  btn.className = "btn-failed";
-  btn.style.display = "block";
-  btn.onclick = () => location.href = "/recharge.html";
-}
-
-function showPending() {
-  document.getElementById("icon").textContent = "⏳";
-  document.getElementById("icon").className = "icon pending";
-  document.getElementById("title").textContent = "Payment Pending";
-  document.getElementById("message").textContent =
-    "Your payment is being verified. Please check again after some time.";
-
-  const btn = document.getElementById("btn");
-  btn.textContent = "Go to Wallet";
-  btn.className = "btn-home";
-  btn.style.display = "block";
-  btn.onclick = () => location.href = "/mine.html";
-}
 </script>
-
 </body>
 </html>
