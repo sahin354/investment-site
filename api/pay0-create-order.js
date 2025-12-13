@@ -1,8 +1,7 @@
 // api/pay0-create-order.js
-import axios from 'axios';
 
 export default async function handler(req, res) {
-  // 1. Allow only POST requests
+  // 1. Allow only POST
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, message: "Method Not Allowed" });
   }
@@ -10,23 +9,21 @@ export default async function handler(req, res) {
   try {
     const { amount, customer_name, customer_mobile, order_id } = req.body;
 
-    // 2. Validate Input
     if (!amount || !customer_mobile || !customer_name || !order_id) {
       return res.status(400).json({ ok: false, message: "Missing required fields" });
     }
 
-    // 3. Load Environment Variables
-    const PAY0_URL = process.env.PAY0_CREATE_URL;
+    // 2. Get Env Vars
+    const PAY0_URL = process.env.PAY0_CREATE_URL; // https://payo.shop/api/create-order
     const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
     const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
     if (!PAY0_URL || !PAY0_TOKEN) {
-      console.error("Missing Env Vars: PAY0_CREATE_URL or PAY0_USER_TOKEN");
-      return res.status(500).json({ ok: false, message: "Server Misconfiguration" });
+      console.error("Missing Vercel Env Vars");
+      return res.status(500).json({ ok: false, message: "Server Config Error" });
     }
 
-    // 4. Prepare Data for Pay0
-    // Pay0 requires application/x-www-form-urlencoded
+    // 3. Prepare Form Data
     const params = new URLSearchParams();
     params.append("customer_mobile", customer_mobile);
     params.append("customer_name", customer_name);
@@ -35,36 +32,49 @@ export default async function handler(req, res) {
     params.append("order_id", order_id);
     params.append("redirect_url", REDIRECT_URL);
 
-    // 5. Send Request using Axios
-    const response = await axios.post(PAY0_URL, params.toString(), {
-      headers: { 
-        "Content-Type": "application/x-www-form-urlencoded" 
-      }
+    // 4. Send Request (using standard fetch)
+    const response = await fetch(PAY0_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
     });
 
-    // 6. Handle Pay0 Response
-    // Axios automatically parses JSON, so we use response.data
-    const result = response.data;
+    // 5. Handle Text Response (Safe Parsing)
+    const text = await response.text();
+    let json;
 
-    if (!result.status || !result.result || !result.result.payment_url) {
-      console.error("Pay0 Error:", result);
-      return res.status(502).json({
-        ok: false,
-        message: result.message || "Payment Gateway Error",
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      console.error("Pay0 returned non-JSON:", text);
+      return res.status(502).json({ 
+        ok: false, 
+        message: "Gateway Invalid Response", 
+        raw: text.substring(0, 100) 
       });
     }
 
-    // 7. Success
+    // 6. Check Success
+    if (!json.status || !json.result || !json.result.payment_url) {
+      console.error("Pay0 Failed:", json);
+      return res.status(502).json({ 
+        ok: false, 
+        message: json.message || "Gateway Rejected Transaction" 
+      });
+    }
+
     return res.status(200).json({
       ok: true,
-      paymentUrl: result.result.payment_url,
+      paymentUrl: json.result.payment_url,
     });
 
   } catch (error) {
-    console.error("pay0-create-order error:", error.response?.data || error.message);
+    console.error("Critical Error:", error);
     return res.status(500).json({ 
       ok: false, 
-      message: "Server error creating payment. Check logs." 
+      message: "Internal Server Error" 
     });
   }
 }
