@@ -1,18 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Payment Success</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Payment Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
+<body>
 
-<body style="text-align:center;padding-top:80px;">
-  <img src="./assets/success.gif" width="100">
-  <h2>Payment Successful 🎉</h2>
-  <p>Your wallet will update automatically within 10–30 seconds.</p>
+  <h2>Please wait, verifying your payment...</h2>
 
-  <button onclick="window.location.href='mine.html'" style="margin-top:20px;" class="btn-primary">
-    Go to Wallet
-  </button>
+  <script>
+    (async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get("order_id");
+
+        // you already store uid in localStorage
+        const userId = localStorage.getItem("uid");
+
+        if (!orderId || !userId) {
+          document.body.innerHTML = "<h3>Invalid payment session</h3>";
+          return;
+        }
+
+        const res = await fetch("/api/pay0-verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            order_id: orderId,
+            user_id: userId
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.status === "SUCCESS") {
+          document.body.innerHTML = "<h2>✅ Payment Successful</h2>";
+        } else if (data.status === "FAILED") {
+          document.body.innerHTML = "<h2>❌ Payment Failed</h2>";
+        } else {
+          document.body.innerHTML = "<h2>⏳ Payment Pending</h2>";
+        }
+
+      } catch (err) {
+        document.body.innerHTML = "<h2>⚠️ Verification error</h2>";
+      }
+    })();
+  </script>
+
 </body>
 </html>
