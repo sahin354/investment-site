@@ -5,7 +5,7 @@ import { appAuth } from "./common.js";
 
 console.log("[Recharge] script loaded");
 
-const MIN_RECHARGE = 120;
+const MIN_RECHARGE = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
   const amountInput = document.getElementById("rechargeAmount");
