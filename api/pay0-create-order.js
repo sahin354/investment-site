@@ -1,97 +1,68 @@
-// api/pay0-create-order.js
-
 export default async function handler(req, res) {
-  // 1. Allow only POST
   if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, message: "Method Not Allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { amount, customer_name, customer_mobile, order_id } = req.body;
+    const { amount, user_id } = req.body || {};
 
-    if (!amount || !customer_mobile || !customer_name || !order_id) {
-      return res.status(400).json({ ok: false, message: "Missing required fields" });
-    }
-
-    // 2. Get Env Vars
-    const PAY0_URL = process.env.PAY0_CREATE_URL; // https://payo.shop/api/create-order
-    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
-    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
-
-    if (!PAY0_URL || !PAY0_TOKEN) {
-      console.error("Missing Vercel Env Vars");
-      return res.status(500).json({ ok: false, message: "Server Config Error" });
-    }
-
-    // 3. Prepare Form Data
-    const params = new URLSearchParams();
-    params.append("customer_mobile", customer_mobile);
-    params.append("customer_name", customer_name);
-    params.append("user_token", PAY0_TOKEN);
-    params.append("amount", amount);
-    params.append("order_id", order_id);
-    params.append("redirect_url", REDIRECT_URL);
-
-    // 1. Save order as PENDING
-await supabase.from("payment_orders").insert({
-  order_id,
-  user_id,
-  amount,
-  status: "PENDING"
-});
-
-// 2. Create transaction (PENDING)
-await supabase.from("transactions").insert({
-  user_id,
-  order_id,
-  amount,
-  type: "RECHARGE",
-  status: "PENDING"
-});
-
-    // 4. Send Request (using standard fetch)
-    const response = await fetch(PAY0_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-    });
-
-    // 5. Handle Text Response (Safe Parsing)
-    const text = await response.text();
-    let json;
-
-    try {
-      json = JSON.parse(text);
-    } catch (e) {
-      console.error("Pay0 returned non-JSON:", text);
-      return res.status(502).json({ 
-        ok: false, 
-        message: "Gateway Invalid Response", 
-        raw: text.substring(0, 100) 
+    if (!amount || !user_id) {
+      return res.status(400).json({
+        error: "Missing amount or user_id"
       });
     }
 
-    // 6. Check Success
-    if (!json.status || !json.result || !json.result.payment_url) {
-      console.error("Pay0 Failed:", json);
-      return res.status(502).json({ 
-        ok: false, 
-        message: json.message || "Gateway Rejected Transaction" 
+    const PAY0_URL = process.env.PAY0_CREATE_URL;
+    const PAY0_TOKEN = process.env.PAY0_USER_TOKEN;
+    const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
+
+    if (!PAY0_URL || !PAY0_TOKEN || !REDIRECT_URL) {
+      return res.status(500).json({
+        error: "ENV_MISSING",
+        env: {
+          PAY0_CREATE_URL: !!PAY0_URL,
+          PAY0_USER_TOKEN: !!PAY0_TOKEN,
+          PAY0_REDIRECT_URL: !!REDIRECT_URL
+        }
+      });
+    }
+
+    const orderPayload = {
+      amount: Number(amount),
+      currency: "INR",
+      redirect_url: `${REDIRECT_URL}?uid=${user_id}`,
+      order_id: "ORD_" + Date.now()
+    };
+
+    const pay0Res = await fetch(PAY0_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${PAY0_TOKEN}`
+      },
+      body: JSON.stringify(orderPayload)
+    });
+
+    const pay0Data = await pay0Res.json();
+
+    if (!pay0Res.ok) {
+      return res.status(500).json({
+        error: "PAY0_FAILED",
+        pay0Data
       });
     }
 
     return res.status(200).json({
-      ok: true,
-      paymentUrl: json.result.payment_url,
+      success: true,
+      payment_url: pay0Data.payment_url,
+      order_id: orderPayload.order_id
     });
 
-  } catch (error) {
-    console.error("Critical Error:", error);
-    return res.status(500).json({ 
-      ok: false, 
-      message: "Internal Server Error" 
+  } catch (err) {
+    console.error("PAY0 CREATE ERROR:", err);
+    return res.status(500).json({
+      error: "INTERNAL_SERVER_ERROR",
+      message: err.message
     });
   }
 }
