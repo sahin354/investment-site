@@ -3,21 +3,19 @@
 import { supabase } from "./supabase.js";
 import { appAuth } from "./common.js";
 
-console.log("[Recharge] script loaded");
-
 const MIN_RECHARGE = 1;
+const SESSION_KEY = "active_recharge_order";
 
 document.addEventListener("DOMContentLoaded", () => {
   const amountInput = document.getElementById("rechargeAmount");
+  // Selecting quick buttons to maintain original UI functionality
   const quickButtons = document.querySelectorAll(".quick-amount-btn, .quick-amount");
   const rechargeBtn = document.getElementById("proceedRecharge");
 
-  if (!amountInput || !rechargeBtn) {
-    console.error("Recharge elements not found");
-    return;
-  }
+  if (!amountInput || !rechargeBtn) return;
 
   // ---------- QUICK SELECT ----------
+  // Preserved from original to ensure buttons like "100", "500" still work
   quickButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const amt = btn.dataset.amount || btn.innerText.replace("₹", "").trim();
@@ -25,76 +23,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---------- MAIN BUTTON ----------
+  // ---------- MAIN BUTTON (New Safe Logic) ----------
   rechargeBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    let amount = parseFloat(amountInput.value.trim());
-    if (isNaN(amount) || amount < MIN_RECHARGE) {
+    let amount = Number(amountInput.value);
+    if (!amount || amount < MIN_RECHARGE) {
       alert(`Minimum recharge amount is ₹${MIN_RECHARGE}`);
       return;
     }
 
-    // mobile
+    const user = appAuth.user || (await supabase.auth.getUser()).data?.user;
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
+    // 🔒 SESSION LOCK: Prevent double clicks/duplicate orders
+    const existingOrder = sessionStorage.getItem(SESSION_KEY);
+    if (existingOrder) {
+      alert("Payment already in progress. Please complete it.");
+      return;
+    }
+
     let mobile = localStorage.getItem("userMobile");
     if (!mobile) {
-      mobile = prompt("Enter your mobile number:");
+      mobile = prompt("Enter mobile number");
       if (!mobile || mobile.length < 10) {
-        alert("Please enter valid mobile number");
+        alert("Invalid mobile number");
         return;
       }
       localStorage.setItem("userMobile", mobile);
     }
 
+    const orderId = "ORD_" + Date.now() + Math.random().toString(36).slice(2, 6);
+
     rechargeBtn.disabled = true;
-    rechargeBtn.textContent = "Processing...";
+    rechargeBtn.textContent = "Redirecting...";
+
+    // 1️⃣ Save pending request
+    const { error: prErr } = await supabase.from("payment_requests").insert({
+      user_id: user.id,
+      user_email: user.email,
+      order_id: orderId,
+      amount,
+      status: "PENDING",
+      payment_method: "Pay0",
+      customer_mobile: mobile,
+    });
+
+    if (prErr) {
+      console.error("DB Error", prErr);
+      alert("Database error");
+      rechargeBtn.disabled = false;
+      rechargeBtn.textContent = "Proceed to Recharge";
+      return;
+    }
+
+    // 2️⃣ Pending transaction
+    await supabase.from("transactions").insert({
+      user_id: user.id,
+      user_email: user.email,
+      type: "Deposit",
+      amount,
+      status: "PENDING",
+      reference_id: orderId,
+      details: "Pay0 recharge initiated",
+    });
+
+    // 🔒 Lock session
+    sessionStorage.setItem(SESSION_KEY, orderId);
 
     try {
-      // current user
-      let user = appAuth?.user || null;
-      if (!user) {
-        const { data } = await supabase.auth.getUser();
-        user = data?.user || null;
-      }
-      if (!user) {
-        alert("Please login first");
-        window.location.href = "login.html";
-        return;
-      }
-
-      const orderId = "ORD" + Date.now() + Math.random().toString(36).slice(2, 6);
-
-      // 1) save in DB as pending
-      const { error: prErr } = await supabase.from("payment_requests").insert({
-        user_id: user.id,
-        user_email: user.email,
-        order_id: orderId,
-        amount,
-        status: "pending",
-        payment_method: "Pay0",
-        customer_mobile: mobile,
-      });
-
-      if (prErr) {
-        alert("SUPABASE ERROR:\n" + JSON.stringify(prErr, null, 2));
-        rechargeBtn.disabled = false;
-        rechargeBtn.textContent = "Proceed to Recharge";
-        return;
-      }
-
-      // 2) log transaction as Pending
-      await supabase.from("transactions").insert({
-        user_id: user.id,
-        user_email: user.email,
-        type: "Deposit",
-        amount,
-        status: "Pending",
-        details: "Recharge via Pay0",
-        reference_id: orderId,
-      });
-
-      // 3) call Vercel backend to create Pay0 order
-      const response = await fetch("/api/pay0-create-order", {
+      // 3️⃣ Create Pay0 order
+      const res = await fetch("/api/pay0-create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,91 +107,55 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       });
 
-      // ---- NEW DEBUG LOGIC HERE ----
-      const rawText = await response.text();
-      console.log("[Pay0 create-order RAW reply]", rawText);
+      const data = await res.json();
 
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (e) {
-        // Server did NOT send JSON – show exactly what it sent
-        alert("SERVER RAW RESPONSE:\n\n" + rawText);
-        console.error("Server response is not valid JSON:", rawText);
-        rechargeBtn.disabled = false;
-        rechargeBtn.textContent = "Proceed to Recharge";
-        return;
+      if (!res.ok || !data.ok || !data.paymentUrl) {
+        throw new Error(data.message || "Payment gateway error");
       }
 
-      // extra safety checks
-      if (!response.ok || data.ok === false) {
-        alert("API ERROR: " + (data.message || "Unknown error from /api/pay0-create-order"));
-        console.error("API error:", data);
-        rechargeBtn.disabled = false;
-        rechargeBtn.textContent = "Proceed to Recharge";
-        return;
-      }
-
-      if (!data.paymentUrl) {
-        alert("API ERROR: paymentUrl missing in response");
-        console.error("paymentUrl missing:", data);
-        rechargeBtn.disabled = false;
-        rechargeBtn.textContent = "Proceed to Recharge";
-        return;
-      }
-      // ---- END OF NEW BLOCK ----
-
-      // 4) redirect user to gateway
       window.location.href = data.paymentUrl;
 
     } catch (err) {
       console.error(err);
-      alert(err.message || "Payment Gateway Error");
+      alert(err.message || "Error initiating payment");
+      sessionStorage.removeItem(SESSION_KEY);
       rechargeBtn.disabled = false;
       rechargeBtn.textContent = "Proceed to Recharge";
     }
   });
 
-  checkPaymentAfterReturn();
+  verifyAfterReturn();
 });
 
-
-// -------------------- AFTER PAYMENT RETURN --------------------
-async function checkPaymentAfterReturn() {
+// 🔁 AFTER REDIRECT
+async function verifyAfterReturn() {
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("order_id");
 
   if (!orderId) return;
 
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
+  try {
     const res = await fetch("/api/pay0-check-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order_id: orderId, user_id: user.id }),
     });
 
-    const verify = await res.json();
-    console.log("[Pay0 check-order reply]", verify);
+    const result = await res.json();
 
-    if (!verify.ok) {
-      alert("Payment failed or still pending.");
-      cleanUrl();
-      return;
+    // Release lock & clean URL
+    sessionStorage.removeItem(SESSION_KEY);
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    if (result.ok) {
+      alert(`Payment successful! ₹${result.amount} added.`);
+    } else {
+      alert("Payment failed or pending.");
     }
-
-    alert(`Payment Successful!\n₹${verify.amount} added to wallet.`);
-
-  } catch (err) {
-    console.error(err);
-    alert("Error verifying payment.");
-  } finally {
-    cleanUrl();
+  } catch (e) {
+    console.error("Verification error:", e);
   }
 }
-
-function cleanUrl() {
-  window.history.replaceState({}, document.title, window.location.pathname);
-        }
