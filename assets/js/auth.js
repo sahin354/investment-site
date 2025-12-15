@@ -1,12 +1,22 @@
-// auth.js - ULTRA SIMPLE VERSION
+// auth.js
 import { supabase } from './supabase.js';
 
 console.log('Simple auth.js loaded');
 
-// Simple alert function
+// ================= HELPER FUNCTIONS =================
+
 function showAlert(message) {
     alert(message);
 }
+
+// Global helper to generate referral code (Available to all functions)
+function generateReferralCode(uid) {
+    // Falls back to random string if UID is not provided, though UID is preferred
+    if (!uid) return "INV" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    return "INV" + uid.replace(/-/g, "").slice(0, 8).toUpperCase();
+}
+
+// ================= DOM EVENT LISTENERS =================
 
 // REGISTRATION - SIMPLE VERSION
 const registerForm = document.getElementById('registerForm');
@@ -66,7 +76,7 @@ if (registerForm) {
                 return;
             }
 
-            // -------------------- Referral Logic Added --------------------
+            // -------------------- Referral Logic --------------------
             const user = authData.user;
             const userId = user.id;
 
@@ -88,12 +98,8 @@ if (registerForm) {
                 }
             }
 
-            // Generate user's referral code
-            function makeReferralCode(uid) {
-                return "INV" + uid.replace(/-/g, "").slice(0, 8).toUpperCase();
-            }
-
-            const referralCode = makeReferralCode(user.id);
+            // Generate user's referral code using the global helper
+            const referralCode = generateReferralCode(user.id);
             // ----------------------------------------------------------------
 
             showAlert('Step 2: Creating profile...');
@@ -106,8 +112,8 @@ if (registerForm) {
                     phone: phone,
                     email: email,
                     balance: 0,
-                    referral_code: referralCode,     // updated code
-                    referred_by: referredById,       // new column added
+                    referral_code: referralCode,
+                    referred_by: referredById,
                     is_vip: false,
                     is_blocked: false
                 });
@@ -153,6 +159,7 @@ if (loginForm) {
             });
             
             if (error) {
+                // Fallback: Try to login via phone (by looking up email first)
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('email')
@@ -188,13 +195,73 @@ if (loginForm) {
     });
 }
 
+// ================= UTILITY FUNCTIONS =================
+
 // Logout Function
 async function logoutUser() {
-  const { error } = await supabase.auth.signOut();
-  if (!error) {
-    localStorage.removeItem("sb-user");
-    window.location.href = "login.html"; 
-  } else {
-    alert("Logout Failed: " + error.message);
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+        localStorage.removeItem("sb-user");
+        window.location.href = "login.html"; 
+    } else {
+        alert("Logout Failed: " + error.message);
+    }
+}
+// Expose logout to global scope for HTML onclick events
+window.logoutUser = logoutUser;
+
+
+// Standalone Signup Function (Utility)
+// Note: This logic differs slightly from the event listener above (it checks for triggers)
+async function signUp(email, password, phone, fullName) {
+  try {
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          phone: phone,
+          full_name: fullName
+        }
+      }
+    });
+
+    if (authError) throw authError;
+
+    if (authData.user) {
+      // Wait a moment for the potential Database Trigger to run
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Check if profile was created by a Trigger
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (!profile && !profileError) {
+        // Manually create profile if trigger failed
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: email,
+            phone: phone,
+            full_name: fullName,
+            wallet_balance: 0,
+            referral_code: generateReferralCode(authData.user.id) // Uses shared helper
+          });
+
+        if (createError) {
+          console.warn('Manual profile creation failed:', createError);
+        }
+      }
+
+      return { success: true, user: authData.user };
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    return { success: false, error: error.message };
   }
-                          }
+    }
+    
