@@ -1,70 +1,47 @@
-// auth.js - COMPLETE FIXED VERSION
+// auth.js - SIMPLE WORKING VERSION
 import { supabase } from './supabase.js';
 
-console.log('Auth.js loaded');
+console.log('Auth loaded');
 
-// ================= HELPER FUNCTIONS =================
-
-function showAlert(message) {
-    alert(message);
-}
-
-function generateReferralCode() {
-    return "REF" + Math.random().toString(36).substr(2, 8).toUpperCase();
-}
-
-// ================= REGISTRATION FORM =================
-
+// Registration
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Get form values
+        // Get values
         const fullName = document.getElementById('name').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const email = document.getElementById('email').value.trim().toLowerCase();
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
-        // Basic validation
+        // Validation
         if (!fullName || !phone || !email || !password) {
-            showAlert('Please fill all fields');
+            alert('Please fill all fields');
             return;
         }
         
         if (password !== confirmPassword) {
-            showAlert('Passwords do not match');
+            alert('Passwords do not match');
             return;
         }
         
         if (password.length < 6) {
-            showAlert('Password must be at least 6 characters');
+            alert('Password must be at least 6 characters');
             return;
         }
         
-        // Validate email
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showAlert('Please enter a valid email address');
-            return;
-        }
-        
-        // Validate phone (10 digits)
-        if (!/^\d{10}$/.test(phone)) {
-            showAlert('Please enter a valid 10-digit phone number');
-            return;
-        }
-        
-        // Disable form during processing
-        const submitBtn = registerForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Creating account...';
+        // Disable button
+        const btn = registerForm.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Creating account...';
         
         try {
-            // 1. Sign up with Supabase Auth
-            showAlert('Creating account...');
+            console.log('Starting registration for:', email);
             
+            // 1. Create auth user
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -80,108 +57,82 @@ if (registerForm) {
                 console.error('Auth error:', authError);
                 
                 if (authError.message.includes('already registered') || 
-                    authError.message.includes('already exists') ||
                     authError.code === 'user_already_exists') {
-                    showAlert('This email is already registered. Please login instead.');
+                    alert('This email is already registered. Please login instead.');
                 } else {
-                    showAlert('Registration error: ' + authError.message);
+                    alert('Registration error: ' + authError.message);
                 }
                 return;
             }
             
-            if (!authData?.user) {
-                showAlert('Registration failed: No user created');
+            if (!authData.user) {
+                alert('No user created');
                 return;
             }
 
-            const user = authData.user;
-            console.log('User created:', user.id);
-
-            // 2. Wait a moment for auth to complete
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log('User created:', authData.user.id);
             
-            // 3. Check for referral code from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get("ref");
-            let referredById = null;
-
-            if (refCode) {
-                const { data: refUser } = await supabase
-                    .from("profiles")
-                    .select("id")
-                    .eq("referral_code", refCode)
-                    .single();
-
-                if (refUser) {
-                    referredById = refUser.id;
-                }
-            }
-
-            // 4. Generate referral code for new user
-            const referralCode = generateReferralCode();
+            // Wait for auth to complete
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // 5. Create user profile with CORRECT COLUMN NAME: wallet_balance
-            showAlert('Creating profile...');
-            
-            const { error: profileError } = await supabase
+            // 2. Check if profile already exists
+            const { data: existingProfile } = await supabase
                 .from('profiles')
-                .insert({
-                    id: user.id,
-                    email: email,
-                    phone: phone,
-                    full_name: fullName,
-                    wallet_balance: 0,  // FIXED: Changed from 'balance' to 'wallet_balance'
-                    referral_code: referralCode,
-                    referred_by: referredById,
-                    is_vip: false,
-                    is_blocked: false,
-                    created_at: new Date().toISOString()
-                });
+                .select('id')
+                .eq('id', authData.user.id)
+                .single()
+                .catch(() => ({ data: null }));
             
-            if (profileError) {
-                console.error('Profile error:', profileError);
+            if (existingProfile) {
+                console.log('Profile already exists');
+                alert('✅ Registration successful! Account already exists.');
+            } else {
+                // 3. Create profile with SIMPLE structure
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: authData.user.id,
+                        email: email,
+                        full_name: fullName,
+                        phone: phone,
+                        wallet_balance: 0
+                    });
                 
-                // If profile already exists (duplicate signup attempt), continue
-                if (profileError.code === '23505') {
-                    console.log('Profile already exists, continuing...');
-                } else {
-                    showAlert('Profile creation error: ' + profileError.message);
+                if (profileError) {
+                    console.error('Profile error:', profileError);
                     
-                    // Try to delete the auth user if profile creation failed
-                    try {
-                        await supabase.auth.admin.deleteUser(user.id);
-                    } catch (deleteErr) {
-                        console.error('Could not delete auth user:', deleteErr);
+                    // If duplicate, that's okay
+                    if (profileError.code === '23505') {
+                        console.log('Profile already exists');
+                    } else {
+                        alert('Profile creation error: ' + profileError.message);
+                        return;
                     }
-                    
-                    return;
                 }
+                
+                console.log('Profile created successfully');
+                alert('✅ Registration successful!');
             }
-
-            // 6. Registration successful
-            showAlert('✅ Registration successful! Redirecting to login...');
             
             // Clear form
             registerForm.reset();
             
-            // Redirect to login after delay
+            // Redirect to login
             setTimeout(() => {
-                window.location.href = 'login.html?message=Registration successful! Please login.';
-            }, 2000);
+                window.location.href = 'login.html?message=Registration+successful';
+            }, 1500);
             
         } catch (error) {
             console.error('Registration error:', error);
-            showAlert('Registration failed: ' + (error.message || 'Unknown error'));
+            alert('Registration failed: ' + (error.message || 'Unknown error'));
         } finally {
-            // Re-enable form button
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     });
 }
 
-// ================= LOGIN FORM =================
-
+// Login
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -191,17 +142,18 @@ if (loginForm) {
         const password = document.getElementById('password').value;
         
         if (!loginId || !password) {
-            showAlert('Please enter email/phone and password');
+            alert('Please enter email/phone and password');
             return;
         }
         
-        // Disable form during processing
-        const submitBtn = loginForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Logging in...';
+        const btn = loginForm.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Logging in...';
         
         try {
+            console.log('Attempting login with:', loginId);
+            
             // Try as email first
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: loginId,
@@ -209,99 +161,80 @@ if (loginForm) {
             });
             
             if (error) {
+                console.log('Email login failed, trying phone...');
+                
                 // Try as phone number
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('email')
                     .eq('phone', loginId)
-                    .single();
+                    .single()
+                    .catch(() => ({ data: null }));
                 
-                if (profile?.email) {
+                if (profile && profile.email) {
                     const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
                         email: profile.email,
                         password: password
                     });
                     
                     if (retryError) {
-                        showAlert('Login failed: Invalid credentials');
+                        console.error('Phone login error:', retryError);
+                        alert('Invalid email/phone or password');
                         return;
                     }
                     
-                    // Login successful with phone
-                    showAlert('✅ Login successful!');
+                    console.log('Login successful via phone');
+                    alert('✅ Login successful!');
                     setTimeout(() => window.location.href = 'index.html', 1000);
                     return;
                 }
                 
-                // If still error, show message
-                if (error.message.includes('Invalid login credentials')) {
-                    showAlert('Invalid email/phone or password');
-                } else {
-                    showAlert('Login failed: ' + error.message);
-                }
+                console.error('Login error:', error);
+                alert('Invalid email/phone or password');
                 return;
             }
             
-            // Login successful with email
-            showAlert('✅ Login successful!');
+            console.log('Login successful via email');
+            alert('✅ Login successful!');
             setTimeout(() => window.location.href = 'index.html', 1000);
             
         } catch (error) {
             console.error('Login error:', error);
-            showAlert('Login error: ' + error.message);
+            alert('Login error: ' + error.message);
         } finally {
-            // Re-enable form button
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     });
 }
 
-// ================= UTILITY FUNCTIONS =================
-
-// Logout Function
-async function logoutUser() {
+// Logout
+window.logoutUser = async function() {
     try {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            alert("Logout Failed: " + error.message);
-            return;
-        }
-        
-        // Clear local storage
-        localStorage.removeItem("sb-user");
-        localStorage.removeItem("userMobile");
-        
-        // Redirect to login
-        window.location.href = "login.html";
-        
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout error:', error);
-        alert("Logout failed");
+        alert('Logout failed');
     }
-}
+};
 
-// Expose logout to global scope for HTML onclick events
-window.logoutUser = logoutUser;
-
-// ================= AUTO-LOGIN CHECK =================
-
+// Check login status on page load
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-            console.log('User already logged in:', user.email);
+            console.log('User logged in:', user.email);
             
-            // On login page, redirect to home
+            // On login/register pages, redirect to home
             if (window.location.pathname.includes('login.html') || 
                 window.location.pathname.includes('register.html')) {
                 window.location.href = 'index.html';
             }
         } else {
-            // Not logged in
             // On protected pages, redirect to login
-            const protectedPages = ['index.html', 'recharge.html', 'refer.html'];
+            const protectedPages = ['index.html', 'recharge.html', 'refer.html', 'mine.html'];
             const currentPage = window.location.pathname.split('/').pop();
             
             if (protectedPages.includes(currentPage)) {
@@ -309,6 +242,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     } catch (error) {
-        console.error('Auto-login check error:', error);
+        console.error('Auth check error:', error);
     }
 });
