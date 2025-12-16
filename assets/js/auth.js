@@ -120,7 +120,7 @@ if (registerForm) {
             // 4. Generate referral code for new user
             const referralCode = generateReferralCode();
             
-            // 5. Create user profile
+            // 5. Create user profile with CORRECT COLUMN NAME: wallet_balance
             showAlert('Creating profile...');
             
             const { error: profileError } = await supabase
@@ -130,9 +130,11 @@ if (registerForm) {
                     email: email,
                     phone: phone,
                     full_name: fullName,
-                    wallet_balance: 0,  // Using correct column name
+                    wallet_balance: 0,  // FIXED: Changed from 'balance' to 'wallet_balance'
                     referral_code: referralCode,
                     referred_by: referredById,
+                    is_vip: false,
+                    is_blocked: false,
                     created_at: new Date().toISOString()
                 });
             
@@ -282,97 +284,8 @@ async function logoutUser() {
 // Expose logout to global scope for HTML onclick events
 window.logoutUser = logoutUser;
 
-// Standalone Signup Function (for API use if needed)
-async function signUp(email, password, phone, fullName) {
-    try {
-        // 1. Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
-                    phone: phone,
-                    full_name: fullName
-                }
-            }
-        });
-
-        if (authError) {
-            console.error('Signup auth error:', authError);
-            return { 
-                success: false, 
-                error: authError.message,
-                code: authError.code 
-            };
-        }
-
-        if (!authData?.user) {
-            return { 
-                success: false, 
-                error: 'No user created' 
-            };
-        }
-
-        const user = authData.user;
-        
-        // 2. Wait a moment
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // 3. Create profile
-        const referralCode = generateReferralCode();
-        
-        const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-                id: user.id,
-                email: email,
-                phone: phone,
-                full_name: fullName,
-                wallet_balance: 0,
-                referral_code: referralCode,
-                created_at: new Date().toISOString()
-            });
-
-        if (profileError) {
-            console.error('Signup profile error:', profileError);
-            
-            // If duplicate profile, still return success
-            if (profileError.code === '23505') {
-                return { 
-                    success: true, 
-                    user: user,
-                    message: 'User already has profile' 
-                };
-            }
-            
-            return { 
-                success: false, 
-                error: profileError.message,
-                code: profileError.code 
-            };
-        }
-
-        return { 
-            success: true, 
-            user: user,
-            message: 'Registration successful' 
-        };
-        
-    } catch (error) {
-        console.error('Signup error:', error);
-        return { 
-            success: false, 
-            error: error.message || 'Unknown error' 
-        };
-    }
-}
-
-// Expose signUp function globally if needed
-window.signUp = signUp;
-
 // ================= AUTO-LOGIN CHECK =================
 
-// Check if user is already logged in on page load
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -384,24 +297,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (window.location.pathname.includes('login.html') || 
                 window.location.pathname.includes('register.html')) {
                 window.location.href = 'index.html';
-            }
-            
-            // Ensure profile exists
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('id', user.id)
-                .single();
-            
-            if (!profile) {
-                // Create profile if missing
-                const referralCode = generateReferralCode();
-                await supabase.from('profiles').insert({
-                    id: user.id,
-                    email: user.email,
-                    wallet_balance: 0,
-                    referral_code: referralCode
-                });
             }
         } else {
             // Not logged in
@@ -417,18 +312,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Auto-login check error:', error);
     }
 });
-
-// ================= HELPER TO GET USER INFO =================
-
-async function getCurrentUser() {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        return user;
-    } catch (error) {
-        console.error('Get user error:', error);
-        return null;
-    }
-}
-
-// Export functions if needed
-export { logoutUser, signUp, getCurrentUser };
