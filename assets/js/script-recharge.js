@@ -1,213 +1,247 @@
-// script-recharge.js - SIMPLE WORKING VERSION
+// auth.js - SIMPLE WORKING VERSION
 import { supabase } from './supabase.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const amountInput = document.getElementById('rechargeAmount');
-    const quickButtons = document.querySelectorAll('.quick-amount-btn, .quick-amount');
-    const rechargeBtn = document.getElementById('proceedRecharge');
-    
-    if (!amountInput || !rechargeBtn) return;
-    
-    // Quick amount buttons
-    quickButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const amt = btn.dataset.amount || btn.innerText.replace('₹', '').trim();
-            amountInput.value = amt;
-        });
-    });
-    
-    // Main recharge button
-    rechargeBtn.addEventListener('click', async () => {
-        const amount = Number(amountInput.value);
+console.log('Auth loaded');
+
+// Registration
+const registerForm = document.getElementById('registerForm');
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        if (!amount || amount < 120 || amount > 50000) {
-            alert('Amount must be between ₹120 and ₹50,000');
+        // Get values
+        const fullName = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Validation
+        if (!fullName || !phone || !email || !password) {
+            alert('Please fill all fields');
             return;
         }
         
-        // Get user
-        let user;
-        try {
-            const { data: authData } = await supabase.auth.getUser();
-            user = authData?.user;
-        } catch (error) {
-            console.error('Auth error:', error);
-        }
-        
-        if (!user) {
-            alert('Please login first');
-            window.location.href = 'login.html';
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
             return;
         }
         
-        console.log('Starting recharge for user:', user.email);
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters');
+            return;
+        }
         
         // Disable button
-        rechargeBtn.disabled = true;
-        rechargeBtn.textContent = 'Processing...';
+        const btn = registerForm.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Creating account...';
         
         try {
-            // Generate order ID
-            const orderId = 'ORD_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            console.log('Starting registration for:', email);
             
-            // 1. Check/create payment_requests table
-            console.log('Creating payment request...');
-            
-            // Try to insert into payment_requests
-            const { error: paymentError } = await supabase
-                .from('payment_requests')
-                .insert({
-                    user_id: user.id,
-                    user_email: user.email,
-                    order_id: orderId,
-                    amount: amount,
-                    status: 'PENDING',
-                    payment_method: 'Pay0',
-                    created_at: new Date().toISOString()
-                })
-                .catch(async (error) => {
-                    console.log('payment_requests table might not exist, trying to create it...');
-                    
-                    // Table might not exist, create it first
-                    const { error: createError } = await supabase.rpc('create_payment_requests_table_if_not_exists');
-                    
-                    if (createError) {
-                        console.error('Failed to create table:', createError);
-                        throw new Error('Database setup required. Please contact support.');
+            // 1. Create auth user
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone: phone
                     }
-                    
-                    // Retry insertion
-                    const { error: retryError } = await supabase
-                        .from('payment_requests')
-                        .insert({
-                            user_id: user.id,
-                            user_email: user.email,
-                            order_id: orderId,
-                            amount: amount,
-                            status: 'PENDING',
-                            payment_method: 'Pay0',
-                            created_at: new Date().toISOString()
-                        });
-                    
-                    if (retryError) throw retryError;
-                    
-                    return { error: null };
-                });
-            
-            if (paymentError) {
-                console.error('Payment request error:', paymentError);
-                throw new Error('Failed to create payment request: ' + paymentError.message);
-            }
-            
-            console.log('Payment request created:', orderId);
-            
-            // 2. Create transaction record
-            console.log('Creating transaction...');
-            
-            const { error: txError } = await supabase
-                .from('transactions')
-                .insert({
-                    user_id: user.id,
-                    user_email: user.email,
-                    type: 'Deposit',
-                    amount: amount,
-                    status: 'PENDING',
-                    reference_id: orderId,
-                    details: 'Recharge initiated',
-                    created_at: new Date().toISOString()
-                })
-                .catch(async (error) => {
-                    console.log('transactions table might not exist, skipping...');
-                    return { error: null };
-                });
-            
-            if (txError) {
-                console.error('Transaction error (non-fatal):', txError);
-            }
-            
-            // 3. Call API (if exists) or show success
-            console.log('Calling payment API...');
-            
-            try {
-                const response = await fetch('/api/pay0-create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        amount: amount,
-                        user_id: user.id,
-                        customer_name: user.email
-                    })
-                });
+                }
+            });
+
+            if (authError) {
+                console.error('Auth error:', authError);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.ok && data.payment_url) {
-                        // Redirect to payment gateway
-                        window.location.href = data.payment_url;
+                if (authError.message.includes('already registered') || 
+                    authError.code === 'user_already_exists') {
+                    alert('This email is already registered. Please login instead.');
+                } else {
+                    alert('Registration error: ' + authError.message);
+                }
+                return;
+            }
+            
+            if (!authData.user) {
+                alert('No user created');
+                return;
+            }
+
+            console.log('User created:', authData.user.id);
+            
+            // Wait for auth to complete
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // 2. Check if profile already exists
+            const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('id', authData.user.id)
+                .single()
+                .catch(() => ({ data: null }));
+            
+            if (existingProfile) {
+                console.log('Profile already exists');
+                alert('✅ Registration successful! Account already exists.');
+            } else {
+                // 3. Create profile with SIMPLE structure
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: authData.user.id,
+                        email: email,
+                        full_name: fullName,
+                        phone: phone,
+                        wallet_balance: 0
+                    });
+                
+                if (profileError) {
+                    console.error('Profile error:', profileError);
+                    
+                    // If duplicate, that's okay
+                    if (profileError.code === '23505') {
+                        console.log('Profile already exists');
+                    } else {
+                        alert('Profile creation error: ' + profileError.message);
                         return;
                     }
                 }
                 
-                // If API fails, show success message
-                console.log('Payment API not available, showing success message');
-                alert(`✅ Recharge request created!\n\nOrder ID: ${orderId}\nAmount: ₹${amount}\n\nPayment processing will be completed manually.`);
-                
-            } catch (apiError) {
-                console.log('API call failed:', apiError);
-                alert(`✅ Recharge request created!\n\nOrder ID: ${orderId}\nAmount: ₹${amount}\n\nPayment processing will be completed manually.`);
+                console.log('Profile created successfully');
+                alert('✅ Registration successful!');
             }
             
-            // Clear input
-            amountInput.value = '';
+            // Clear form
+            registerForm.reset();
+            
+            // Redirect to login
+            setTimeout(() => {
+                window.location.href = 'login.html?message=Registration+successful';
+            }, 1500);
             
         } catch (error) {
-            console.error('Recharge error:', error);
-            alert('Error: ' + error.message);
+            console.error('Registration error:', error);
+            alert('Registration failed: ' + (error.message || 'Unknown error'));
         } finally {
-            rechargeBtn.disabled = false;
-            rechargeBtn.textContent = 'Proceed to Recharge';
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     });
-});
+}
 
-// Check if returning from payment gateway
-async function checkPaymentReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const orderId = params.get('order_id');
-    
-    if (!orderId) return;
-    
-    // Clean URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    
+// Login
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const loginId = document.getElementById('loginId').value.trim();
+        const password = document.getElementById('password').value;
+        
+        if (!loginId || !password) {
+            alert('Please enter email/phone and password');
+            return;
+        }
+        
+        const btn = loginForm.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Logging in...';
+        
+        try {
+            console.log('Attempting login with:', loginId);
+            
+            // Try as email first
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: loginId,
+                password: password
+            });
+            
+            if (error) {
+                console.log('Email login failed, trying phone...');
+                
+                // Try as phone number
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('phone', loginId)
+                    .single()
+                    .catch(() => ({ data: null }));
+                
+                if (profile && profile.email) {
+                    const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+                        email: profile.email,
+                        password: password
+                    });
+                    
+                    if (retryError) {
+                        console.error('Phone login error:', retryError);
+                        alert('Invalid email/phone or password');
+                        return;
+                    }
+                    
+                    console.log('Login successful via phone');
+                    alert('✅ Login successful!');
+                    setTimeout(() => window.location.href = 'index.html', 1000);
+                    return;
+                }
+                
+                console.error('Login error:', error);
+                alert('Invalid email/phone or password');
+                return;
+            }
+            
+            console.log('Login successful via email');
+            alert('✅ Login successful!');
+            setTimeout(() => window.location.href = 'index.html', 1000);
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login error: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    });
+}
+
+// Logout
+window.logoutUser = async function() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+    } catch (error) {
+        console.error('Logout error:', error);
+        alert('Logout failed');
+    }
+};
+
+// Check login status on page load
+document.addEventListener('DOMContentLoaded', async () => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
         
-        // Call verification API
-        const response = await fetch('/api/pay0-check-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                order_id: orderId,
-                user_id: user.id
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            if (result.ok) {
-                alert(`✅ Payment successful! ₹${result.amount} has been added to your wallet.`);
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                alert('❌ Payment failed or pending.');
+        if (user) {
+            console.log('User logged in:', user.email);
+            
+            // On login/register pages, redirect to home
+            if (window.location.pathname.includes('login.html') || 
+                window.location.pathname.includes('register.html')) {
+                window.location.href = 'index.html';
+            }
+        } else {
+            // On protected pages, redirect to login
+            const protectedPages = ['index.html', 'recharge.html', 'refer.html', 'mine.html'];
+            const currentPage = window.location.pathname.split('/').pop();
+            
+            if (protectedPages.includes(currentPage)) {
+                window.location.href = 'login.html';
             }
         }
     } catch (error) {
-        console.error('Payment verification error:', error);
+        console.error('Auth check error:', error);
     }
-}
-
-// Run on page load
-setTimeout(checkPaymentReturn, 1000);
+});
