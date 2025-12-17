@@ -177,17 +177,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         throw new Error("API call failed with status: " + response.status);
                     }
                 } catch (apiError) {
-                    console.warn("API call failed, showing manual payment instructions:", apiError.message);
-                    
-                    // Show success message with payment details
-                    alert(
-                        "✅ Payment Request Created Successfully!\n\n" +
-                        "Order ID: " + orderId + "\n" +
-                        "Amount: ₹" + amount + "\n" +
-                        "Status: PENDING\n\n" +
-                        "✅ Database Updated Successfully!\n\n" +
-                        "Please complete the payment using your preferred method and share the UTR/Screenshot with support."
-                    );
+  console.error("Pay0 API error:", apiError);
+
+  alert("Payment gateway temporarily unavailable. Please try again.");
+  rechargeBtn.disabled = false;
+  rechargeBtn.textContent = "Proceed to Recharge";
+  return;
+}
                     
                     // Clear input
                     amountInput.value = "";
