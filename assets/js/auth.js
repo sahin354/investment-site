@@ -1,4 +1,6 @@
-// auth.js — FINAL FIXED VERSION (NO PROFILE INSERT, NO RLS ERROR)
+// auth.js — FINAL FIXED VERSION
+// IMPORTANT: NO PROFILE INSERT HERE (Handled by DB trigger)
+
 import { supabase } from './supabase.js';
 
 console.log('Auth loaded');
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Creating account...';
 
       try {
-        // ✅ CREATE AUTH USER ONLY
+        // ✅ ONLY AUTH SIGNUP
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        // ✅ PROFILE IS AUTO-CREATED BY DATABASE TRIGGER
+        // ✅ PROFILE IS CREATED BY DATABASE TRIGGER
         alert('✅ Registration successful! Please login.');
 
         registerForm.reset();
