@@ -1,4 +1,3 @@
-// script-recharge.js – FINAL FIXED VERSION
 import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const rechargeBtn = document.getElementById("proceedRecharge");
-
   if (!rechargeBtn) return;
 
   rechargeBtn.addEventListener("click", async (e) => {
@@ -101,12 +99,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
 
-      if (!response.ok || !result.ok || !result.payment_url) {
+      // 🔥 FIXED HERE (paymentUrl, not payment_url)
+      if (!response.ok || !result.ok || !result.paymentUrl) {
         throw new Error("Payment gateway unavailable");
       }
 
-      // ✅ REDIRECT TO PAY0 (NO POPUP)
-      window.location.href = result.payment_url;
+      // ✅ Redirect to Pay0
+      window.location.href = result.paymentUrl;
 
     } catch (err) {
       console.error("Recharge error:", err);
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 🔁 Verify payment when user returns from Pay0
+  // 🔁 Verify payment when user returns
   checkPaymentReturn();
 });
 
