@@ -1,14 +1,16 @@
-// api/pay0-create-order.js
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, message: "Method Not Allowed" });
   }
 
   try {
-    const { amount, customer_name, customer_mobile, order_id } = req.body;
+    // 🔥 IMPORTANT: Parse body safely
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    if (!amount || !customer_mobile || !customer_name || !order_id) {
+    const { amount, customer_name, customer_mobile, order_id } = body;
+
+    if (!amount || !customer_name || !customer_mobile || !order_id) {
       return res.status(400).json({
         ok: false,
         message: "Missing required fields",
@@ -20,7 +22,7 @@ export default async function handler(req, res) {
     const REDIRECT_URL = process.env.PAY0_REDIRECT_URL;
 
     if (!PAY0_URL || !PAY0_TOKEN || !REDIRECT_URL) {
-      console.error("❌ Missing Pay0 env vars");
+      console.error("❌ Missing Pay0 ENV");
       return res.status(500).json({
         ok: false,
         message: "Payment gateway not configured",
@@ -39,30 +41,19 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${PAY0_TOKEN}` // 🔥 IMPORTANT
       },
       body: params.toString(),
     });
 
-    const rawText = await response.text();
-    console.log("[Pay0 RAW RESPONSE]", rawText);
+    const raw = await response.text();
+    console.log("PAY0 RAW:", raw);
 
-    let json;
-    try {
-      json = JSON.parse(rawText);
-    } catch (err) {
-      console.error("❌ Pay0 returned non-JSON:", rawText);
-      return res.status(502).json({
-        ok: false,
-        message: "Payment gateway invalid response",
-      });
-    }
+    const json = JSON.parse(raw);
 
     if (!json.status || !json.result?.payment_url) {
-      console.error("❌ Pay0 rejected:", json);
       return res.status(502).json({
         ok: false,
-        message: json.message || "Payment gateway rejected request",
+        message: json.message || "Pay0 rejected request",
       });
     }
 
@@ -78,4 +69,4 @@ export default async function handler(req, res) {
       message: "Payment gateway temporarily unavailable",
     });
   }
-  }
+}
