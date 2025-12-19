@@ -1,113 +1,109 @@
-// auth.js
-import { supabase } from './supabase.js';
+import { supabase } from "./supabase.js";
 
-function showAlert(msg) {
-  alert(msg);
+/* ======================
+   PASSWORD TOGGLE LOGIC
+====================== */
+
+// Utility to add show/hide toggle
+function addPasswordToggle(inputId, labelText) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  // Create toggle button
+  const toggle = document.createElement("span");
+  toggle.textContent = "Show";
+  toggle.style.cursor = "pointer";
+  toggle.style.fontSize = "12px";
+  toggle.style.color = "#4a6cf7";
+  toggle.style.float = "right";
+  toggle.style.marginTop = "6px";
+
+  toggle.addEventListener("click", () => {
+    if (input.type === "password") {
+      input.type = "text";
+      toggle.textContent = "Hide";
+    } else {
+      input.type = "password";
+      toggle.textContent = "Show";
+    }
+  });
+
+  // Insert toggle after input
+  input.parentElement.appendChild(toggle);
 }
 
-// ================= REGISTER =================
-const registerForm = document.getElementById("registerForm");
+// Apply toggle to both fields
+addPasswordToggle("password");
+addPasswordToggle("confirmPassword");
 
-if (registerForm) {
-  document.getElementById("registerBtn").addEventListener("click", async () => {
+/* ======================
+   REGISTER LOGIC
+====================== */
 
+const registerBtn = document.getElementById("registerBtn");
+
+if (registerBtn) {
+  registerBtn.addEventListener("click", async () => {
     const fullName = document.getElementById("name").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
 
-    // ----------- VALIDATIONS -----------
-
-    // Gmail only
-    if (!email.endsWith("@gmail.com")) {
-      showAlert("Only @gmail.com emails are allowed");
-      return;
-    }
-
-    // Phone 10 digits
-    if (!/^\d{10}$/.test(phone)) {
-      showAlert("Mobile number must be 10 digits");
-      return;
-    }
-
-    // Password format
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
-
-    if (!passwordRegex.test(password)) {
-      showAlert("Password must be like: password@836");
+    // Basic validation
+    if (!fullName || !phone || !email || !password || !confirmPassword) {
+      alert("Please fill all fields");
       return;
     }
 
     if (password !== confirmPassword) {
-      showAlert("Passwords do not match");
+      alert("Passwords do not match");
       return;
     }
 
-    // ----------- CHECK ALREADY REGISTERED -----------
-
-    const { data: existingUser } = await supabase
-      .from("profiles")
-      .select("id")
-      .or(`email.eq.${email},phone.eq.${phone}`)
-      .maybeSingle();
-
-    if (existingUser) {
-      showAlert("Already registered");
+    // Gmail only
+    if (!email.endsWith("@gmail.com")) {
+      alert("Only @gmail.com emails are allowed");
       return;
     }
 
-    // ----------- SUPABASE AUTH -----------
+    // 10 digit phone
+    if (!/^\d{10}$/.test(phone)) {
+      alert("Mobile number must be 10 digits");
+      return;
+    }
 
-    const btn = document.getElementById("registerBtn");
-    btn.disabled = true;
-    btn.textContent = "Creating account...";
+    // Strong password rule
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
 
-    const { data: authData, error: authError } =
-      await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: phone
-          }
+    if (!passwordRegex.test(password)) {
+      alert("Password must be like: password@836");
+      return;
+    }
+
+    registerBtn.disabled = true;
+    registerBtn.textContent = "Creating account...";
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          phone: phone
         }
-      });
+      }
+    });
 
-    if (authError || !authData.user) {
-      showAlert(authError?.message || "Registration failed");
-      btn.disabled = false;
-      btn.textContent = "Register";
+    if (error) {
+      alert(error.message);
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Register";
       return;
     }
 
-    // ----------- PROFILE INSERT -----------
-
-    const userId = authData.user.id;
-    const referralCode = "REF" + userId.slice(0, 8).toUpperCase();
-
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({
-        id: userId,
-        full_name: fullName,
-        phone,
-        email,
-        balance: 0,
-        referral_code: referralCode,
-        is_vip: false
-      });
-
-    if (profileError) {
-      showAlert(profileError.message);
-      btn.disabled = false;
-      btn.textContent = "Register";
-      return;
-    }
-
-    showAlert("✅ Registration successful!");
-    setTimeout(() => window.location.href = "login.html", 1500);
+    alert("✅ Registration successful! Please login.");
+    window.location.href = "login.html";
   });
-        }
+}
