@@ -21,63 +21,38 @@ function setupPasswordToggle(inputId) {
   eye.style.cursor = "pointer";
   eye.style.fontSize = "16px";
   eye.style.opacity = "0.6";
-  eye.style.userSelect = "none";
 
   eye.onclick = () => {
-    if (input.type === "password") {
-      input.type = "text";
-      eye.style.opacity = "1";
-    } else {
-      input.type = "password";
-      eye.style.opacity = "0.6";
-    }
+    input.type = input.type === "password" ? "text" : "password";
+    eye.style.opacity = input.type === "text" ? "1" : "0.6";
   };
 
   wrapper.appendChild(eye);
 }
 
-/* ===== Apply Toggles ===== */
-// Register page
+// Register
 setupPasswordToggle("password");
 setupPasswordToggle("confirmPassword");
 
-// Login page (IMPORTANT: same id as HTML)
+// Login
 setupPasswordToggle("password");
 
 /* =========================
-   REGISTER LOGIC
+   REGISTER
 ========================= */
 const registerBtn = document.getElementById("registerBtn");
 
 if (registerBtn) {
-  registerBtn.addEventListener("click", async () => {
-    const fullName = document.getElementById("name")?.value.trim();
-    const phone = document.getElementById("phone")?.value.trim();
-    const email = document.getElementById("email")?.value.trim();
-    const password = document.getElementById("password")?.value;
+  registerBtn.onclick = async () => {
+    const fullName = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
     const confirmPassword =
-      document.getElementById("confirmPassword")?.value;
+      document.getElementById("confirmPassword").value;
 
     if (!fullName || !phone || !email || !password || !confirmPassword) {
       alert("Please fill all fields");
-      return;
-    }
-
-    if (!email.endsWith("@gmail.com")) {
-      alert("Only @gmail.com emails are allowed");
-      return;
-    }
-
-    if (!/^\d{10}$/.test(phone)) {
-      alert("Mobile number must be 10 digits");
-      return;
-    }
-
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
-
-    if (!passwordRegex.test(password)) {
-      alert("Password must be like: password@836");
       return;
     }
 
@@ -86,23 +61,16 @@ if (registerBtn) {
       return;
     }
 
-    registerBtn.disabled = true;
-    registerBtn.textContent = "Creating account...";
-
-    /* 🔐 SIGN UP (Brevo email verification ON) */
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
-          phone: phone
+          phone
         }
       }
     });
-
-    registerBtn.disabled = false;
-    registerBtn.textContent = "Register";
 
     if (error) {
       alert(error.message);
@@ -110,39 +78,32 @@ if (registerBtn) {
     }
 
     alert(
-      "🎉 Thank you for joining us!\n\nPlease check your email to confirm your account."
+      "🎉 Thank you for joining Uzumaki!\n\nPlease check your email to confirm your account."
     );
 
     window.location.href = "login.html";
-  });
+  };
 }
 
 /* =========================
-   LOGIN LOGIC (FIXED)
+   LOGIN
 ========================= */
 const loginForm = document.getElementById("loginForm");
 
 if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
+  loginForm.onsubmit = async (e) => {
     e.preventDefault();
 
-    const loginId = document.getElementById("loginId")?.value.trim();
-    const password = document.getElementById("password")?.value;
-
-    if (!loginId || !password) {
-      alert("Please enter email and password");
-      return;
-    }
+    const email = document.getElementById("loginId").value.trim();
+    const password = document.getElementById("password").value;
 
     const { error } = await supabase.auth.signInWithPassword({
-      email: loginId,
+      email,
       password
     });
 
     if (error) {
-      const msg = error.message.toLowerCase();
-
-      if (msg.includes("confirm") || msg.includes("verify")) {
+      if (error.message.toLowerCase().includes("confirm")) {
         alert("Please verify your email before login.");
       } else {
         alert("Invalid email or password");
@@ -150,7 +111,37 @@ if (loginForm) {
       return;
     }
 
-    alert("✅ Login successful!");
     window.location.href = "index.html";
-  });
-  }
+  };
+}
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+const forgotBtn = document.getElementById("forgotPassword");
+
+if (forgotBtn) {
+  forgotBtn.onclick = async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("loginId").value.trim();
+
+    if (!email) {
+      alert("Please enter your email first");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://investsafe.vercel.app/reset-password.html"
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert(
+      "📧 Password reset email sent!\n\nPlease check your email."
+    );
+  };
+                                                                }
