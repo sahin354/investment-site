@@ -21,66 +21,34 @@ function setupPasswordToggle(inputId) {
   eye.style.cursor = "pointer";
   eye.style.fontSize = "16px";
   eye.style.opacity = "0.6";
-  eye.style.userSelect = "none";
 
   eye.onclick = () => {
-    if (input.type === "password") {
-      input.type = "text";
-      eye.style.opacity = "1";
-    } else {
-      input.type = "password";
-      eye.style.opacity = "0.6";
-    }
+    input.type = input.type === "password" ? "text" : "password";
+    eye.style.opacity = input.type === "text" ? "1" : "0.6";
   };
 
   wrapper.appendChild(eye);
 }
 
-// Register page
 setupPasswordToggle("password");
 setupPasswordToggle("confirmPassword");
-
-// Login page
 setupPasswordToggle("loginPassword");
 
 /* =========================
-   REGISTER LOGIC
+   REGISTER LOGIC (FIXED)
 ========================= */
 const registerBtn = document.getElementById("registerBtn");
 
 if (registerBtn) {
   registerBtn.addEventListener("click", async () => {
-    const fullName = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const confirmPassword =
-      document.getElementById("confirmPassword").value;
+    const fullName = name.value.trim();
+    const phone = phoneInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
 
-    // Basic validation
     if (!fullName || !phone || !email || !password || !confirmPassword) {
       alert("Please fill all fields");
-      return;
-    }
-
-    // Gmail only
-    if (!email.endsWith("@gmail.com")) {
-      alert("Only @gmail.com emails are allowed");
-      return;
-    }
-
-    // Phone validation
-    if (!/^\d{10}$/.test(phone)) {
-      alert("Mobile number must be 10 digits");
-      return;
-    }
-
-    // Password rule
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
-
-    if (!passwordRegex.test(password)) {
-      alert("Password must be like: password@836");
       return;
     }
 
@@ -90,16 +58,30 @@ if (registerBtn) {
     }
 
     registerBtn.disabled = true;
-    registerBtn.textContent = "Creating account...";
+    registerBtn.textContent = "Checking account...";
 
-    // 🔐 Supabase handles duplicate EMAIL automatically
+    /* 🔍 STEP 1: TRY LOGIN FIRST */
+    const { error: loginCheckError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (!loginCheckError) {
+      alert("Already registered. Please login.");
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Register";
+      return;
+    }
+
+    /* 🔐 STEP 2: SIGN UP */
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           full_name: fullName,
-          phone: phone
+          phone
         }
       }
     });
@@ -108,17 +90,10 @@ if (registerBtn) {
     registerBtn.textContent = "Register";
 
     if (error) {
-      const msg = error.message.toLowerCase();
-
-      if (msg.includes("already") || msg.includes("registered")) {
-        alert("Already registered. Please login.");
-      } else {
-        alert(error.message);
-      }
+      alert(error.message);
       return;
     }
 
-    // Success message
     alert(
       "🎉 Thank you for joining us!\n\nPlease check your email to confirm your account."
     );
@@ -128,7 +103,7 @@ if (registerBtn) {
 }
 
 /* =========================
-   LOGIN LOGIC (EMAIL / PHONE)
+   LOGIN LOGIC (FIXED)
 ========================= */
 const loginForm = document.getElementById("loginForm");
 
@@ -136,42 +111,24 @@ if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const loginId = document.getElementById("loginId").value.trim();
-    const password =
-      document.getElementById("loginPassword").value;
+    const loginId = loginIdInput.value.trim();
+    const password = loginPassword.value;
 
-    if (!loginId || !password) {
-      alert("Please enter email or phone and password");
-      return;
-    }
-
-    // Try login as email first
     let { error } = await supabase.auth.signInWithPassword({
       email: loginId,
       password
     });
 
-    // If email fails, try phone
     if (error) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("phone", loginId)
-        .maybeSingle();
-
-      if (!profile) {
-        alert("Invalid login credentials");
+      if (
+        error.message.toLowerCase().includes("confirm") ||
+        error.message.toLowerCase().includes("verify")
+      ) {
+        alert("Please verify your email before login.");
         return;
       }
 
-      ({ error } = await supabase.auth.signInWithPassword({
-        email: profile.email,
-        password
-      }));
-    }
-
-    if (error) {
-      alert(error.message);
+      alert("Invalid email or password");
       return;
     }
 
