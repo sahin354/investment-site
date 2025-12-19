@@ -1,139 +1,113 @@
-// auth.js — FINAL FIXED VERSION
-// IMPORTANT: NO PROFILE INSERT HERE (Handled by DB trigger)
-
+// auth.js
 import { supabase } from './supabase.js';
 
-console.log('Auth loaded');
+function showAlert(msg) {
+  alert(msg);
+}
 
-// =======================
-// REGISTRATION
-// =======================
-document.addEventListener('DOMContentLoaded', () => {
-  const registerForm = document.getElementById('registerForm');
+// ================= REGISTER =================
+const registerForm = document.getElementById("registerForm");
 
-  if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+if (registerForm) {
+  document.getElementById("registerBtn").addEventListener("click", async () => {
 
-      const fullName = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+    const fullName = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
 
-      if (!fullName || !phone || !email || !password) {
-        alert('Please fill all fields');
-        return;
-      }
+    // ----------- VALIDATIONS -----------
 
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
+    // Gmail only
+    if (!email.endsWith("@gmail.com")) {
+      showAlert("Only @gmail.com emails are allowed");
+      return;
+    }
 
-      if (password.length < 6) {
-        alert('Password must be at least 6 characters');
-        return;
-      }
+    // Phone 10 digits
+    if (!/^\d{10}$/.test(phone)) {
+      showAlert("Mobile number must be 10 digits");
+      return;
+    }
 
-      const btn = registerForm.querySelector('button[type="submit"]');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Creating account...';
+    // Password format
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
 
-      try {
-        // ✅ ONLY AUTH SIGNUP
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-              phone: phone
-            }
+    if (!passwordRegex.test(password)) {
+      showAlert("Password must be like: password@836");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showAlert("Passwords do not match");
+      return;
+    }
+
+    // ----------- CHECK ALREADY REGISTERED -----------
+
+    const { data: existingUser } = await supabase
+      .from("profiles")
+      .select("id")
+      .or(`email.eq.${email},phone.eq.${phone}`)
+      .maybeSingle();
+
+    if (existingUser) {
+      showAlert("Already registered");
+      return;
+    }
+
+    // ----------- SUPABASE AUTH -----------
+
+    const btn = document.getElementById("registerBtn");
+    btn.disabled = true;
+    btn.textContent = "Creating account...";
+
+    const { data: authData, error: authError } =
+      await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone
           }
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
         }
+      });
 
-        if (!data?.user) {
-          alert('Registration failed');
-          return;
+    if (authError || !authData.user) {
+      showAlert(authError?.message || "Registration failed");
+      btn.disabled = false;
+      btn.textContent = "Register";
+      return;
+    }
+
+    // ----------- PROFILE INSERT -----------
+
+    const userId = authData.user.id;
+    const referralCode = "REF" + userId.slice(0, 8).toUpperCase();
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert({
+        id: userId,
+        full_name: fullName,
+        phone,
+        email,
+        balance: 0,
+        referral_code: referralCode,
+        is_vip: false
+      });
+
+    if (profileError) {
+      showAlert(profileError.message);
+      btn.disabled = false;
+      btn.textContent = "Register";
+      return;
+    }
+
+    showAlert("✅ Registration successful!");
+    setTimeout(() => window.location.href = "login.html", 1500);
+  });
         }
-
-        // ✅ PROFILE IS CREATED BY DATABASE TRIGGER
-        alert('✅ Registration successful! Please login.');
-
-        registerForm.reset();
-
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 1200);
-
-      } catch (err) {
-        console.error('Registration error:', err);
-        alert('Registration failed');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    });
-  }
-
-  // =======================
-  // LOGIN
-  // =======================
-  const loginForm = document.getElementById('loginForm');
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById('loginId').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (!email || !password) {
-        alert('Please enter email and password');
-        return;
-      }
-
-      const btn = loginForm.querySelector('button[type="submit"]');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Logging in...';
-
-      try {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert('✅ Login successful');
-        window.location.href = 'index.html';
-
-      } catch (err) {
-        console.error('Login error:', err);
-        alert('Login failed');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    });
-  }
-});
-
-// =======================
-// LOGOUT
-// =======================
-window.logoutUser = async () => {
-  await supabase.auth.signOut();
-  window.location.href = 'login.html';
-};
