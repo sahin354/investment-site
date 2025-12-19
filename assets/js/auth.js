@@ -36,15 +36,16 @@ function setupPasswordToggle(inputId) {
   wrapper.appendChild(eye);
 }
 
+/* ===== Apply Toggles ===== */
 // Register page
 setupPasswordToggle("password");
 setupPasswordToggle("confirmPassword");
 
-// Login page
-setupPasswordToggle("loginPassword");
+// Login page (IMPORTANT: same id as HTML)
+setupPasswordToggle("password");
 
 /* =========================
-   REGISTER LOGIC (FIXED)
+   REGISTER LOGIC
 ========================= */
 const registerBtn = document.getElementById("registerBtn");
 
@@ -88,7 +89,7 @@ if (registerBtn) {
     registerBtn.disabled = true;
     registerBtn.textContent = "Creating account...";
 
-    // 🔐 Brevo-safe signup (email verification ON)
+    /* 🔐 SIGN UP (Brevo email verification ON) */
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -126,8 +127,7 @@ if (loginForm) {
     e.preventDefault();
 
     const loginId = document.getElementById("loginId")?.value.trim();
-    const password =
-      document.getElementById("loginPassword")?.value;
+    const password = document.getElementById("password")?.value;
 
     if (!loginId || !password) {
       alert("Please enter email and password");
@@ -153,4 +153,4 @@ if (loginForm) {
     alert("✅ Login successful!");
     window.location.href = "index.html";
   });
-         }
+  }
