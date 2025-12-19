@@ -118,13 +118,14 @@ if (loginForm) {
 /* =========================
    FORGOT PASSWORD
 ========================= */
-const forgotBtn = document.getElementById("forgotPassword");
+
+const forgotBtn = document.getElementById("forgotPasswordLink");
 
 if (forgotBtn) {
-  forgotBtn.onclick = async (e) => {
+  forgotBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("loginId").value.trim();
+    const email = document.getElementById("loginId")?.value.trim();
 
     if (!email) {
       alert("Please enter your email first");
@@ -143,5 +144,5 @@ if (forgotBtn) {
     alert(
       "📧 Password reset email sent!\n\nPlease check your email."
     );
-  };
-                                                                }
+  });
+       }
