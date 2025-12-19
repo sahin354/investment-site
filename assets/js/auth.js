@@ -1,7 +1,7 @@
 import { supabase } from "./supabase.js";
 
 /* =========================
-   PASSWORD TOGGLE (SAFE)
+   PASSWORD TOGGLE (EYE 👁️)
 ========================= */
 
 function setupPasswordToggle(inputId) {
@@ -11,36 +11,36 @@ function setupPasswordToggle(inputId) {
   const wrapper = input.closest(".password-wrapper");
   if (!wrapper) return;
 
-  const toggle = document.createElement("span");
-  toggle.textContent = "Show";
-  toggle.style.position = "absolute";
-  toggle.style.right = "15px";
-  toggle.style.top = "50%";
-  toggle.style.transform = "translateY(-50%)";
-  toggle.style.cursor = "pointer";
-  toggle.style.fontSize = "13px";
-  toggle.style.color = "#5b6df7";
-  toggle.style.userSelect = "none";
+  wrapper.style.position = "relative";
 
-  toggle.onclick = () => {
+  const eye = document.createElement("span");
+  eye.innerHTML = "👁️";
+  eye.style.position = "absolute";
+  eye.style.right = "14px";
+  eye.style.top = "50%";
+  eye.style.transform = "translateY(-50%)";
+  eye.style.cursor = "pointer";
+  eye.style.fontSize = "16px";
+  eye.style.opacity = "0.7";
+
+  eye.onclick = () => {
     if (input.type === "password") {
       input.type = "text";
-      toggle.textContent = "Hide";
+      eye.style.opacity = "1";
     } else {
       input.type = "password";
-      toggle.textContent = "Show";
+      eye.style.opacity = "0.7";
     }
   };
 
-  wrapper.style.position = "relative";
-  wrapper.appendChild(toggle);
+  wrapper.appendChild(eye);
 }
 
-// Register page toggles
+// Register page
 setupPasswordToggle("password");
 setupPasswordToggle("confirmPassword");
 
-// Login page toggle
+// Login page
 setupPasswordToggle("loginPassword");
 
 /* =========================
@@ -63,19 +63,16 @@ if (registerBtn) {
       return;
     }
 
-    // Gmail only
     if (!email.endsWith("@gmail.com")) {
       alert("Only @gmail.com emails are allowed");
       return;
     }
 
-    // Phone validation
     if (!/^\d{10}$/.test(phone)) {
       alert("Mobile number must be 10 digits");
       return;
     }
 
-    // Password rule
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{6,}$/;
 
@@ -89,15 +86,15 @@ if (registerBtn) {
       return;
     }
 
-    // 🔁 Duplicate email / phone check
-    const { data: existing } = await supabase
+    // 🔍 PRE-CHECK: email or phone already exists
+    const { data: existingUser } = await supabase
       .from("profiles")
       .select("id")
       .or(`email.eq.${email},phone.eq.${phone}`)
       .maybeSingle();
 
-    if (existing) {
-      alert("Email or phone number already registered");
+    if (existingUser) {
+      alert("Already registered. Please login.");
       return;
     }
 
@@ -115,20 +112,24 @@ if (registerBtn) {
       }
     });
 
+    registerBtn.disabled = false;
+    registerBtn.textContent = "Register";
+
     if (error) {
       alert(error.message);
-      registerBtn.disabled = false;
-      registerBtn.textContent = "Register";
       return;
     }
 
-    alert("✅ Registration successful! Please login.");
+    alert(
+      "🎉 Thank you for joining us!\n\nPlease check your email to confirm your account."
+    );
+
     window.location.href = "login.html";
   });
 }
 
 /* =========================
-   LOGIN LOGIC (FIXED)
+   LOGIN LOGIC (SAFE)
 ========================= */
 
 const loginForm = document.getElementById("loginForm");
@@ -146,13 +147,11 @@ if (loginForm) {
       return;
     }
 
-    // Try email login
-    let { data, error } = await supabase.auth.signInWithPassword({
+    let { error } = await supabase.auth.signInWithPassword({
       email: loginId,
       password
     });
 
-    // If email login fails, try phone
     if (error) {
       const { data: profile } = await supabase
         .from("profiles")
@@ -165,7 +164,7 @@ if (loginForm) {
         return;
       }
 
-      ({ data, error } = await supabase.auth.signInWithPassword({
+      ({ error } = await supabase.auth.signInWithPassword({
         email: profile.email,
         password
       }));
