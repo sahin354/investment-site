@@ -1,45 +1,52 @@
 import { supabase } from "./supabase.js";
 
 /* =========================
-   CONSTANTS & STATE
+   CONSTANTS
 ========================= */
 const PAYMENT_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
-let countdownTimer = null;
-let verifyTimer = null;
+const PAYMENT_KEY = "active_payment";
 
 /* =========================
-   LOCAL STORAGE
+   PAYMENT STATE (LOCAL)
 ========================= */
 function savePaymentState(data) {
-  localStorage.setItem("active_payment", JSON.stringify(data));
+  localStorage.setItem(PAYMENT_KEY, JSON.stringify(data));
 }
 
 function getPaymentState() {
   try {
-    return JSON.parse(localStorage.getItem("active_payment"));
+    return JSON.parse(localStorage.getItem(PAYMENT_KEY));
   } catch {
     return null;
   }
 }
 
 function clearPaymentState() {
-  localStorage.removeItem("active_payment");
+  localStorage.removeItem(PAYMENT_KEY);
+}
+
+/* =========================
+   PENDING MESSAGE CONTROL
+========================= */
+function wasPendingNotified(orderId) {
+  return localStorage.getItem("pending_notified_" + orderId) === "1";
+}
+
+function markPendingNotified(orderId) {
+  localStorage.setItem("pending_notified_" + orderId, "1");
 }
 
 /* =========================
    COUNTDOWN (RESUMABLE)
 ========================= */
 function startCountdown(startedAt) {
-  if (countdownTimer) clearInterval(countdownTimer);
-
   const expiryAt = startedAt + PAYMENT_EXPIRY_MS;
 
-  countdownTimer = setInterval(() => {
+  const timer = setInterval(() => {
     const remaining = expiryAt - Date.now();
 
     if (remaining <= 0) {
-      clearInterval(countdownTimer);
-      countdownTimer = null;
+      clearInterval(timer);
       alert("⏳ Payment session expired");
       clearPaymentState();
       window.location.href = "index.html";
@@ -48,73 +55,80 @@ function startCountdown(startedAt) {
 }
 
 /* =========================
-   VERIFY PAYMENT
+   VERIFY PAYMENT (BACKEND TRUTH)
 ========================= */
 async function verifyPayment(orderId, startedAt) {
-  if (verifyTimer) return;
+  try {
+    const { data } = await supabase.auth.getUser();
+    if (!data?.user) return;
 
-  const poll = async () => {
-    try {
-      const { data } = await supabase.auth.getUser();
-      if (!data?.user) return;
-
-      const res = await fetch("/api/pay0-check-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          order_id: orderId,
-          user_id: data.user.id
-        })
-      });
-
-      const result = await res.json();
-
-      if (result.status === "SUCCESS") {
-        alert("✅ Payment successful!");
-        clearPaymentState();
+    // Show pending info ONCE
+    if (!wasPendingNotified(orderId)) {
+      alert(
+        "⏳ Your transaction is pending.\n\n" +
+        "Please wait 2–5 minutes for confirmation.\n\n" +
+        "You can safely go back to the main page."
+      );
+      markPendingNotified(orderId);
+      setTimeout(() => {
         window.location.href = "index.html";
-        return;
-      }
-
-      if (result.status === "FAILED") {
-        alert("❌ Payment failed. Amount not deducted.");
-        clearPaymentState();
-        window.location.href = "index.html";
-        return;
-      }
-
-      verifyTimer = setTimeout(poll, 5000);
-
-    } catch {
-      verifyTimer = setTimeout(poll, 5000);
+      }, 3000);
+      return;
     }
-  };
 
-  poll();
+    const res = await fetch("/api/pay0-check-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        order_id: orderId,
+        user_id: data.user.id
+      })
+    });
+
+    const result = await res.json();
+
+    if (result.status === "SUCCESS") {
+      alert("✅ Payment successful! Wallet updated.");
+      clearPaymentState();
+      window.location.href = "index.html";
+      return;
+    }
+
+    if (result.status === "FAILED") {
+      alert("❌ Payment failed. Amount not credited.");
+      clearPaymentState();
+      window.location.href = "index.html";
+      return;
+    }
+
+    // Still pending → retry after 5 sec
+    setTimeout(() => verifyPayment(orderId, startedAt), 5000);
+
+  } catch (err) {
+    console.warn("Verification error:", err);
+    setTimeout(() => verifyPayment(orderId, startedAt), 5000);
+  }
 }
 
 /* =========================
-   MAIN
+   PAGE LOAD
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ Recharge script loaded");
+  console.log("✅ Recharge page loaded");
 
-  /* QUICK AMOUNT */
-  const amountInput = document.getElementById("rechargeAmount");
+  /* QUICK AMOUNT BUTTONS (IMPORTANT – FIXED) */
+  document.querySelectorAll(".quick-amount-btn, .quick-amount").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const amount =
+        btn.dataset.amount ||
+        btn.innerText.replace("₹", "").trim();
 
-  document
-    .querySelectorAll(".quick-amount-btn, .quick-amount")
-    .forEach(btn => {
-      btn.addEventListener("click", () => {
-        if (!amountInput) return;
-        const value =
-          btn.getAttribute("data-amount") ||
-          btn.textContent.replace(/[^\d]/g, "");
-        amountInput.value = value;
-      });
+      const input = document.getElementById("rechargeAmount");
+      if (input) input.value = amount;
     });
+  });
 
-  /* AUTO CHECK PENDING PAYMENT (THIS IS WHAT YOU ASKED ABOUT) */
+  /* AUTO CHECK PENDING PAYMENT */
   const state = getPaymentState();
   if (state && state.status === "PROCESSING") {
     startCountdown(state.started_at);
@@ -123,10 +137,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* RECHARGE BUTTON */
   const rechargeBtn = document.getElementById("proceedRecharge");
-  if (!rechargeBtn || !amountInput) return;
+  if (!rechargeBtn) return;
 
-  rechargeBtn.addEventListener("click", async () => {
-    const amount = parseInt(amountInput.value, 10);
+  rechargeBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const amount = parseInt(
+      document.getElementById("rechargeAmount")?.value
+    );
 
     if (!amount || amount < 120 || amount > 50000) {
       alert("Amount must be between ₹120 and ₹50,000");
@@ -145,16 +163,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const user = authData.user;
-      const orderId = "ORD" + Date.now();
+      const orderId = "ORD" + Date.now() + Math.floor(Math.random() * 10000);
       const startedAt = Date.now();
 
       let mobile = localStorage.getItem("userMobile");
-      if (!mobile || mobile.length < 10) {
+      if (!mobile || mobile.length !== 10) {
         mobile = prompt("Enter your 10-digit mobile number");
-        if (!mobile || mobile.length < 10) throw new Error();
+        if (!mobile || mobile.length !== 10) {
+          alert("Valid mobile number required");
+          rechargeBtn.disabled = false;
+          rechargeBtn.textContent = "Proceed to Recharge";
+          return;
+        }
         localStorage.setItem("userMobile", mobile);
       }
 
+      /* SAVE STATE */
       savePaymentState({
         order_id: orderId,
         amount,
@@ -164,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       startCountdown(startedAt);
 
+      /* INSERT PAYMENT REQUEST */
       await supabase.from("payment_requests").insert({
         user_id: user.id,
         order_id: orderId,
@@ -172,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         payment_method: "Pay0"
       });
 
+      /* INSERT TRANSACTION (VISIBLE IN MINE PAGE) */
       await supabase.from("transactions").insert({
         user_id: user.id,
         type: "Deposit",
@@ -181,7 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
         details: "Pay0 recharge initiated"
       });
 
-      const res = await fetch("/api/pay0-create-order", {
+      /* CREATE PAY0 ORDER */
+      const response = await fetch("/api/pay0-create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -192,16 +219,20 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       });
 
-      const json = await res.json();
-      if (!json.ok || !json.paymentUrl) throw new Error();
+      const result = await response.json();
 
-      window.location.href = json.paymentUrl;
+      if (!response.ok || !result.paymentUrl) {
+        throw new Error("Payment gateway error");
+      }
 
-    } catch {
+      window.location.href = result.paymentUrl;
+
+    } catch (err) {
+      console.error("Recharge error:", err);
       alert("Payment gateway temporarily unavailable. Please try again.");
+      clearPaymentState();
       rechargeBtn.disabled = false;
       rechargeBtn.textContent = "Proceed to Recharge";
-      clearPaymentState();
     }
   });
 });
