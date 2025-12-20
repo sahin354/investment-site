@@ -40,7 +40,6 @@ function startCountdown(startedAt) {
     if (remaining <= 0) {
       clearInterval(countdownTimer);
       countdownTimer = null;
-
       alert("⏳ Payment session expired");
       clearPaymentState();
       window.location.href = "index.html";
@@ -52,7 +51,7 @@ function startCountdown(startedAt) {
    VERIFY PAYMENT
 ========================= */
 async function verifyPayment(orderId, startedAt) {
-  if (verifyTimer) return; // prevent duplicate polling
+  if (verifyTimer) return;
 
   const poll = async () => {
     try {
@@ -84,10 +83,9 @@ async function verifyPayment(orderId, startedAt) {
         return;
       }
 
-      // still processing
       verifyTimer = setTimeout(poll, 5000);
 
-    } catch (err) {
+    } catch {
       verifyTimer = setTimeout(poll, 5000);
     }
   };
@@ -101,7 +99,7 @@ async function verifyPayment(orderId, startedAt) {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ Recharge script loaded");
 
-  /* ---------- QUICK AMOUNT ---------- */
+  /* QUICK AMOUNT */
   const amountInput = document.getElementById("rechargeAmount");
 
   document
@@ -109,30 +107,21 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(btn => {
       btn.addEventListener("click", () => {
         if (!amountInput) return;
-
         const value =
           btn.getAttribute("data-amount") ||
           btn.textContent.replace(/[^\d]/g, "");
-
         amountInput.value = value;
       });
     });
 
-  /* ---------- HANDLE REFRESH / RETURN ---------- */
-  const params = new URLSearchParams(window.location.search);
-  const returnedOrder = params.get("order_id");
+  /* AUTO CHECK PENDING PAYMENT (THIS IS WHAT YOU ASKED ABOUT) */
   const state = getPaymentState();
-
   if (state && state.status === "PROCESSING") {
     startCountdown(state.started_at);
     verifyPayment(state.order_id, state.started_at);
   }
 
-  if (returnedOrder && state?.order_id === returnedOrder) {
-    verifyPayment(returnedOrder, state.started_at);
-  }
-
-  /* ---------- RECHARGE BUTTON ---------- */
+  /* RECHARGE BUTTON */
   const rechargeBtn = document.getElementById("proceedRecharge");
   if (!rechargeBtn || !amountInput) return;
 
@@ -157,17 +146,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const user = authData.user;
       const orderId = "ORD" + Date.now();
+      const startedAt = Date.now();
 
       let mobile = localStorage.getItem("userMobile");
       if (!mobile || mobile.length < 10) {
         mobile = prompt("Enter your 10-digit mobile number");
-        if (!mobile || mobile.length < 10) {
-          throw new Error("Invalid mobile");
-        }
+        if (!mobile || mobile.length < 10) throw new Error();
         localStorage.setItem("userMobile", mobile);
       }
-
-      const startedAt = Date.now();
 
       savePaymentState({
         order_id: orderId,
@@ -207,14 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const json = await res.json();
-
-      if (!json.ok || !json.paymentUrl) {
-        throw new Error("Gateway error");
-      }
+      if (!json.ok || !json.paymentUrl) throw new Error();
 
       window.location.href = json.paymentUrl;
 
-    } catch (err) {
+    } catch {
       alert("Payment gateway temporarily unavailable. Please try again.");
       rechargeBtn.disabled = false;
       rechargeBtn.textContent = "Proceed to Recharge";
