@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Secure Control Panel</title>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Separate Admin CSS -->
+    <link rel="stylesheet" href="admin-style.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+</head>
+<body class="admin-body">
+    
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>Admin Pro</h2>
+            <p>Secure Control Center</p>
+        </div>
+        
+        <div class="admin-info">
+            <div class="admin-avatar" id="adminAvatar">A</div>
+            <div class="admin-details">
+                <h4 id="adminName">Loading...</h4>
+                <p id="adminEmail"></p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                <i class="nav-icon fas fa-chart-line"></i>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            
+            <a href="#users" class="nav-item" data-section="users">
+                <i class="nav-icon fas fa-users"></i>
+                <span class="nav-label">User Management</span>
+                <span class="nav-badge" id="userCountBadge">0</span>
+            </a>
+            
+            <a href="#financial" class="nav-item" data-section="financial">
+                <i class="nav-icon fas fa-wallet"></i>
+                <span class="nav-label">Financial Control</span>
+            </a>
+            
+            <a href="#payments" class="nav-item" data-section="payments">
+                <i class="nav-icon fas fa-exchange-alt"></i>
+                <span class="nav-label">Payment Requests</span>
+                <span class="nav-badge" id="paymentCountBadge">0</span>
+            </a>
+            
+            <a href="#plans" class="nav-item" data-section="plans">
+                <i class="nav-icon fas fa-cube"></i>
+                <span class="nav-label">Plan Management</span>
+            </a>
+            
+            <a href="#settings" class="nav-item" data-section="settings">
+                <i class="nav-icon fas fa-cog"></i>
+                <span class="nav-label">System Config</span>
+            </a>
+            
+            <a href="#recharge" class="nav-item" data-section="recharge">
+                <i class="nav-icon fas fa-credit-card"></i>
+                <span class="nav-label">Recharge Settings</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Secure Logout</span>
+            </button>
+        </div>
+    </aside>
+    
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+        <!-- HEADER -->
+        <header class="admin-header">
+            <div class="header-left">
+                <h1 id="sectionTitle">Dashboard</h1>
+                <p id="sectionDescription">Monitor system performance and statistics</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="stats-badge online">
+                    <i class="fas fa-circle"></i>
+                    <span>System Online</span>
+                </div>
+                <div class="stats-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Session</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- CONTENT AREA -->
+        <div class="admin-content">
+            
+            <!-- DASHBOARD SECTION -->
+            <div id="dashboardSection" class="section-content active-section">
+                <div class="dashboard-grid">
+                    <!-- Stats Cards -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-title">Total Users</div>
+                        </div>
+                        <div class="card-value" id="totalUsers">0</div>
+                        <div class="card-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12% this month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon balance">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <div class="card-title">Total Balance</div>
+                        </div>
+                        <div class="card-value" id="totalBalance">₹0</div>
+                        <div class="card-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8% this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon sessions">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="card-title">Active Today</div>
+                        </div>
+                        <div class="card-value" id="activeUsers">0</div>
+                        <div class="card-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+5% today</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <div class="card-icon profit">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="card-title">Monthly Profit</div>
+                        </div>
+                        <div class="card-value" id="monthlyProfit">₹0</div>
+                        <div class="card-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15% this month</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary btn-sm" id="refreshActivity">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>IP Address</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityTable">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 40px;">
+                                            <i class="fas fa-spinner fa-spin"></i> Loading activity...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- USER MANAGEMENT SECTION -->
+            <div id="usersSection" class="section-content">
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-user-cog"></i> User Management</h3>
+                        <div class="section-actions">
+                            <div class="search-box">
+                                <input type="text" id="searchUsers" placeholder="Search users..." class="form-control" style="width: 250px;">
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="exportUsers">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>User ID</th>
+                                        <th>Email</th>
+                                        <th>Balance</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Bank Details</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FINANCIAL CONTROL SECTION -->
+            <div id="financialSection" class="section-content">
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-money-check-alt"></i> Financial Control</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Select User</label>
+                                <select id="financialUser" class="form-control">
+                                    <option value="">-- Select User --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Current Balance</label>
+                                <input type="text" id="currentBalance" class="form-control" readonly value="₹0.00">
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Transaction Type</label>
+                                <select id="transactionType" class="form-control">
+                                    <option value="add">Add Funds</option>
+                                    <option value="subtract">Deduct Funds</option>
+                                    <option value="set">Set Balance</option>
+                                    <option value="bonus">Add Bonus</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Amount (₹)</label>
+                                <input type="number" id="transactionAmount" class="form-control" placeholder="Enter amount" min="0" step="0.01">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Transaction Reason</label>
+                            <textarea id="transactionReason" class="form-control" rows="3" placeholder="Reason for this transaction..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="btn btn-primary" id="executeTransaction">
+                                <i class="fas fa-check-circle"></i> Execute Transaction
+                            </button>
+                            <button class="btn btn-secondary" id="clearForm">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Transaction History -->
+                <div class="section-container" style="margin-top: 30px;">
+                    <div class="section-header">
+                        <h3><i class="fas fa-history"></i> Recent Transactions</h3>
+                    </div>
+                    <div class="section-content">
+                        <div id="transactionHistory">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAYMENT REQUESTS SECTION -->
+            <div id="paymentsSection" class="section-content">
+                <div class="admin-tabs">
+                    <button class="tab-btn active" data-tab="deposits">
+                        <i class="fas fa-arrow-down"></i> Deposit Requests
+                        <span class="badge badge-info" id="depositCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="withdrawals">
+                        <i class="fas fa-arrow-up"></i> Withdrawal Requests
+                        <span class="badge badge-warning" id="withdrawalCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="history">
+                        <i class="fas fa-history"></i> Payment History
+                    </button>
+                </div>
+                
+                <!-- Deposit Requests -->
+                <div id="depositsTab" class="tab-content active">
+                    <div class="section-container">
+                        <div class="section-content">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>User</th>
+                                            <th>Amount (₹)</th>
+                                            <th>UTR/Ref No.</th>
+                                            <th>Screenshot</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="depositRequests">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Withdrawal Requests -->
+                <div id="withdrawalsTab" class="tab-content">
+                    <div class="section-container">
+                        <div class="section-content">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>User</th>
+                                            <th>Requested (₹)</th>
+                                            <th>TDS (18%)</th>
+                                            <th>Payout (₹)</th>
+                                            <th>Bank Details</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="withdrawalRequests">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment History -->
+                <div id="historyTab" class="tab-content">
+                    <div class="section-container">
+                        <div class="section-content">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>User</th>
+                                            <th>Amount (₹)</th>
+                                            <th>Status</th>
+                                            <th>Processed By</th>
+                                            <th>UTR/Ref</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="paymentHistory">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PLAN MANAGEMENT SECTION -->
+            <div id="plansSection" class="section-content">
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-cubes"></i> Investment Plan Management</h3>
+                        <div class="section-actions">
+                            <button class="btn btn-primary" id="createPlanBtn">
+                                <i class="fas fa-plus"></i> Create New Plan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="plan-filters" style="margin-bottom: 20px;">
+                            <div class="admin-tabs">
+                                <button class="tab-btn active" data-plan-filter="all">All Plans</button>
+                                <button class="tab-btn" data-plan-filter="active">Active</button>
+                                <button class="tab-btn" data-plan-filter="inactive">Inactive</button>
+                                <button class="tab-btn" data-plan-filter="vip">VIP Plans</button>
+                            </div>
+                        </div>
+                        
+                        <div class="plans-grid" id="plansGrid">
+                            <!-- Plans will be loaded here -->
+                            <div class="loading-plans" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p>Loading plans...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SYSTEM CONFIG SECTION -->
+            <div id="settingsSection" class="section-content">
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-sliders-h"></i> System Configuration</h3>
+                        <div class="section-actions">
+                            <button class="btn btn-success" id="saveAllSettings">
+                                <i class="fas fa-save"></i> Save All Settings
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-content">
+                        <div class="admin-tabs">
+                            <button class="tab-btn active" data-settings-tab="general">General</button>
+                            <button class="tab-btn" data-settings-tab="commissions">Commissions</button>
+                            <button class="tab-btn" data-settings-tab="limits">Limits</button>
+                            <button class="tab-btn" data-settings-tab="notifications">Notifications</button>
+                        </div>
+                        
+                        <!-- General Settings -->
+                        <div id="generalTab" class="tab-content active">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">App Name</label>
+                                    <input type="text" id="appName" class="form-control" placeholder="Enter app name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Support Email</label>
+                                    <input type="email" id="supportEmail" class="form-control" placeholder="support@example.com">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Support Phone</label>
+                                    <input type="tel" id="supportPhone" class="form-control" placeholder="+91 XXXXXXXXXX">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Maintenance Mode</label>
+                                    <select id="maintenanceMode" class="form-control">
+                                        <option value="false">Disabled</option>
+                                        <option value="true">Enabled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Commission Settings -->
+                        <div id="commissionsTab" class="tab-content">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                These commissions are applied to referral earnings
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Level 1 Commission (%)</label>
+                                    <input type="number" id="commission1" class="form-control" min="0" max="100" step="0.1" value="21">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Level 2 Commission (%)</label>
+                                    <input type="number" id="commission2" class="form-control" min="0" max="100" step="0.1" value="3">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Level 3 Commission (%)</label>
+                                    <input type="number" id="commission3" class="form-control" min="0" max="100" step="0.1" value="1">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Direct Referral Bonus (₹)</label>
+                                    <input type="number" id="directBonus" class="form-control" min="0" value="50">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Limit Settings -->
+                        <div id="limitsTab" class="tab-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Minimum Deposit (₹)</label>
+                                    <input type="number" id="minDeposit" class="form-control" min="0" value="100">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Maximum Deposit (₹)</label>
+                                    <input type="number" id="maxDeposit" class="form-control" min="0" value="50000">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Minimum Withdrawal (₹)</label>
+                                    <input type="number" id="minWithdrawal" class="form-control" min="0" value="100">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Maximum Withdrawal (₹)</label>
+                                    <input type="number" id="maxWithdrawal" class="form-control" min="0" value="50000">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Daily Withdrawal Limit (₹)</label>
+                                    <input type="number" id="dailyWithdrawalLimit" class="form-control" min="0" value="200000">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">TDS Percentage (%)</label>
+                                    <input type="number" id="tdsPercentage" class="form-control" min="0" max="100" value="18">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RECHARGE SETTINGS SECTION -->
+            <div id="rechargeSection" class="section-content">
+                <div class="section-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-qrcode"></i> Recharge & Payment Settings</h3>
+                    </div>
+                    <div class="section-content">
+                        <div class="admin-tabs">
+                            <button class="tab-btn active" data-recharge-tab="upi">UPI Settings</button>
+                            <button class="tab-btn" data-recharge-tab="bank">Bank Details</button>
+                            <button class="tab-btn" data-recharge-tab="qrcode">QR Codes</button>
+                        </div>
+                        
+                        <!-- UPI Settings -->
+                        <div id="upiTab" class="tab-content active">
+                            <div class="alert alert-success">
+                                <i class="fas fa-info-circle"></i>
+                                These UPI IDs will be shown to users for making deposits
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Primary UPI ID</label>
+                                <input type="text" id="primaryUpi" class="form-control" placeholder="your-upi@okhdfc">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Secondary UPI ID (Optional)</label>
+                                <input type="text" id="secondaryUpi" class="form-control" placeholder="alternate-upi@oksbi">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">UPI Name (Display Name)</label>
+                                <input type="text" id="upiName" class="form-control" placeholder="Your Business Name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <button class="btn btn-primary" id="saveUpiSettings">
+                                    <i class="fas fa-save"></i> Save UPI Settings
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Bank Details -->
+                        <div id="bankTab" class="tab-content">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Account Holder Name</label>
+                                    <input type="text" id="bankName" class="form-control" placeholder="Enter account holder name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Bank Name</label>
+                                    <input type="text" id="bankFullName" class="form-control" placeholder="Enter bank name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Account Number</label>
+                                    <input type="text" id="bankAccount" class="form-control" placeholder="Enter account number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">IFSC Code</label>
+                                    <input type="text" id="bankIfsc" class="form-control" placeholder="Enter IFSC code">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Branch Name</label>
+                                    <input type="text" id="bankBranch" class="form-control" placeholder="Enter branch name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Account Type</label>
+                                    <select id="accountType" class="form-control">
+                                        <option value="savings">Savings Account</option>
+                                        <option value="current">Current Account</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button class="btn btn-primary" id="saveBankSettings">
+                                    <i class="fas fa-save"></i> Save Bank Details
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- QR Codes -->
+                        <div id="qrcodeTab" class="tab-content">
+                            <div class="form-group">
+                                <label class="form-label">UPI QR Code Image</label>
+                                <div class="qr-upload-area" style="border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 10px;">
+                                    <i class="fas fa-qrcode fa-3x" style="color: #ccc; margin-bottom: 15px;"></i>
+                                    <p>Upload QR Code Image (PNG, JPG, max 2MB)</p>
+                                    <input type="file" id="qrCodeUpload" accept="image/*" style="display: none;">
+                                    <button class="btn btn-secondary" onclick="document.getElementById('qrCodeUpload').click()">
+                                        <i class="fas fa-upload"></i> Upload QR Code
+                                    </button>
+                                </div>
+                                <div id="qrPreview" style="margin-top: 20px; text-align: center;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- MODALS -->
+    
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="admin-modal">
+        <div class="modal-dialog" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-circle"></i> User Details</h3>
+                <button class="modal-close" data-modal="userDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="userDetailsContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Plan Editor Modal -->
+    <div id="planEditorModal" class="admin-modal">
+        <div class="modal-dialog" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-cube"></i> Plan Editor</h3>
+                <button class="modal-close" data-modal="planEditorModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="planEditorContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Action Modal -->
+    <div id="paymentActionModal" class="admin-modal">
+        <div class="modal-dialog" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-money-check-alt"></i> Process Payment</h3>
+                <button class="modal-close" data-modal="paymentActionModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="paymentActionContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Security Alert Modal -->
+    <div id="securityAlertModal" class="admin-modal">
+        <div class="modal-dialog" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Security Alert</h3>
+                <button class="modal-close" data-modal="securityAlertModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="securityMessage"></span>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-modal="securityAlertModal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="firebaseConfig.js"></script>
+    <script src="admin-security.js"></script>
+    <script src="admin-functions.js"></script>
+</body>
+</html>
