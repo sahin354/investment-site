@@ -2,90 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>System Control Panel</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-        .security-notice {
-            text-align: center;
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Secure Access</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="admin-style.css">
+    
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './supabase.js';
+        import { adminSecurity } from './admin-security-supabase.js';
+        
+        // Make supabase available globally for the login form
+        window.supabase = supabase;
+        window.adminSecurity = adminSecurity;
+    </script>
 </head>
-<body class="auth-page-background">
-    <main class="auth-container">
-        <div class="auth-card">
-            <h2>System Control</h2>
-            <div class="security-notice">
+<body class="admin-body">
+    <main class="auth-container-wrapper">
+        <div class="auth-header">
+            <h1>Admin Portal</h1>
+            <p>Secure System Control Panel</p>
+        </div>
+        
+        <div class="auth-content">
+            <h2>System Access</h2>
+            <div class="alert alert-warning" style="margin-bottom: 20px;">
+                <i class="fas fa-shield-alt"></i>
                 Authorized Personnel Only
             </div>
+            
             <form id="systemLoginForm">
                 <div class="input-group">
-                    <label for="systemEmail">Access ID</label>
-                    <input type="email" id="systemEmail" name="systemEmail" placeholder="Enter access ID" required>
+                    <label for="systemEmail">Admin Email</label>
+                    <input type="email" id="systemEmail" name="systemEmail" 
+                           placeholder="Enter admin email" required>
                 </div>
+                
                 <div class="input-group">
-                    <label for="systemPassword">Security Key</label>
+                    <label for="systemPassword">Security Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="systemPassword" name="systemPassword" placeholder="Enter security key" required>
-                        <span id="toggleSystemPassword" class="password-toggle-icon">👁️</span>
+                        <input type="password" id="systemPassword" name="systemPassword" 
+                               placeholder="Enter security password" required>
+                        <span id="toggleSystemPassword" class="password-toggle-icon">
+                            <i class="fas fa-eye"></i>
+                        </span>
                     </div>
                 </div>
-                <button type="submit" class="submit-btn">Access System</button>
+                
+                <button type="submit" class="submit-btn" id="loginBtn">
+                    <i class="fas fa-lock"></i> Secure Login
+                </button>
+                
+                <div class="auth-footer-link">
+                    <a href="#" onclick="window.location.href='index.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Main Site
+                    </a>
+                </div>
             </form>
         </div>
     </main>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="firebaseConfig.js"></script>
     <script>
-        // Pre-defined system administrators (must be lowercase)
-        const SYSTEM_ADMINS = [
-            "sahin54481@gmail.com",
-            "admin@adani.com"
-        ];
-
-        document.getElementById('systemLoginForm').addEventListener('submit', function(e) {
+        document.getElementById('systemLoginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('systemEmail').value;
             const password = document.getElementById('systemPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
             
-            // First, check if the email is in the admin list to avoid unnecessary Firebase calls
-            if (!SYSTEM_ADMINS.includes(email.toLowerCase())) {
-                alert('Access Denied: Invalid access credentials.');
-                return;
+            // Disable button and show loading
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            loginBtn.disabled = true;
+            
+            try {
+                // Use the security system for login
+                await window.adminSecurity.validateAdminLogin(email, password);
+                
+                // Redirect to admin panel
+                window.location.href = 'admin-panel.html';
+                
+            } catch (error) {
+                alert(error.message);
+                
+                // Reset button
+                loginBtn.innerHTML = '<i class="fas fa-lock"></i> Secure Login';
+                loginBtn.disabled = false;
             }
-
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Double-check after successful login
-                    if (SYSTEM_ADMINS.includes(userCredential.user.email.toLowerCase())) {
-                        console.log('Admin login successful, redirecting...');
-                        window.location.href = 'control-panel.html';
-                    } else {
-                        // This case is for when a non-admin has a valid password
-                        alert('Invalid access credentials. Not an authorized administrator.');
-                        firebase.auth().signOut();
-                    }
-                })
-                .catch((error) => {
-                    alert('Access denied: ' + error.message);
-                });
         });
-
+        
         // Toggle password visibility
         document.getElementById('toggleSystemPassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('systemPassword');
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
         });
     </script>
 </body>
