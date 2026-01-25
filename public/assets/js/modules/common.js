@@ -1,5 +1,5 @@
 // common.js (FINAL VERSION)
-import { supabase } from './supabase.js';
+import { supabase } from "../config/supabase-client.js";
 
 console.log('[common.js] loaded');
 
