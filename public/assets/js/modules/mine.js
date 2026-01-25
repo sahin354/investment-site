@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "../config/supabase-client.js";
 
 console.log("[script-mine.js] loaded");
 
@@ -77,7 +77,7 @@ function setupButtons(userId) {
   if (logoutBtn) {
     logoutBtn.onclick = async () => {
       await supabase.auth.signOut();
-      window.location.href = "login.html";
+      window.location.href = "/pages/auth/login.html";
     };
   }
 
