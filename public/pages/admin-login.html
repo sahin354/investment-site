@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Secure Access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .login-form {
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #1a237e;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #666;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .security-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            border-left: 4px solid #1a237e;
+        }
+
+        .security-info h4 {
+            color: #1a237e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .security-info ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .security-info li {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .security-info li i {
+            color: #1a237e;
+            font-size: 0.8rem;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .login-footer a {
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 15px;
+            }
+            
+            .login-header {
+                padding: 25px 20px;
+            }
+            
+            .login-form {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-shield-alt"></i> Admin Portal</h1>
+            <p>Secure System Control Panel</p>
+        </div>
+        
+        <div class="alert error" id="errorAlert"></div>
+        
+        <form class="login-form" id="adminLoginForm">
+            <div class="input-group">
+                <label for="adminEmail"><i class="fas fa-envelope"></i> Admin Email</label>
+                <input 
+                    type="email" 
+                    id="adminEmail" 
+                    placeholder="admin@uzumaki.com" 
+                    required
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="input-group">
+                <label for="adminPassword"><i class="fas fa-lock"></i> Password</label>
+                <input 
+                    type="password" 
+                    id="adminPassword" 
+                    placeholder="••••••••" 
+                    required
+                    minlength="8"
+                    autocomplete="current-password"
+                >
+                <button type="button" class="password-toggle" id="passwordToggle">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <div class="input-group">
+                <label for="admin2FA">
+                    <i class="fas fa-key"></i> 2FA Code (Optional)
+                </label>
+                <input 
+                    type="text" 
+                    id="admin2FA" 
+                    placeholder="123456"
+                    maxlength="6"
+                    pattern="[0-9]*"
+                    inputmode="numeric"
+                >
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span id="loginText">Secure Login</span>
+                <span id="loginSpinner" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Authenticating...
+                </span>
+            </button>
+        </form>
+        
+        <div class="security-info">
+            <h4><i class="fas fa-info-circle"></i> Security Notice</h4>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Access restricted to authorized personnel only</li>
+                <li><i class="fas fa-check-circle"></i> All actions are logged and monitored</li>
+                <li><i class="fas fa-check-circle"></i> Session automatically expires after 30 minutes</li>
+                <li><i class="fas fa-check-circle"></i> Unauthorized access attempts are blocked</li>
+            </ul>
+        </div>
+        
+        <div class="login-footer">
+            <p><i class="fas fa-exclamation-triangle"></i> For security, close browser after logout</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Supabase client
+        import { supabase } from '../assets/js/config/supabase-client.js';
+        
+        // DOM elements
+        const loginForm = document.getElementById('adminLoginForm');
+        const adminEmail = document.getElementById('adminEmail');
+        const adminPassword = document.getElementById('adminPassword');
+        const admin2FA = document.getElementById('admin2FA');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginText = document.getElementById('loginText');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const errorAlert = document.getElementById('errorAlert');
+        
+        // Whitelisted admin emails
+        const ADMIN_WHITELIST = [
+            "sahin54481@gmail.com",
+            "admin@uzumaki.com",
+            "admin@adani.com"
+        ].map(email => email.toLowerCase());
+        
+        // Toggle password visibility
+        passwordToggle.addEventListener('click', () => {
+            const type = adminPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            adminPassword.setAttribute('type', type);
+            passwordToggle.innerHTML = type === 'password' 
+                ? '<i class="fas fa-eye"></i>' 
+                : '<i class="fas fa-eye-slash"></i>';
+        });
+        
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = adminEmail.value.trim().toLowerCase();
+            const password = adminPassword.value;
+            const twoFactorCode = admin2FA.value.trim();
+            
+            // Basic validation
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+            
+            // Check if email is in whitelist
+            if (!ADMIN_WHITELIST.includes(email)) {
+                showError('Access Denied: Invalid credentials');
+                logFailedAttempt(email, 'Invalid admin email');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginText.style.display = 'none';
+            loginSpinner.style.display = 'inline';
+            
+            try {
+                // Sign in with Supabase
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Verify admin status
+                const user = data.user;
+                
+                // Additional check: Fetch user metadata to confirm admin role
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('role, is_active')
+                    .eq('email', email)
+                    .single();
+                
+                if (userError || !userData) {
+                    throw new Error('User record not found');
+                }
+                
+                if (userData.role !== 'admin' || !userData.is_active) {
+                    throw new Error('Insufficient privileges');
+                }
+                
+                // Optional 2FA verification
+                if (twoFactorCode) {
+                    // Here you would integrate with your 2FA system
+                    // This is a placeholder for actual 2FA implementation
+                    console.log('2FA code entered:', twoFactorCode);
+                }
+                
+                // Log successful login
+                await logSecurityEvent('SUCCESS_LOGIN', {
+                    email: email,
+                    ip: await getIPAddress(),
+                    user_agent: navigator.userAgent
+                });
+                
+                // Store admin session data
+                sessionStorage.setItem('admin_session', JSON.stringify({
+                    email: email,
+                    user_id: user.id,
+                    role: userData.role,
+                    login_time: new Date().toISOString(),
+                    token: data.session.access_token
+                }));
+                
+                // Set session timeout (30 minutes)
+                sessionStorage.setItem('admin_session_expiry', 
+                    Date.now() + 30 * 60 * 1000
+                );
+                
+                // Redirect to admin panel
+                window.location.href = 'admin-panel.html';
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Log failed attempt
+                await logSecurityEvent('FAILED_LOGIN', {
+                    email: email,
+                    error: error.message,
+                    ip: await getIPAddress()
+                });
+                
+                showError(error.message || 'Authentication failed. Please try again.');
+                
+                // Reset button
+                loginBtn.disabled = false;
+                loginText.style.display = 'inline';
+                loginSpinner.style.display = 'none';
+            }
+        });
+        
+        // Function to show error message
+        function showError(message) {
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            errorAlert.classList.add('error');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Function to log security events
+        async function logSecurityEvent(event, details) {
+            try {
+                const { error } = await supabase
+                    .from('security_logs')
+                    .insert([{
+                        event_type: event,
+                        details: details,
+                        timestamp: new Date().toISOString(),
+                        ip_address: await getIPAddress(),
+                        user_agent: navigator.userAgent
+                    }]);
+                
+                if (error) console.error('Failed to log security event:', error);
+            } catch (error) {
+                console.error('Error logging security event:', error);
+            }
+        }
+        
+        // Function to get IP address (simplified)
+        async function getIPAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                return 'unknown';
+            }
+        }
+        
+        // Prevent form submission on Enter in 2FA field
+        admin2FA.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+        
+        // Auto-focus email field on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            adminEmail.focus();
+        });
+    </script>
+</body>
+  </html>
