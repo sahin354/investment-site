@@ -1,5 +1,5 @@
 // script.js – Home page, Supabase version
-import { supabase } from './supabase.js';
+import { supabase } from "../config/supabase-client.js";
 import { appAuth } from './common.js';
 
 console.log('[script.js] loaded');
