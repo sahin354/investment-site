@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "../config/supabase-client.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ Recharge script loaded");
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data: authData, error: authError } = await supabase.auth.getUser();
       if (authError || !authData?.user) {
         alert("Please login first");
-        window.location.href = "login.html";
+       window.location.href = "/pages/auth/login.html";
         return;
       }
 
