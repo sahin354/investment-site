@@ -1,7 +1,6 @@
 // script.js – Home page, Supabase version
 import { supabase } from "../config/supabase-client.js";
-import { appAuth } from './common.js';
-
+import { appAuth } from './assets/js/modules/common.js';
 console.log('[script.js] loaded');
 
 function setupTabs() {
