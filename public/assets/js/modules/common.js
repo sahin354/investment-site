@@ -92,7 +92,7 @@ function startInactivityTimer() {
   inactivityTimer = setTimeout(async () => {
     alert('You were logged out due to inactivity.');
     await supabase.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href = "/pages/auth/login.html";
   }, INACTIVITY_TIMEOUT_MS);
 }
 
