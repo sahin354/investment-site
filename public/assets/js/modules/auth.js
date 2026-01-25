@@ -112,7 +112,7 @@ if (loginForm) {
       return;
     }
 
-  window.location.href = "/pages/auth/login.html";
+  window.location.href = "/index.html";
   };
 }
 
