@@ -81,7 +81,7 @@ if (registerBtn) {
       "🎉 Thank you for joining Uzumaki!\n\nPlease check your email to confirm your account."
     );
 
-    window.location.href = "/pages/auth/login.html";
+  window.location.href = "index.html";
 
   };
 }
@@ -112,7 +112,7 @@ if (loginForm) {
       return;
     }
 
-    window.location.href = "index.html";
+  window.location.href = "/pages/auth/login.html";
   };
 }
 
