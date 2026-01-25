@@ -143,7 +143,7 @@ async function handleLogoutClick(e) {
   try {
     await supabase.auth.signOut();
     stopInactivityTimer();
-    window.location.href = 'login.html';
+     window.location.href = "/pages/auth/login.html";
   } catch (err) {
     console.error('Logout error', err);
     alert('Logout failed. Please try again.');
