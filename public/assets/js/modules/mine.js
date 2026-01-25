@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = data?.user;
 
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "/pages/auth/login.html";
     return;
   }
 
