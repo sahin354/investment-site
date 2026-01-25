@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "../config/supabase-client.js";
 
 let CURRENT_USER = null;
 
@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = data?.user;
 
   if (!user) {
-    window.location.href = "login.html";
+   window.location.href = "/pages/auth/login.html";
     return;
   }
 
