@@ -1,4 +1,4 @@
-import { supabase } from "./supabase.js";
+import { supabase } from "../config/supabase-client.js";
 
 /* =========================
    PASSWORD TOGGLE 👁️
@@ -81,7 +81,8 @@ if (registerBtn) {
       "🎉 Thank you for joining Uzumaki!\n\nPlease check your email to confirm your account."
     );
 
-    window.location.href = "login.html";
+    window.location.href = "/pages/auth/login.html";
+
   };
 }
 
