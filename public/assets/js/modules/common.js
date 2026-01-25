@@ -165,7 +165,7 @@ async function handleUserChange(user) {
   if (!user) {
     appAuth.set(null, null);
     if (!isPublic) {
-      window.location.href = 'login.html';
+     window.location.href = "/pages/auth/login.html";
     }
     return;
   }
