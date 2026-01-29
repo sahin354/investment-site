@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wallet • Investment Platform</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="/assets/css/core/reset.css" />
+  <link rel="stylesheet" href="/assets/css/core/variables.css" />
+  <link rel="stylesheet" href="/assets/css/core/layout.css" />
+
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="/assets/css/user/wallet.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <h1 class="logo">Wallet</h1>
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+  </header>
+
+  <!-- Main -->
+  <main class="wallet">
+
+    <!-- Balance -->
+    <section class="card wallet-balance">
+      <p class="label">Available Balance</p>
+      <h2 id="walletBalance">₹0.00</h2>
+    </section>
+
+    <!-- Actions -->
+    <section class="wallet-actions">
+      <button id="depositBtn" class="btn-primary">Deposit</button>
+      <button id="withdrawBtn" class="btn-secondary">Withdraw</button>
+    </section>
+
+    <!-- Transactions -->
+    <section class="card wallet-transactions">
+      <h3>Recent Transactions</h3>
+      <ul id="transactionList" class="transaction-list">
+        <li>Loading...</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <!-- Core -->
+  <script type="module" src="/assets/js/core/supabase.js"></script>
+  <script type="module" src="/assets/js/core/auth.js"></script>
+  <script type="module" src="/assets/js/core/route-guard.js"></script>
+
+  <!-- Page -->
+  <script type="module" src="/assets/js/user/wallet.js"></script>
+
+</body>
+</html>
