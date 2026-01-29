@@ -1,0 +1,141 @@
+/* ==========================================================
+   FILE: login.css
+   PATH: assets/css/auth/login.css
+   UI: Modern Fintech • Mobile First • App-like
+========================================================== */
+
+/* ---------- Layout ---------- */
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  padding: 24px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ---------- Card ---------- */
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #020617;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  border: 1px solid #1e293b;
+}
+
+/* ---------- Header ---------- */
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.auth-header p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* ---------- Form ---------- */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
+.input-group input {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* ---------- Button ---------- */
+
+.btn-primary {
+  margin-top: 10px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(79,70,229,0.35);
+}
+
+/* ---------- Error ---------- */
+
+.auth-error {
+  min-height: 16px;
+  font-size: 13px;
+  color: #f87171;
+  text-align: center;
+}
+
+/* ---------- Footer ---------- */
+
+.auth-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.auth-footer a {
+  color: #818cf8;
+  text-decoration: none;
+}
+
+.auth-footer span {
+  margin: 0 6px;
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 768px) {
+  .auth-card {
+    padding: 36px;
+  }
+
+  .auth-header h1 {
+    font-size: 26px;
+  }
+}
