@@ -1,0 +1,89 @@
+/* ==========================================================
+   FILE: wallet.css
+   PATH: assets/css/user/wallet.css
+========================================================== */
+
+.wallet {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ---------- Balance ---------- */
+
+.wallet-balance {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.wallet-balance .label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.wallet-balance h2 {
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+/* ---------- Actions ---------- */
+
+.wallet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.btn-primary,
+.btn-secondary {
+  height: 48px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #cbd5f5;
+}
+
+.btn-secondary:hover {
+  border-color: #6366f1;
+}
+
+/* ---------- Transactions ---------- */
+
+.wallet-transactions h3 {
+  margin-bottom: 12px;
+}
+
+.transaction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transaction-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #1e293b;
+  font-size: 14px;
+  color: #cbd5f5;
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 768px) {
+  .wallet-balance h2 {
+    font-size: 34px;
+  }
+}
