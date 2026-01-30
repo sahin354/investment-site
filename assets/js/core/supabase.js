@@ -2,23 +2,19 @@
    FILE: supabase.js
    PATH: assets/js/core/supabase.js
 
-   RULES:
-   - ONLY Supabase init file in project
-   - Imported everywhere
-   - NO UI
-   - NO direct DB queries
+   SOURCE:
+   - Keys taken directly from existing ZIP
+   - Static HTML compatible
+   - Vercel compatible
 ========================================================= */
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-/* ================= ENV ================= */
+/* ================= SUPABASE CONFIG ================= */
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error("Supabase ENV missing");
-}
+const SUPABASE_URL = "https://zrufavpxsnootmvwybye.supabase.co";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_EvHDWxi1BcEjcv_UnycVIQ_3T-V_A5s";
 
 /* ================= CLIENT ================= */
 
@@ -43,7 +39,7 @@ export async function getSession() {
 
 export async function getUser() {
   const session = await getSession();
-  return session?.user ?? null;
+  return session?.user || null;
 }
 
 export async function signOut() {
