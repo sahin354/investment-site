@@ -1,0 +1,55 @@
+/* ==========================================================
+   FILE: transactions.css
+   PATH: assets/css/user/transactions.css
+========================================================== */
+
+.transactions {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.transaction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transaction-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #1e293b;
+  font-size: 14px;
+  color: #cbd5f5;
+}
+
+.tx-type {
+  font-weight: 600;
+}
+
+.tx-amount {
+  font-weight: 600;
+}
+
+.tx-amount.credit {
+  color: #22c55e;
+}
+
+.tx-amount.debit {
+  color: #ef4444;
+}
+
+.tx-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 600px) {
+  .transaction-list li {
+    grid-template-columns: 1fr;
+  }
+}
