@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile • Investment Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="/assets/css/core/reset.css" />
+  <link rel="stylesheet" href="/assets/css/core/variables.css" />
+  <link rel="stylesheet" href="/assets/css/core/layout.css" />
+
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="/assets/css/user/profile.css" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <h1 class="logo">Profile</h1>
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+  </header>
+
+  <main class="profile">
+
+    <section class="card profile-card">
+      <h3>Account Details</h3>
+
+      <form id="profileForm" class="profile-form">
+
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" required />
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" id="email" disabled />
+        </div>
+
+        <button type="submit" class="btn-primary">
+          Update Profile
+        </button>
+
+        <p class="form-success" id="successMsg"></p>
+        <p class="form-error" id="errorMsg"></p>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Core -->
+  <script type="module" src="/assets/js/core/supabase.js"></script>
+  <script type="module" src="/assets/js/core/route-guard.js"></script>
+
+  <!-- Page -->
+  <script type="module" src="/assets/js/user/profile.js"></script>
+
+</body>
+</html>
