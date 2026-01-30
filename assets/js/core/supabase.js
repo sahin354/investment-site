@@ -2,23 +2,28 @@
    FILE: supabase.js
    PATH: assets/js/core/supabase.js
 
-   SOURCE:
-   - Keys taken directly from existing ZIP
-   - Static HTML compatible
-   - Vercel compatible
+   PURPOSE:
+   - Single global Supabase client
+   - Static HTML safe (Vercel compatible)
+   - Base of entire security system
 ========================================================= */
-
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 /* ================= SUPABASE CONFIG ================= */
 
+/* 🔓 PUBLIC keys (safe by design, security via RLS) */
 const SUPABASE_URL = "https://zrufavpxsnootmvwybye.supabase.co";
 const SUPABASE_ANON_KEY =
   "sb_publishable_EvHDWxi1BcEjcv_UnycVIQ_3T-V_A5s";
 
-/* ================= CLIENT ================= */
+/* ================= CLIENT INIT ================= */
 
-export const supabase = createClient(
+/*
+  NOTE:
+  - `supabase` object comes from CDN script
+  - Loaded in HTML before this file
+*/
+
+window.supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   {
@@ -30,19 +35,22 @@ export const supabase = createClient(
   }
 );
 
-/* ================= HELPERS ================= */
+/* ================= GLOBAL HELPERS ================= */
 
-export async function getSession() {
-  const { data } = await supabase.auth.getSession();
+/* Get active session */
+window.getSession = async () => {
+  const { data } = await window.supabaseClient.auth.getSession();
   return data.session;
-}
+};
 
-export async function getUser() {
-  const session = await getSession();
-  return session?.user || null;
-}
+/* Get logged-in user */
+window.getUser = async () => {
+  const session = await window.getSession();
+  return session ? session.user : null;
+};
 
-export async function signOut() {
-  await supabase.auth.signOut();
+/* Logout everywhere */
+window.signOut = async () => {
+  await window.supabaseClient.auth.signOut();
   window.location.href = "/pages/auth/login.html";
-}
+};
