@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transactions • Investment Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="/assets/css/core/reset.css" />
+  <link rel="stylesheet" href="/assets/css/core/variables.css" />
+  <link rel="stylesheet" href="/assets/css/core/layout.css" />
+
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="/assets/css/user/transactions.css" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <header class="topbar">
+    <h1 class="logo">Transactions</h1>
+    <button id="logoutBtn" class="logout-btn">Logout</button>
+  </header>
+
+  <main class="transactions">
+
+    <section class="card">
+      <h3>Transaction History</h3>
+
+      <ul id="transactionList" class="transaction-list">
+        <li>Loading...</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <!-- Core -->
+  <script type="module" src="/assets/js/core/supabase.js"></script>
+  <script type="module" src="/assets/js/core/auth.js"></script>
+  <script type="module" src="/assets/js/core/route-guard.js"></script>
+
+  <!-- Page -->
+  <script type="module" src="/assets/js/user/transactions.js"></script>
+
+</body>
+</html>
